@@ -1,0 +1,20 @@
+===
+$ COMMANDS
+@ openCache
+@ addFile
+
+===
+$ WORKSPACES
+# [palette
+~/Dropbox/Tasks/feelings/allFeels.to
+~/Dropbox/Tasks/cs/vimTasks.to
+===
+
+% journal: ~/Dropbox/Tasks/[gitIgnore/journal.to
+% moreTasks: ~/Dropbox/Tasks/[gitIgnore/moreTasks.to
+% compile: ~/Dropbox/Tasks/[gitIgnore/compile.to
+% cs: ~/Dropbox/Tasks/cs/cs.to
+===
+(# [unloaded
+(~/Dropbox/Tasks/[gitIgnore/later.to
+===
