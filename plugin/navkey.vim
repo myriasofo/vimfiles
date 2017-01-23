@@ -165,7 +165,7 @@ endfun
 " For bookmark mode
 fun! NavKey_ListBookmarks()
     set nomore
-    echo repeat("\n", winheight(0))
+    echo repeat("\n", 2)
 
     let bookmarks = s:get_bookmarks(s:open_cache())
     call s:pick_bookmark(bookmarks)

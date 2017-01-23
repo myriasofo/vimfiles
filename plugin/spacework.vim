@@ -70,7 +70,7 @@ fun! s:print_dialog(arr_displayText, hash_wsFiles)
     return 
 endfun
 fun! s:printCache_topLevel(arr_displayText, hash_wsFiles)
-    echo repeat("\n", winheight(0))
+    echo repeat("\n", 2)
 
     let jumpList = {}
     call s:reset_jumpKey()
