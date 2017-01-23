@@ -1,0 +1,1706 @@
+" NOTE: The indenting below allows for easy folding
+"       My fold function was adapted from Steve Losh's *Learn Vimscript
+"       the Hard Way* and is provided below, called FoldByIndentHeader()
+
+"| Meta vimrc
+    " I use dropbox to sync vim bw several machines
+        " These are DEFAULTS. Change below if needed
+        set shellslash
+        let g:dir_myPlugins = expand('~') . '/Dropbox/Archives/vimfiles/'
+        let dir_palettes  = expand('~/Dropbox/Tasks/[gitIgnore/')
+        let dir_vundle = '~/vim/bundle/'
+
+        if g:machine == 'thinkpad_t460s' && has('win32')
+            " Just use defaults
+        elseif g:machine == 'thinkpad_t460s' && has('unix')
+            " Just use defaults
+        elseif g:machine == 'macbook_aaptiv'
+            let g:dir_myPlugins = expand('~/dev/vimfiles/')
+            let dir_palettes  = expand('~/dev/palettes/')
+        else
+            echom 'NOTE: Please set "g:machine" to a valid value'
+            finish
+        endif
+
+        if !isdirectory(g:dir_myPlugins)
+            echom 'NOTE: Please set "g:dir_myPlugins" to valid folder'
+            finish
+        endif
+
+
+        " These caches are for navkey + spacework
+        let g:NavKey_cacheLocation    = g:dir_myPlugins . 'cache/navkey_'    . g:machine . '.to'
+        let g:Spacework_cacheLocation = g:dir_myPlugins . 'cache/spacework_' . g:machine . '.to'
+
+        " Locations for todo files (just notes)
+        let g:todos_path = {}
+        for tail in ['list', 'temp1', 'temp2']
+            let g:todos_path[tail] = dir_palettes . tail . '.to'
+        endfor
+        
+        " Add my personal plugins
+        let &runtimepath .= ',' . g:dir_myPlugins
+        " Use vundle to manage plugins
+        " Vundle begin
+            set nocompatible
+            filetype off
+            let &runtimepath .= ',' . dir_vundle . 'Vundle.vim'
+            try
+                call vundle#begin(dir_vundle)
+            catch
+                echom "NOTE: Put Vundle.vim in ~/vim/bundle"
+                finish
+            endtry
+            " let Vundle manage Vundle, required
+            Plugin 'gmarik/Vundle.vim'
+
+        " Get plugins from github
+            " My faves
+            Plugin 'altercation/vim-colors-solarized'
+            "Plugin 'kien/ctrlp.vim'
+            "Plugin 'FelikZ/ctrlp-py-matcher'
+            Plugin 'tpope/vim-sleuth'
+            Plugin 'tomtom/tcomment_vim'
+            "Plugin 'luochen1990/rainbow'
+
+            " Could make my own version of
+            Plugin 'xolox/vim-session'
+            Plugin 'xolox/vim-misc'
+
+            " Using my own custom version of below
+            "Plugin 'Lokaltog/vim-easymotion'
+            "Plugin 'techlivezheng/vim-plugin-minibufexpl'
+            "Plugin 'henrik/vim-indexed-search'
+            "Plugin 'Yggdroot/indentLine'
+
+            " Interesting, but I don't want
+            "Plugin 'szw/vim-ctrlspace'
+            "Plugin 'severin-lemaignan/vim-minimap' "Not useful
+            "Plugin 'nathanaelkane/vim-indent-guides' "Noisy-looking
+
+            " Trying now
+            Plugin 'tpope/vim-surround' "Operations with surround chars, surprisingly useful
+            Plugin 'rking/ag.vim' "Faster grep, searching thru files for text
+            "Plugin 'raimondi/delimitmate' "Auto add matching parens (so don't forget to)
+            Plugin 'godlygeek/tabular' "Aligns text by char (eg. = or :)
+            Plugin 'kchmck/vim-coffee-script'
+
+            "Plugin 'Valloric/YouCompleteMe'
+            "Plugin 'scrooloose/syntastic'
+            "Plugin 'wookiehangover/jshint.vim'
+            "Plugin 'jeetsukumaran/vim-buffersaurus'
+
+            "Plugin 'tpope/vim-jdaddy' "Doesn't format json, so useless to me
+            "Plugin 'tpope/vim-fugitive'
+            "Plugin 'airblade/vim-gitgutter'
+            "Plugin 'mhinz/vim-startify'
+            "Plugin 'Shougo/unite.vim'
+            "Plugin 'ntpeters/vim-better-whitespace'
+            "Plugin 'klen/python-mode'
+            "Plugin 'hdima/python-syntax'
+
+        " Vundle end
+            call vundle#end()
+            filetype plugin on
+
+        " Old pathogen cmds
+            "execute pathogen#infect()
+            "call pathogen#helptags()
+
+    " Disable modeline bc of security reasons
+        set nomodeline
+        set modelines=0
+
+    " Saving undo, cmds, backups
+        " Save undo history, even after file is closed!
+            if has('persistent_undo')
+                "Make sure dir exists
+                set undodir=~/vim/undofiles
+                if !isdirectory(&undodir)
+                    call mkdir(&undodir,"p")
+                endif
+                set undolevels=100
+                set undofile
+            endif
+
+        " Save history of commands (note: commands, not undo)
+            let &viminfo .= ',n~/vim/viminfo'
+            set history=100
+
+        " File backups
+            set backupdir=~/vim/backups
+            set directory=~/vim/backups
+            if !isdirectory(&backupdir)
+                call mkdir(&backupdir,"p")
+            endif
+            set backupskip=/tmp/*,/private/tmp/*
+            set backup
+            set writebackup
+
+    " Set default line endings to unix for full compatability
+        set fileformats=unix,dos
+
+"| Plugin-only options
+    " Self-explanatory
+        let g:matchparen_timeout = 100
+        let g:fugitive_no_maps = 1
+        let g:EasyMotion_skipfoldedline = 0
+        let g:session_lock_enabled = 0
+        let g:session_persist_globals = []
+
+    " For MBE
+        "let g:miniBufExplStatusLineText = '\ '
+        "let g:miniBufExplStatusLineText = "%{bufnr('$')}"
+        "let g:miniBufExplStatusLineText = "%{fnamemodify(getcwd(),':t')}"
+        let g:miniBufExplStatusLineText = "%{PrintCurrFolder()}"
+
+        fun! PrintCurrFolder()
+            let raw = getcwd()
+            let path = fnamemodify(raw, ':t')
+
+            "If we're at root, ie. 'C:/'
+            if path == ''
+                let path = raw
+            endif
+
+            return path
+        endfun
+
+        " Put MBE in vert, with colm 20
+        let g:miniBufExplVSplit = 20
+
+        " Put MBE in left
+        let g:miniBufExplBRSplit = 0
+
+    " For tcomment
+        let g:tcommentOptions = {'whitespace': 'no'}
+        try
+            call tcomment#DefineType('javascript','// %s')
+            call tcomment#DefineType('cpp','// %s')
+            call tcomment#DefineType('java','// %s')
+            call tcomment#DefineType('todo','( %s')
+        catch
+            echom "NOTE: tcomment is not loaded"
+        endtry
+
+    " For sleuth
+        let g:did_indent_on = 1
+
+    " For gitgutter
+        let g:gitgutter_map_keys = 0
+        let g:gitgutter_realtime = 0
+        let g:gitgutter_sign_removed = '-'
+        "let g:gitgutter_eager = 0
+        "hi clear SignColumn "Not sure the point of this
+
+    " For rainbow parentheses
+        let g:rainbow_active = 1
+
+        if &background == "dark"
+            let brickred = '#dc322f' "best
+            let purp = '#6c71c4'
+            let teal = '#2aa198' "strangely good
+            "let orange = '#b58900' "too strange
+            let green = '#719e07' "horrifically ugly
+            let blue = '#268bd2' "not distinguishable from purp/teal
+            "let pink = '#d33682' "not distinguishable from red
+        else
+            let brickred = '#dc322f' "best
+            let green = 'darkgreen' "horrifically ugly
+            let blue = 'blue' "not distinguishable from purp/teal
+        endif
+
+        let g:rainbow_conf = {
+            \'guifgs': [brickred, green, blue],
+            \'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+            \'operators': '_,_',
+            \'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+            \'separately': {
+                \'*': {},
+                \'vim': {
+                    \'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold',
+                    \'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody',
+                    \'start=/{/ end=/}/ fold containedin=vimFuncBody'],
+                \},
+                \'todo': 0,
+            \}
+        \}
+        "\'guifgs': ['#dc322f','#afad27','seagreen3','royalblue3','darkorchid3'],
+        "\ 'html': {
+        "    \ 'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
+        "\ },
+    " For delimitMate
+        let g:delimitMate_expand_cr = 1
+        let g:delimitMate_jump_expansion = 1
+        let g:delimitMate_excluded_regions = ''
+        let g:delimitMate_excluded_ft = 'todo'
+
+"| Load these once
+    if !exists("g:loadOnce_onFirstSource")
+    let g:loadOnce_onFirstSource = 1
+    exe "cd ~"
+
+    " cmds 'colorscheme' and 'syntax enable' are fickle, so run only once
+        syntax enable
+        if has("gui_running")
+            colorscheme solarized
+        else
+            silent! colorscheme desert
+        endif
+        "colorscheme desert
+        "colorscheme molokai
+        "colorscheme hybrid
+        "colorscheme lucius
+        set background=dark
+        "set background=light
+        "let g:molokai_original =1
+        "let g:solarized_termcolors=256
+
+    " appearance options that can be toggled, but default on
+        set nowrap
+        set hlsearch
+        set incsearch
+        "set lines=40 columns=150
+
+    " All my autocmds (almost all about appearance/formatting)
+        " For debugging autocmds
+            "set verbose=9
+            "au
+
+        " Highlight orphaned whitespace
+            "au BufRead * call HL_OrphanedWhitespace()
+
+            highlight OrphanedWhitespace guibg=grey30 ctermbg=grey
+            fun! HL_OrphanedWhitespace()
+                match OrphanedWhitespace /\s\+\%#\@<!$/
+                "match OrphanedWhitespace /\s\+$/
+            endfun
+            fun! OrphanedWhitespace_search()
+                "execute "normal! /^\\s\\+$\<cr>"
+                %s/\s\+$//c
+
+                "call HL_OrphanedWhitespace()
+                " Todo - could make this much more sophisticated
+                " 1. tells you how many orphaned blocks are left below
+                " 2. simply clears ALL orphaned
+            endfun
+
+            " Turn it off if distracting
+            "fun! HighlightWhitespace_clear()
+            "    highlight ExtraSpace guibg=NONE ctermbg=NONE
+            "endfun
+
+        " Maximize window
+            if has('win32')
+                "set lines=999 columns=999
+                au GUIEnter * simalt ~x
+            else
+                au GUIEnter * call system('wmctrl -i -b add,maximized_vert,maximized_horz -r '.v:windowid)
+                "set lines=999 columns=999
+            endif
+
+        " Turns off bells fo REAL
+            au GUIEnter * set vb t_vb=
+
+        " Makes help appear as vertical split (instead of horiz)
+            au FileType help call WhenHelp()
+            fun! WhenHelp()
+                wincmd L
+            endfun
+        " Disable autocomments
+            au FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
+        " HL for python
+            au FileType python call PythonSyntaxHl()
+            fun! PythonSyntaxHl()
+                " All operators
+                syn match Type "="
+                syn match Type "+"
+                syn match Type "-"
+                syn match Type "/"
+                syn match Type "\*"
+                syn match Type ">"
+                syn match Type "<"
+                syn match Type ":"
+                syn match Type "!"
+
+                " All delimiters
+                "syn match Delimiter "("
+                "syn match Delimiter ")"
+                "syn match Delimiter "\["
+                "syn match Delimiter "\]"
+                "syn match Delimiter ","
+
+                " Manually add functions
+                syn keyword pythonBuiltin append insert
+                syn keyword pythonBuiltin strip split join format
+                syn keyword pythonBuiltin sleep time play floor
+                hi link pythonBuiltin Function
+
+                "syn keyword Type i
+                "syn keyword Conditional i
+                syn keyword Function i j
+                "syn keyword Function self
+
+            endfun
+
+        " HL for Javascript
+            au FileType html call HtmlSyntaxHl()
+            fun! HtmlSyntaxHl()
+                hi javaScript guifg=fg
+                "call JsSyntaxHl()
+
+                "syn keyword jsBuiltin console log trace p printType getType getProtoChain
+                "syn keyword jsBuiltin map reduce filter forEach call apply bind
+                "syn keyword jsBuiltin length join
+                "syn keyword jsBuiltin max min create
+                "hi link jsBuiltin Underlined
+            endfun
+
+            au FileType javascript call JsSyntaxHl()
+            fun! JsSyntaxHl()
+                " Literals : Including strings and booleans
+                hi link javaScriptNull Constant
+                syn match Constant "\<\d\+\>"
+                syn keyword Constant NaN
+
+                " Operators : Booleans
+                syn match Type "="
+                syn match Type "!"
+                syn match Type ">"
+                syn match Type "<"
+                syn match Type "&"
+                syn match Type "|"
+                syn match Type "\~"
+                syn match Type "\^"
+
+                " Operators : Math
+                syn match Type "+"
+                syn match Type "-"
+                syn match Type "\*"
+                syn match Type "\/"
+                syn match Type "%"
+
+                " Operators : Language-specific
+                "syn match Type "\."
+                syn match Type ";"
+                syn match Type "?"
+                syn match Type ":"
+
+                " Operators : Keywords
+                syn keyword jsOps var let in void of const
+                syn keyword jsOps typeof instanceof new delete
+                hi link jsOps Type
+
+                " Comments (Note: keep this at the end, after operators)
+                syn match javaScriptLineComment "\/\/.*" contains=@Spell,javaScriptCommentTodo
+                syn region javaScriptComment start="/\*"  end="\*/" contains=@Spell,javaScriptCommentTodo
+
+                " Special string (using <`>)
+                syn region javaScriptStringT start=+`+ end=+`+ contains=javaScriptSpecial,@htmlPreproc,innerExpression
+                syn region innerExpression start=+${+ end=+}+
+                hi def link javaScriptStringT String
+
+                " Functions : Special emphasis on keywords 'return', 'break', 'function'
+                hi link javaScriptFunction Special
+                hi link javaScriptStatement PreProc
+                hi link javaScriptBranch PreProc
+                " Also highlight dangerous keywords, eg. debugger, escape, alert
+                hi link javaScriptReserved PreProc
+                hi link javaScriptDeprecated PreProc
+                hi link javaScriptMessage PreProc
+                " Clear out normal keywords: window, document
+                syntax clear javaScriptGlobal javaScriptMember
+                syn keyword PreProc yield
+
+                " Defined : Functions that are global
+                syn keyword jsInternal eval call apply bind create keys hasOwnProperty isArray
+                syn keyword jsInternal console log addEventListener getElementById setTimeout setInterval
+                syn keyword jsInternal Math max min JSON stringify parse
+                syn keyword jsInternal splice slice push pop sort indexOf concat map reduce filter forEach
+                syn keyword jsInternal toString toFixed split substr
+                " external: jquery and my own helper fctns
+                syn keyword jsExternal extend
+                syn match   jsExternal "\$"
+                syn keyword jsExternal printType getType getProtoChain
+                hi link javaScriptType Function
+                hi link jsInternal Function
+                hi link jsExternal Function
+
+                " Use this to highlight ALL properties
+                "syn match jsMine "\.\<\w\+\>"
+                "hi link jsMine Function
+
+                " Critical : 'this' is most important word in all of js
+                " NOTE - put this section AFTER jzZebra's syn match
+                syn keyword jsThis this arguments pv self
+                hi link jsThis helpVim
+                syn match jsThis "\$\<this\w*\>"
+                syn match jsThis "\$$private"
+                syn match jsThis "\$scope"
+            endfun
+
+        " HL for new filetype, 'todo'
+            au BufRead,BufNewFile *.to call TodoSyntaxHL()
+            fun! TodoSyntaxHL()
+                set filetype=todo
+                syn match Identifier "^\s*#.*"
+                syn match Statement "^\s*\$.*"
+                syn match Type "^\s*_.*"
+                syn match Special "^\s*!.*"
+            endfun
+
+        " Setup Indent lines!
+            " NOTE - this must go *after* other syntax hl
+            set conceallevel=2
+            set concealcursor=nic
+
+            " about same colors as text
+            "highlight Conceal guibg=NONE guifg=#586e75
+
+            " nice
+            if &background == "dark"
+                highlight Conceal guibg=NONE guifg=#214651
+            else
+                highlight Conceal guibg=NONE guifg=gray
+            endif
+
+            " too light
+            "highlight Conceal guibg=NONE guifg=0c3540
+
+            let g:indentLine_char = '¦'
+            "let g:indentLine_char='│'
+            "let g:indentLine_char='░'
+            "let g:indentLine_char='▓'
+            "let g:indentLine_char='▒'
+            "let g:indentLine_char='▌'
+            let g:indentLine_maxInd = 10
+
+            au BufRead * call DrawIndentLine()
+            fun! DrawIndentLine()
+                if &filetype == 'todo'
+                    return
+                endif
+
+                let space = &shiftwidth
+                for i in range(space+1, space * g:indentLine_maxInd + 1, space)
+                    execute 'syntax match IndentLine /\%(^\s\+\)\@<=\%'.i.'v / containedin=ALL conceal cchar='.g:indentLine_char
+                endfor
+            endfun
+
+        " Indents after newlines
+            au FileType * call IndentingForNewLines()
+            fun! IndentingForNewLines()
+                if &filetype == 'todo'
+                    setlocal autoindent
+                else
+                    setlocal autoindent
+                    "setlocal cindent "Problem is that ONLY for C -> so weird special cases
+                    "setlocal cinkeys-=0#
+                endif
+            endfun
+
+        " Trying for netrw
+        "au FileType netrw call s:setup_vinegar()
+        "au FileType netrw call SetupNetrw()
+        "au BufRead * call SetupNetrw()
+        "au BufNewFile * call SetupNetrw()
+        "fun! SetupNetrw()
+        "    echo 'any file'
+        "    if &filetype == 'netrw'
+        "        echom 'setup netrw!'
+        "        "nnoremap <silent> s :<c-u>call ScoutKey()<cr>
+        "    endif
+        "endfun
+
+
+    " Enable folding, except for help/mbe/noname
+        "au FileType * call StartFolding()
+        au FileType * call PreventFolding()
+        fun! PreventFolding()
+            if &buftype == 'help' || &buftype == 'nofile'
+                setlocal foldmethod=manual
+                "setlocal foldexpr =0
+                "setlocal nofoldenable
+            endif
+        endfun
+
+    " Save session, load session
+        " Order
+        "   open vim > noname > session load > open mbe
+        "   start close > close mbe > session save > exit
+
+        set sessionoptions=blank,buffers,curdir,folds,tabpages,winpos
+        "set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winpos
+        let g:miniBufExplAutoStart = 0
+        if has("gui_running")
+            let g:session_autosave = 'yes'
+            let g:session_autoload = 'yes'
+        else
+            let g:session_autosave = 'no'
+            let g:session_autoload = 'no'
+        endif
+        let g:session_directory = '~/vim/session'
+
+        au VimLeavePre * MBEClose
+        au VimLeavePre * call setqflist([]) "So session.vim doesn't save quickfix list
+        au VimLeavePre * silent! argdel *        "So session.vim doesn't save args
+        au VimLeavePre * call CloseOpenHelpWin()
+        fun! CloseOpenHelpWin()
+            " Go thru win and close any that are &filetype == 'help'
+            for i in range(1,winnr('$'))
+                let winFileType = getwinvar(i, '&filetype') 
+                "if winFileType == 'help' || winFileType == 'qf'
+                if winFileType == 'qf'
+                    exe i.' wincmd w'
+                    quit
+                endif
+            endfor
+        endfun
+
+        au SessionLoadPost * call WhenSessionLoad()
+        fun! WhenSessionLoad()
+            if !exists("g:sessionHasLoaded")
+                let g:sessionHasLoaded = 1
+                MBEOpen
+            endif
+        endfun
+        "execute 'nnoremap xu :mksession! ~/vim/session/base.vim<cr>'
+        "execute 'nnoremap xi :source ~/vim/session/base.vim<cr>'
+
+    " Delete session
+        fun! DeleteSession()
+            call delete(expand("~/vim/session/default.vim"))
+            call delete(expand("~/vim/session/default.vim.lock"))
+            let g:session_autosave = 'no'
+            exe 'source '.g:dir_myPlugins.'plugin/vimrc'
+            "let g:session_autoload = 'no'
+        endfun
+
+    " Refresh results for Scroller()
+        " NOTE - currently using '/' instead of refresh
+        "let &ut = 300
+        "autocmd CursorHold * if line('$')<3000 | call Scroller_refreshSearchResults() | endif
+
+
+    " file is 1mb or greater (just for folding, lol)
+        let g:FileSizeMax = 1024 * 500 "0.5mb
+        "autocmd BufReadPre * echom "BufReadPre"
+        "autocmd BufReadPost * echom "BufReadPost"
+
+        "BufEnter BufWinteEnter WinEnter
+
+        autocmd BufReadPre * call LargeFile('pre')
+        autocmd BufReadPost * call LargeFile('post')
+        "autocmd FileType javascript call LargeFile('filetype')
+        fun! LargeFile(event)
+            let fsize = getfsize(expand("<afile>"))
+            if fsize > g:FileSizeMax || fsize == -2
+                "if a:event == 'filetype'
+                "    let &filetype = ''
+                if a:event == 'pre'
+                    " worst iniital load: folding
+                    "echom "fsize pre"
+                    setlocal foldmethod=manual
+
+                    " worst on search/jump: syntax
+                    "setlocal eventignore+=FileType
+                    "setlocal syntax=
+                    "set filetype=nofile
+                    "let &filetype = ''
+                    "set filetype=
+
+                    " Need to the below AFTER buf is read! wowow
+                    "normal! GG
+                    "setlocal filetype=javascript
+
+
+                    "set eventignore+=FileType
+                    "setlocal eventignore=all
+                    "" save memory when other file is viewed
+                    "setlocal bufhidden=unload
+                    "" is read-only (write with :w new_filename)
+                    "setlocal buftype=nowrite
+                    "" no undo possible
+                    "setlocal undolevels=-1
+                    "setlocal nofoldenable
+
+                    " Tweaks to make vim faster
+                        "set noswapfile
+                        "set eventignore +=FileType
+                        "setlocal undolevels=-1
+                        "setlocal buftype=nowrite
+
+
+                    "setlocal statusline=
+                    "syntax off
+                elseif a:event == 'post'
+                    "echom "fsize post"
+                    "normal! GG
+                    "setlocal filetype=javascript
+                endif
+                "echom "file:" expand('%')
+                "echom "filetype:" &filetype
+            endif
+        endfun
+        fun! LargeFileAfter()
+        endfun
+
+    " Refresh when switching back to vim
+        autocmd FocusGained * redraw!
+
+    endif
+
+
+"| Appearance and formatting
+    " GUI and indents
+        " One-liners
+            " Self-explanatory
+            if has('unix')
+                let &guifont = "Consolas 12"
+                set linespace=3
+            elseif has('win32')
+                set guifont=Consolas:h11
+                "set linespace=5
+                "let &guifont = "Source_Code_Pro:h9"
+            endif
+
+            set encoding=utf8
+            set showcmd
+            set relativenumber
+            set notimeout
+            set hidden
+            set lazyredraw
+            set synmaxcol=200
+            set wildmenu
+            set wildmode=longest:list "To list all options
+            set linebreak "Useful for wrapping by words
+            set list
+            set listchars=tab:=-
+            "set ttyfast
+            "set ruler
+            set breakindent
+
+            " Turn off mouse (no cheating!)
+            set mouse =
+            set guicursor+=a:blinkon0
+
+        " Status line
+            set laststatus =2
+            "set statusline =\ \ 
+            set statusline =\ \ 
+            set statusline +=%{Scroller()}
+            set statusline +=\|
+            set statusline +=%5l
+            set statusline +=/
+            set statusline +=%L
+
+            "set statusline +=%02{&foldlevel}
+            "set statusline +=\|
+            "set statusline +=%P
+            "set statusline +=\|
+
+            ":set statusline=%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
+            "hi User1 guibg=red guifg=blue
+
+        " Title string
+            set titlestring=\ 
+            "set titlestring =%{PrintCurrFolder()}
+
+        " Dismantle any gui toolbars
+            if has("gui_running")
+                set guioptions-=t
+                set guioptions-=T
+                set guioptions-=m
+                set guioptions-=r
+                set guioptions-=L
+                "set guioptions-=M
+            endif
+
+        " Formatting of indents/tabs
+            " autoindent is *exactly* what I want: when <CR> in insert mode, matches ind of above
+            "set autoindent
+            "set smartindent
+            set tabstop=4
+            set shiftwidth=4
+            set softtabstop=4
+            set expandtab
+
+    " Syntax hl and coloring
+        if exists("g:colors_name")
+        " Highlight for desert
+            if g:colors_name == 'desert'
+                hi Folded guibg=bg ctermbg=NONE
+                hi ShowCursor guibg=khaki guifg=NONE
+            endif
+
+        " Highlighting for solarized
+            if g:colors_name == 'solarized'
+                "hi! link Folded Normal gui=bold
+                hi Folded gui=bold guifg=fg guibg=bg
+                "hi Folded gui=bold
+                "hi! link Folded Underlined
+                hi ShowCursor guibg=fg guifg=bg
+                hi! link wildmenu Cursor
+                hi! link Search Visual
+            endif
+
+        " Highlighting for all colorschemes
+            hi! link LineNr Folded
+            hi! link CursorLineNr LineNr
+
+            hi NonText guifg=bg guibg=bg ctermfg=NONE ctermbg=NONE
+            hi VertSplit guibg=bg guifg=bg cterm=NONE ctermfg=NONE
+            hi HideCursor guibg=bg
+            "hi MatchParen guibg=bg guifg=grey70
+            "hi Conceal guifg=grey45
+            "hi! link SpecialKey Conceal
+
+        " Highlight status line and EOF
+            "hi! link StatusLine LineNr
+            hi StatusLine guibg=bg gui=bold
+            hi StatusLineNc guibg=bg gui=NONE ctermbg=NONE
+            "hi! link StatusLineNc Comment
+            "hi StatusLine guibg=grey33 guifg=gold
+            "hi StatusLineNC guibg=grey25 guifg=gold
+            ""hi StatusLine guibg=grey30 guifg=gold gui=bold
+            ""hi StatusLineNC guibg=grey20 guifg=gold gui=bold
+            ""hi StatusLine guibg=grey20 guifg=gold gui=bold
+            ""hi StatusLineNC guibg=grey20 guifg=grey60 gui=bold
+
+        endif
+
+"| Keybinds
+    " Getting around
+        " Reassign hjkl
+            noremap j h
+            noremap ; l
+
+            " PURPOSE - set jump history for multi-line moves (look at m`)
+            noremap k k
+            nnoremap <silent> k :<c-u>call WrapperForKey_k()<cr>
+            fun! WrapperForKey_k()
+                if v:count >= 1
+                    exe "normal! " . v:count. "km`\<c-o>"
+                else
+                    normal! k
+                endif
+            endfun
+
+            noremap l j
+            nnoremap <silent> l :<c-u>call WrapperForKey_l()<cr>
+            fun! WrapperForKey_l()
+                if v:count >= 1
+                    exe "normal! " . v:count. "jm`\<c-o>"
+                else
+                    normal! j
+                endif
+            endfun
+
+        " Simple navigation
+            noremap <space> zz
+            noremap <return> zt
+            "noremap <enter> zt
+            noremap W zb
+            noremap E zt
+
+            " PURPOSE - H/L are strangely slow on folds
+            nnoremap <silent> w :call cursor(line('w0'), 0)<cr>
+            nnoremap <silent> e :call cursor(line('w$'), 0)<cr>
+            vnoremap w H
+            vnoremap e L
+            "vnoremap <silent> w :<c-u>call MoveCursor_toWindowTop('v')<cr>
+            "vnoremap <silent> e :<c-u>call MoveCursor_toWindowBottom('v')<cr>
+
+
+        " Misc nav remaps
+            "noremap gf G
+            noremap # $
+            noremap gb b
+            noremap ge e
+            noremap gw w
+
+        " Key mappings for search
+            let g:indexed_search_mappings = 0
+            set shortmess+=s
+
+            noremap<silent> * *:set hlsearch<cr>zv
+            noremap<silent> & #:set hlsearch<cr>zv
+            noremap<silent> n n:set hlsearch<cr>zv
+            noremap<silent> N N:set hlsearch<cr>zv
+
+            "noremap ' :set hlsearch<cr>/
+            "noremap ' :set hlsearch<bar>ShowSearchIndex<cr>/
+            "noremap ' :set hlsearch<bar>call Refresher()<bar>ShowSearchIndex<cr>/
+            noremap ' :call WrapperForSearch()<cr>/
+            noremap <silent> / :call Scroller_refreshSearchResults()<cr>
+            fun! WrapperForSearch()
+                set hlsearch
+                if exists("b:Scroller_searchPlacement")
+                    unlet b:Scroller_searchPlacement
+                endif
+                "call Scroller_triggerRefresh()
+                "normal! /
+            endfun
+
+    " All operators
+        " Operator by itself
+            noremap x <
+            noremap c >
+
+            noremap t "+y
+            noremap d "+d
+            nnoremap da "_d
+            vnoremap a "_d
+            noremap z "_c
+
+            noremap y .
+
+        " Operator with motion
+            nnoremap xx <<
+            nnoremap cc >>
+
+            nnoremap tt "+yy
+            nnoremap te "+ye
+            nnoremap tw "+yw
+            nnoremap to "+yi
+            nnoremap ti "+yiw
+            nnoremap tsf; "+y$
+            nnoremap tsfj "+y^
+            nnoremap tsfk "+ygg
+            nnoremap tsfl "+yG
+
+            nnoremap dd "+dd
+            nnoremap de "+de
+            nnoremap dw "+dw
+            nnoremap do "+di
+            nnoremap di "+diw
+            nnoremap dsf; "+d$
+            nnoremap dsfj "+d^
+            nnoremap dsfk "+dgg
+            nnoremap dsfl "+dG
+
+            nnoremap daa "_dd
+            nnoremap dae "_de
+            nnoremap daw "_dw
+            nnoremap dao "_di
+            nnoremap dai "_diw
+            nnoremap dasf; "_d$
+            nnoremap dasfj "_d^
+            nnoremap dasfk "_dgg
+            nnoremap dasfl "_dG
+
+            nnoremap zz "_cc
+            nnoremap ze "_ce
+            nnoremap zw "_cw
+            nnoremap zo "_ci
+            nnoremap zi "_ciw
+            "nnoremap z; "_cl
+            "nnoremap zj "_ch
+            nnoremap zsf; "_c$
+            nnoremap zsfj "_c^
+            nnoremap zsfk "_cgg
+            nnoremap zsfl "_cG
+
+        " Comments
+            let commentKey = 'q'
+            nmap q <plug>TComment_gc
+            nmap qq <Plug>TComment_gcc
+            nmap q; <Plug>TComment_Comment
+            nmap qj <Plug>TComment_Uncomment
+
+            vmap qq :TComment<cr>
+            vmap q; <Plug>TComment_Comment
+            vmap qj <Plug>TComment_Uncomment
+
+    " Actions
+        " Del and Bsp
+            " make bsp work in Windows
+            set backspace =eol,start,indent
+            nnoremap <bs> "_X
+            nnoremap <del> "_x
+            inoremap <c-BS> <c-w>
+            cnoremap <c-BS> <c-w>
+            let g:ctrlp_prompt_mappings = {
+                \ 'PrtDeleteWord()': ['<c-bs>'],
+                \ }
+
+        " Undo
+            noremap U <c-r>
+            "noremap <silent> u :<c-u>call WrapperForKeyU()<cr>
+            "fun! WrapperForKeyU()
+            "    if v:count >= 1
+            "        call RemoveBuffer(v:count)
+            "    else
+            "        normal! u
+            "    endif
+            "endfun
+
+        " Insert and paste
+            let g:Insertatron_easykeymaps = 1
+            noremap v r
+
+        " For autocomplete
+            fun! TabToAutocomplete(direction)
+                return IsBlank('.') || IsWhitespace('.') ?
+                    \ (a:direction == 'forward' ? "\<tab>" : "\<bs>") :
+                    \ (a:direction == 'forward' ? "\<c-n>" : "\<c-p>")
+            endfun
+            inoremap <tab> <c-r>=TabToAutocomplete('forward')<CR>
+            inoremap <s-tab> <c-r>=TabToAutocomplete('backward')<CR>
+            set completeopt +=longest
+            set complete =.,w
+
+        " Action by inaction
+            " ie. train self not to use these keys
+            noremap I <nop>
+            noremap A <nop>
+            noremap O <nop>
+            noremap P <nop>
+            nnoremap $ <nop>
+            "noremap p <nop>
+            "noremap b <nop>
+            "noremap m <nop>
+            "noremap / <nop>
+            "noremap gg <nop>
+            map gg g
+            noremap gf <nop>
+            "noremap G <nop>
+            nnoremap ) <nop>
+            nnoremap ( <nop>
+
+            imap <c-a> <nop>
+            imap <c-t> <nop>
+
+    " Managing files and views
+        " File basics
+            nnoremap qw :xa<cr>
+            nnoremap qu :call UnloadCurrentBuffer()<cr>
+            fun! UnloadCurrentBuffer()
+                update
+                "call Spacework_addFileToWs("[unloaded", expand('%:p'))
+                MBEbd
+            endfun
+            nnoremap qy :MBEbd! <cr>
+            nnoremap <silent> qi :q<cr>
+
+            " NOTE: no <cr> below on purpose, as a check to make sure
+            nnoremap qh :call delete(expand('%'))
+            nnoremap qn :call DeleteSession()
+
+            nnoremap <silent> s :<c-u>call ScoutKey()<cr>
+            "noremap sfk gg
+            "noremap sfl G
+
+            "onoremap sfl G
+            "onoremap sfk gg
+            "onoremap sf; $
+            "onoremap sfj ^
+
+            vnoremap sfl G
+            vnoremap sfk gg
+            vnoremap sf; $
+            vnoremap sfj ^
+
+        " Follow links in help
+            nnoremap q' <c-]>
+        " Pull up most recent cmd
+            nnoremap qo :<c-p>
+        " Pull up all cmds (in a sep win)
+            nnoremap qp q:
+
+"| Helper functions
+    " NOTE - Using '.' is confusing and needs to stop
+    " NOTE - 'lnum' means integer or '.' while 'num' means only integer
+
+    " Clean these up
+    fun! GetNextVisible(lnum, incr)
+        " WHY - get next line, in case of folded sections
+        " NOTE : incr is determined by being 1 or not 1
+
+        let nCurr = LnumToInt(a:lnum)
+        " Can't go past EOF/BOF
+        if (nCurr == line('$') && a:incr == 1) || (nCurr == 1 && a:incr == -1)
+            "return 0
+            return nCurr
+            "return -4 "Todo
+        endif
+
+        " Get next visible, being careful of folds
+        let nextVisible = GetFoldBounds(nCurr, a:incr) + a:incr
+
+        " Also for nextVisible, make sure we're on top of any fold
+        if IsFolded(nextVisible) && a:incr == -1
+            let nextVisible = GetFoldStart(nextVisible)
+        endif
+
+        return nextVisible
+    endfun
+
+    fun! IsEndMarker(lnum)
+        if &filetype == 'todo'
+            return 0
+        else
+            if &filetype == 'vim'
+                let text = substitute(getline(a:lnum), '^\s*', '', '')
+                return (text[0:2] == 'end')
+
+            elseif &filetype == 'javascript'
+                " WHY - cover if/else or chained fctns, plus commenting
+                let text = substitute(getline(a:lnum), '^\s*', '', '')
+                if text[0:1] == '//' || text[0:1] == '/*'
+                    return 0
+                elseif text[-1:] == ';' || text[-1:] == ','
+                    let text = text[:-2]
+                endif
+
+                " fml: must check BOTH
+                if text[0] == '}' || text[0] == ')' || text[0] == ']' || text[0:1] == '*/'
+                    return text[-1:] == '}' || text[-1:] == ')' || text[-1:] == ']'  || text[-2:] == '*/'
+                endif
+                return 0
+            endif
+        endif
+    endfun
+
+    fun! Nextnonblank(lnum)
+        " NOTE : no longer needed (bc want to treat whitespace as blank)
+        " WHY : want nextnonblank() to accept whitespace as nonblank
+        let nNext = a:lnum
+        while IsBlank(nNext)
+            if nNext >= line('$')
+                return 0
+            else
+                let nNext += 1
+            endif
+        endwhile
+        return nNext
+    endfun
+
+    fun! ProcessChar()
+        hi! link Cursor HideCursor
+        let char = getchar()
+        if char =~ '^\d\+$'
+            let char = nr2char(char)
+        endif
+        hi! link Cursor ShowCursor
+        return char
+    endfun
+
+    fun! HasNewlines(str)
+        return (match(a:str, "\n") > 0)
+    endfun
+
+
+    " Expected input
+    " Bad : int that's past EOF or 0 or neg
+    
+    " Good : int from 1 to EOF, str that's '.' or '$'
+
+    " Take '.' but does NOT spit it out
+        fun! IsEmptyspace(lnum) "Strange - means blank or whitespace only
+            "return (getline(a:lnum) =~ '^\s*$')
+            "NOTE - nextnonblank is good for EOF (edge case)
+            return (a:lnum != nextnonblank(a:lnum))
+        endfun
+
+        fun! IsBlank(lnum)
+            return (getline(a:lnum) == '')
+        endfun
+
+        fun! IsWhitespace(lnum)
+            return (getline(a:lnum) =~ '^\s\+$')
+        endfun
+
+        fun! IsFolded(lnum)
+            return (foldclosed(a:lnum) > 0)
+        endfun
+
+        fun! IsVisible(lnum)
+            return (a:lnum == GetFoldStart(a:lnum))
+        endfun
+
+        fun! IsFoldable(lnum)
+            " Line is a fold header that's not already folded
+            " NOTE - line must be visible, could potentially be folded to another header above it
+            return (!IsFolded(a:lnum) && FoldByIndentHeader(a:lnum)[0] == ">")
+        endfun
+
+    " For these, can take in '.', but always return int
+        fun! LnumToInt(lnum)
+            return (type(a:lnum) == 0 ? a:lnum : line(a:lnum))
+        endfun
+
+        fun! GetFoldStart(lnum)
+            "return (IsFolded(lnum) ? foldclosed(a:lnum) : a:lnum)
+            return (!IsFolded(a:lnum) ? LnumToInt(a:lnum) : foldclosed(a:lnum))
+        endfun
+
+        fun! GetFoldEnd(lnum)
+            return (!IsFolded(a:lnum) ? LnumToInt(a:lnum) : foldclosedend(a:lnum))
+        endfun
+
+        fun! GetFoldBounds(lnum, incr)
+            " WHAT : get fold start/end, based on direction
+            " NOTE : incr is determined by being 1 or not 1
+            if !IsFolded(a:lnum)
+                return LnumToInt(a:lnum)
+            else
+                return (a:incr == 1 ? GetFoldEnd(a:lnum) : GetFoldStart(a:lnum))
+            endif
+        endfun
+
+"| Old things
+    " For python (in progress)
+        " For python­mode plugin
+        "let g:pymode = 0
+        "let g:pymode_run = 0
+        "let g:pymode_breakpoint = 0
+        "let g:pymode_folding = 0
+        "let g:pymode_trim_whitespaces = 0
+        "let g:pymode_options = 0
+        "let g:pymode_lint = 0
+        "let g:pymode_rope = 0
+        "let g:pymode_motion = 0
+        "let g:pymode_virtualenv = 0
+        "let g:pymode_doc = 1
+        "let g:pymode_doc_bind = 'K'
+        "" pymode breakpoint? cool
+        """ pymodelint/pep8/pyflakes
+
+    " Save/load fold views
+        if !exists("g:loadOnce_temp")
+            let g:loadOnce_temp = 1
+            " Discovering au more
+                "au BufNewFile * call PrintFileInfo('new file')
+                "au BufNew * call PrintFileInfo('buf new')
+                "au BufAdd * call PrintFileInfo('buf add')
+                "au BufRead * call PrintFileInfo('buf read')
+                "au BufHidden * call PrintFileInfo('buf hidden')
+                "au BufUnload * call PrintFileInfo('buf unload')
+                "au FileType * call PrintFileInfo('filetype')
+
+                fun! PrintFileInfo(event)
+                    echom a:event."| file:".expand('%')
+                    echom "ft:".&ft."| buftype:".&buftype
+                    echom "curr win: ".winnr()
+                    echom "buf # in curr win: ".winbufnr(winnr())
+                endfun
+                "let winOf1 = winbufnr(1)
+                "let exists1 = bufnr(1)
+
+            " How to save folds reliably?
+                set viewoptions =folds
+                fun! SaveFold()
+                    "if expand('%') != '' && &buftype!~'nofile'
+                    if &buftype != 'help' && &buftype != 'nofile'
+                        if bufnr(1) == -1
+                            mkview
+                            echom 'actually saved folds'
+                        endif
+                    endif
+                endfun
+                fun! SaveFoldAll()
+                    for i in range(bufnr('$'))
+                        if &buftype != 'help' && &buftype != 'nofile'
+                            exe 'b'.i
+                            mkview
+                        endif
+                    endfor
+                endfun
+                fun! LoadFold()
+                    "echom "trying to load fold"
+                    if &buftype != 'help' && &buftype != 'nofile'
+                        if bufnr(1) == -1
+                            loadview
+                            echom 'actually loaded folds'
+                            "let g:accum .= &ft.' '
+                        endif
+                    endif
+                endfun
+        endif
+
+    " Trying out ctrlspace (concl: doesn't improve on ctrlp)
+        "let g:CtrlSpaceSymbols = { "File": "░", "CTab": "▌", "Tabs": "▓" }
+        "let g:CtrlSpaceUseUnicode = 0
+
+        " use ag  (something lelse?)
+        "if executable("ag")
+        "    let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
+        "endif
+
+        " <b> to add proj to bookmark
+        " <o> to open files
+        " <w> to save worspace
+
+        " <h> for home - see all buffers
+
+        " CtrlSpaceAddProjectRoot -
+        " My maps are interferring w ctrlspace's maps (annoying)
+
+    " Options for IndentGuides
+        "let g:indent_guides_enable_on_vim_startup = 1
+        "let g:indent_guides_auto_colors = 0
+        "hi IndentGuidesOdd  guibg=bg
+        "hi IndentGuidesEven guibg=#214651
+        "
+        "hi IndentGuidesOdd  guibg=#214651
+        "hi IndentGuidesEven guibg=bg
+        "hi IndentGuidesEven guibg=#657b83
+        "hi IndentGuidesEven guibg=#0c3540
+        "hi IndentGuidesEven guibg=#07313c
+        "let g:indent_guides_color_change_percent = 7
+
+    fun! TestSignColumn()
+        sign define tester text=| texthl=Folded
+        exe ":sign place 2 line=5 name=tester buffer=" . winbufnr(0)
+
+        "sign define piet text=>> texthl=Search
+        "hi SignColumn
+        "sign place 2
+        "sign place 2 line=23 name=tester buffer=winbufnr(0)
+        "sign unplace 2
+        hi Folded guibg=black guifg=white
+        hi FoldColumn guibg=blue guifg=white
+        "omg what is foldcolumn?
+        set foldcolumn=1
+    endfun
+
+
+" New things below
+" Keys for navigating jumps (setting marks, walking thru jump history)
+    "noremap hs mH
+    "noremap hd `H
+    noremap hs :call SetMark()<cr>
+    noremap hd :call JumpToMark()<cr>
+    noremap ha <c-o>
+    noremap hf <c-i>
+    "noremap hg :call JumpReset()<cr>
+    "fun! JumpReset()
+    "    normal! <C-I>
+    "endfun
+    "TODO - simply press <c-i> 10 times (hackish = close enough)
+    fun! SetMark()
+        normal! mH
+        echom "Custom mark was set"
+    endfun
+    fun! JumpToMark()
+        normal! `H
+        echom "Jumped to mark"
+    endfun
+
+" Learn vim-surround
+    let g:surround_no_mappings = 1
+    nmap ds <Plug>Dsurround
+    nmap cs <Plug>Csurround
+    nmap ts <Plug>Ysurround
+    nmap tsi <Plug>Ysurroundiw
+
+    "Rarely useful, maybe to add more delims
+    "nmap tso <Plug>Ysurroundi
+    "nmap tss <Plug>Yssurround
+    "xmap S <Plug>VSurround
+    "nmap cS  <Plug>CSurround
+    "nmap ys  <Plug>Ysurround
+    "nmap yS  <Plug>YSurround
+    "nmap yss <Plug>Yssurround
+    "nmap ySs <Plug>YSsurround
+    "nmap ySS <Plug>YSsurround
+    "xmap S   <Plug>VSurround
+    "xmap gS  <Plug>VgSurround
+
+    noremap <tab> v
+    noremap q[ q/
+    vmap qo <nop>
+    map p :call JumpToFold(1)<cr>
+    map P :call JumpToFold(-1)<cr>
+
+" Misc
+    "noremap / <nop>
+    "nnoremap qm :cd %:p:h <cr>
+    noremap hh :update <cr>
+
+" Figuring out ctrlp options
+    " Do not clear filenames cache, to improve CtrlP startup
+    " For ctrlp: don't clear cache (to manually clear, <f5>)
+    "let g:ctrlp_clear_cache_on_exit = 0
+    let g:ctrlp_working_path_mode = 0
+    let g:ctrlp_show_hidden = 1
+    let g:ctrlp_user_command = 'dir %s /-n /b /s /a-d'
+    "let g:ctrlp_user_command = 'dir %s /-n /b /ad'
+    let g:ctrlp_custom_ignore = {
+        \ 'dir': '\v(
+            \Dropbox\\Art
+            \|projects\\CMB
+            \|vimfiles\\backup|vimfiles\\undofiles|vimfiles\\session
+            \|Archives\\documentation|reinstallation|Archives\\static|\.git
+            \|CS\\books_algorithms
+            \|CVS
+            \|Tasks\\[discard
+        \)'
+    \ }
+
+    " Set delay to prevent extra search
+    "let g:ctrlp_lazy_update = 350
+    "let g:ctrlp_use_caching = 0
+
+    " Set no file limit, we are building a big project
+    let g:ctrlp_max_files = 0
+
+    " Trying to use pymatcher
+        if has('python')
+            let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' }
+        else
+            "echom 'pymatcher requires python'
+        endif
+
+    " Trying to use ag
+        if executable('ag')
+            " Use Ag over Grep
+            set grepprg=ag\ -s\ --nogroup\ --nocolor\ --ignore-dir\ CVS
+
+            " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+            "let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
+
+            " ag is fast enough that CtrlP doesn't need to cache
+        elseif has('win32')
+            set grepprg=findstr\ /n\ /s
+        "elseif has('unix')
+        "   e
+        endif
+
+" Unorgz/New
+    fun! FindNextIndentError()
+        " Todo - Doesn't handle folding. Not worth it
+
+        let nStart = line('.')
+        let EOF = line('$')
+        let firstFound = 0
+        let numFound = 0
+
+        if nStart == EOF
+            return
+        endif
+
+        for i in range(nStart+1, EOF-1)
+            if IsBlank(i)
+                continue
+            endif
+
+            " Grab data on this line
+            let nCurr = i
+            let nNext = nextnonblank(i+1)
+            if nNext == 0
+                break
+            endif
+            let indCurr = indent(i)
+            let indNext = indent(nNext)
+            let indDiff = indNext - indCurr
+
+            if (indCurr % &shiftwidth != 0)
+                let firstFound = (!firstFound ? nCurr : firstFound)
+                let numFound += 1
+
+            elseif indDiff > &shiftwidth
+                let firstFound = (!firstFound ? nNext : firstFound)
+                let numFound += 1
+
+            elseif indDiff < -&shiftwidth
+                let nPrev = prevnonblank(i-1)
+                let textPrev = getline(nPrev)
+                if match(textPrev, '^\s\+\(if\|else\|for\|} else\)') == -1 || textPrev[-1:] == '{'
+                    if textPrev[-1:] != ':'
+                        let firstFound = (!firstFound ? nNext : firstFound)
+                        let numFound += 1
+                    endif
+                endif
+            endif
+        endfor
+
+        call cursor(firstFound, 0)
+        echom "Ind errors remaining: " . numFound
+    endfun
+
+    "map <silent> hm :Spacework<cr> "Can just type it in
+    "let g:ctrlp_max_depth = 0
+    " for ctrlp: while in dir mode, press ".." to move up
+
+    " open explorer (of windows) to current file/dir
+    fun! OpenExplorer()
+        if has('win32')
+            !start explorer /select,%:p
+        elseif has('unix')
+            "TODO
+        endif
+    endfun
+    command! FileExplorer call OpenExplorer()
+
+
+    fun! JumpToFold(direction)
+        let nCurr = GetFoldBounds('.', a:direction)
+        let nBound = (a:direction == 1 ? line('$') : 1)
+        if nCurr == nBound
+            return
+        endif
+
+        let i = nCurr + a:direction
+        while !IsFolded(i) && i != nBound
+            let i += a:direction
+        endwhile
+        call cursor(i, 0)
+    endfun
+
+
+    let g:netrw_banner = 0
+    let g:netrw_keepdir = 0
+
+
+    fun! IsMBEOpen()
+        return (bufname(winbufnr(1)) == "-MiniBufExplorer-")
+    endfun
+
+    fun! JsonFormatAll()
+        " Get only websocket data AND special lines (ie. start with '=')
+        " HOW = Get only lines that start with 4::
+        " HOW = Get only lines that are longer than 10 char (not incl ind) - more safe
+        "g/^[^4:|^===]/d
+
+        " open up jstester2
+        " clear out old
+        " paste current clip into it
+        " then run below
+
+        "edit C:/test/js/js_tester2.js
+        "%d
+        "normal! "+]p
+
+        set foldlevel=99
+        for i in range(line('$'), 1, -1)
+            let lineText = getline(i)
+            let textOnly = lineText[indent(i):]
+            if len(textOnly) < 60 && textOnly[0] != "="
+                exe i."delete"
+            endif
+        endfor
+
+        " Main action
+        "%FormatJson
+        for i in range(line('$'), 1, -1)
+            let lineText = getline(i)
+            let textOnly = lineText[indent(i):]
+            if textOnly[0] != "="
+                exe i."FormatJson"
+            endif
+        endfor
+
+        " Cleanup
+        silent! g/^\s*\t/d
+    endfun
+    command! JsonFormatAll call JsonFormatAll()
+
+    fun! ClearAllUndoHistory()
+        let old_undolevels = &undolevels
+        let old_modified = &modified
+
+        set undolevels=-1
+        call setline(line('.'), getline('.'))
+
+        let &undolevels = old_undolevels
+        let &modified = old_modified
+        unlet old_undolevels
+        unlet old_modified
+    endfun
+
+
+    " Grep and search
+        command! -nargs=? Indexer call GrepMe(<f-args>)
+        fun! GrepMe(...)
+            " Format query
+            " TODO: grep is fine with single quotes ('), but doesn't acknowledge double quotes (")
+            if a:0 == 0 " a:0 has number of args (here, 0 or 1) and a:1 has the arg
+                let searchQuery = getreg('/')
+                let searchQuery = (searchQuery[0:1] == '\<' && searchQuery[-2:-1] == '\>' ? searchQuery[2:-3] : searchQuery)
+            else
+                let searchQuery = a:1
+                let @/ = a:1
+            endif
+
+            " Execute grep
+            try
+                exe 'silent grep' '"'.searchQuery.'" *'
+            catch
+                echom "invalid input"
+                return
+            endtry
+
+            " Format result
+            set hlsearch
+            set foldlevel=99
+            redraw!
+
+            " Prep quickfix window
+            copen
+            if &filetype == "qf"
+                call setwinvar(0, "&statusline", '  Found '.len(getqflist())." for [".searchQuery."]")
+                "set ffs=dos
+                "silent g/\\\$/s///
+                redraw!
+            endif
+        endfun
+
+        " Testing why "set hlsearch" does not work on initial run *within function body*
+            "fun! Tester()
+            "    "nohlsearch
+            "    let @/='string'
+            "    setglobal hls
+            "    ":nnoremap <F8> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
+            "endfun
+            "nnoremap <F8> :set hls<CR>
+            "nnoremap <F8> :call Tester()<CR>
+
+        let g:ag_apply_qmappings = 0
+
+    " Manage dups for MBE fname tails
+        "GIVEN
+        let bufs = [1,7,3,9,10,2, 4]
+        let g:correspondence = {
+            \'1':  'C:\f2',
+            \'7':  'C:\g\a\f',
+            \'3':  'C:\h\b\f',
+            \'9':  'C:\i\c\b\f',
+            \'10': 'C:\f3',
+            \'2':  'C:\j\d\b\f',
+            \'4':  'C:\k\e\d\b\f',
+        \}
+        "WANT
+        let want = [ [1,""], [7,"a"], [3, "h" ], [9, "c"], [10, ""], [2, "j"], [4,"e"]]
+
+        "let bufs = [7,3]
+        "let g:correspondence = {
+        "    \'7':  'C:\a\f',
+        "    \'3':  'C:\b\f',
+        "\}
+        "let want = [ [7,"a"], [3, "b" ]]
+
+
+        fun! Manage(bufNums)
+            " Assume fnameArr has *full path* (not tail or shortened path)
+            let dct = {}
+            for bufNum in a:bufNums
+                let fullPath = g:correspondence[bufNum]
+
+                let tail = fnamemodify(fullPath, ':t')
+                if has_key(dct, tail)
+                    call add(dct[tail], bufNum)
+                else
+                    let dct[tail] = [bufNum]
+                endif
+            endfor
+            echo dct
+
+            for tail in keys(dct)
+                let bufNums = dct[tail]
+                if len(bufNums) > 1
+                    call s:manage(bufNums)
+                endif
+            endfor
+        endfun
+
+        " NOTE: only use bufNums and finished
+        fun! s:manage(bufNums)
+            echo 'yes' a:bufNums
+
+            " Race!
+            let finished = []
+            let level = -1
+            "while len(a:bufNums) > 0
+            "while level > -5
+            while len(a:bufNums) > 0
+                let level -= 1
+                call s:manage2(a:bufNums, level, finished)
+            endwhile
+
+            echo finished
+            "return finished
+        endfun
+
+        fun! s:manage2(bufNums, level, finished)
+            " Are there any diff parents in this level?
+            let parents = {}
+            for bufNum in a:bufNums
+                let splitPath = split(g:correspondence[bufNum], '\')
+                "echo 'splitPath:' splitPath
+                let parent = splitPath[a:level]
+                "echo 'parent:' parent
+
+                if has_key(parents, parent)
+                    call add(parents[parent], bufNum)
+                else
+                    let parents[parent] = [bufNum]
+                endif
+            endfor
+            "echo 'parents' parents
+
+            " TODO: any are not dups?
+            for parentName in keys(parents)
+                let bufNums = parents[parentName]
+                if(len(bufNums) == 1)
+                    let bufNum = bufNums[0]
+                    echo 'bufNum' bufNum
+                    call add(a:finished, [bufNum, parentName])
+                    call remove(a:bufNums, index(bufNums, bufNum))
+                endif
+            endfor
+        endfun
+
+    " Clip the file paths of bufs (for the caches of navkey/spacework)
+        "fun! ClipFile()
+        "    let @+ = expand('%:p') . "\n"
+        "endfun
+        "fun! ClipDir()
+        "    let @+ = expand('%:p:h') . "\n"
+        "    "redir @+ | pwd | redir END
+        "endfun
+
+        fun! ClipBufPaths()
+            let @+ = ''
+            for i in range(1, bufnr('$'))
+                if buflisted(i)
+                    let bufPath = expand('#'.i.':p')
+                    if index(g:todos_path, bufPath) == -1 
+                        let @+ .= bufPath . "\n"
+                    endif
+                endif
+            endfor
+        endfun
+        command! CLIPBUFS call ClipBufPaths()
+
+    fun! TestFont(val)
+        if has('unix') "For linux mint, 1920x1680
+            if a:val == 1
+                let &guifont = "Consolas 12"
+                "let &guifont = "Consolas 15"
+                set linespace=5
+            elseif a:val == 2
+                let &guifont = "Inconsolata Medium 13"
+                set linespace=1
+            else
+                let &guifont = "Source Code Pro Regular 13" 
+                "let &guifont = "Source Code Pro Regular 15"
+                set linespace=0
+            endif
+
+        else "For win10 (50% scaling)
+            if a:val == 1
+                let &guifont = "Source_Code_Pro:h9"
+                "let &guifont = "Source_Code_Pro:h10"
+            else
+                let &guifont = "Consolas:h9"
+                "let &guifont = "Consolas:h11"
+            endif
+        endif
+
+    endfun
+
+
+"set autoread

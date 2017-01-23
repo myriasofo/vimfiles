@@ -1,0 +1,10 @@
+$ WINDOW
+getcwd
+win1
+win2
+
+$ MINE
+home: ~
+myPlugins: ~/dev/vimfiles/plugin
+Skyfit: ~/dev/Skyfit
+dashboard: ~/dev/aaptiv-data-dashboard
