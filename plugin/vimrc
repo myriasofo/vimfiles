@@ -61,7 +61,7 @@
             "Plugin 'FelikZ/ctrlp-py-matcher'
             Plugin 'tpope/vim-sleuth'
             Plugin 'tomtom/tcomment_vim'
-            "Plugin 'luochen1990/rainbow'
+            Plugin 'luochen1990/rainbow'
 
             " Could make my own version of
             Plugin 'xolox/vim-session'
@@ -91,8 +91,8 @@
             "Plugin 'jeetsukumaran/vim-buffersaurus'
 
             "Plugin 'tpope/vim-jdaddy' "Doesn't format json, so useless to me
-            "Plugin 'tpope/vim-fugitive'
-            "Plugin 'airblade/vim-gitgutter'
+            Plugin 'tpope/vim-fugitive'
+            Plugin 'airblade/vim-gitgutter'
             "Plugin 'mhinz/vim-startify'
             "Plugin 'Shougo/unite.vim'
             "Plugin 'ntpeters/vim-better-whitespace'
@@ -1703,4 +1703,4 @@
     endfun
 
 
-"set autoread
+set autoread
