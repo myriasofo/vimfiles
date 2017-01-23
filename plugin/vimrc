@@ -679,7 +679,9 @@
             set listchars=tab:=-
             "set ttyfast
             "set ruler
-            set breakindent
+            if exists("&breakindent") "Only in version >= 8
+                set breakindent
+            endif
 
             " Turn off mouse (no cheating!)
             set mouse =
