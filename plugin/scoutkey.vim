@@ -392,7 +392,8 @@ fun! RemoveAllBuffers()
     for i in range(1, bufnr('$'))
         if buflisted(i) && bufwinnr(i) == -1
             let bufPath = expand('#'.i.':t')
-            if !has_key(g:todos_path, split(bufPath, '\.')[0]) "Don't remove todo files
+            let splitTail = split(bufPath, '\.')
+            if len(splitTail) == 0 || !has_key(g:todos_path, splitTail[0])
                 call add(unloadedFiles, bufPath)
                 exe 'bd '.i
             endif
