@@ -6,8 +6,8 @@ $ COMMANDS
 ===
 $ WORKSPACES
 
-% bank: ~/Dropbox/Tasks/[gitIgnore/bank.to
-% moreTasks: ~/Dropbox/Tasks/[gitIgnore/moreTasks.to
+% work: ~/Dropbox/Tasks/[gitIgnore/work.to
+% home: ~/Dropbox/Tasks/[gitIgnore/home.to
 
 % journal: ~/Dropbox/Tasks/[gitIgnore/journal.to
 % compile: ~/Dropbox/Tasks/[gitIgnore/compile.to
