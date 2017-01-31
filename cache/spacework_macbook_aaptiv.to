@@ -12,8 +12,8 @@ $ WORKSPACES
 
 % journal: /Users/abe/dev/palettes/journal.to
 % bank: /Users/abe/dev/palettes/bank.to
-% mongoQuery: /Users/abe/dev/Skyfit/scripts/countPayingUsersByDay.js
-% output: /Users/abe/dev/Skyfit/local/output.csv
+% mongoQuery: /Users/abe/dev/s_mongoQuery/scripts/countPayingUsersByDay.js
+(% output: /Users/abe/dev/Skyfit/local/output.csv
 (% journal: ~/Dropbox/Tasks/[gitIgnore/journal.to
 (% moreTasks: ~/Dropbox/Tasks/[gitIgnore/moreTasks.to
 (% compile: ~/Dropbox/Tasks/[gitIgnore/compile.to

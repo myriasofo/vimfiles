@@ -4,7 +4,9 @@ win1
 win2
 
 $ MINE
-home: ~
 myPlugins: ~/dev/vimfiles/plugin
-Skyfit: ~/dev/Skyfit
+home: ~
+dev: ~/dev
+
 dashboard: ~/dev/aaptiv-data-dashboard
+skyfit master: ~/dev/s_master
