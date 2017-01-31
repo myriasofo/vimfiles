@@ -15,8 +15,9 @@
         elseif g:machine == 'thinkpad_t460s' && has('unix')
             " Just use defaults
         elseif g:machine == 'macbook_aaptiv'
-            let g:dir_myPlugins = expand('~/dev/vimfiles/')
-            let dir_palettes  = expand('~/dev/palettes/')
+            " Just use defaults
+            "let g:dir_myPlugins = expand('~/dev/vimfiles/')
+            "let dir_palettes  = expand('~/dev/palettes/')
         else
             echom 'NOTE: Please set "g:machine" to a valid value'
             finish
