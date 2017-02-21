@@ -93,7 +93,7 @@
 
             "Plugin 'tpope/vim-jdaddy' "Doesn't format json, so useless to me
             Plugin 'tpope/vim-fugitive'
-            Plugin 'airblade/vim-gitgutter'
+            "Plugin 'airblade/vim-gitgutter'
             "Plugin 'mhinz/vim-startify'
             "Plugin 'Shougo/unite.vim'
             "Plugin 'ntpeters/vim-better-whitespace'
