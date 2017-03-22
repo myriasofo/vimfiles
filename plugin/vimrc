@@ -990,8 +990,8 @@
             nnoremap <silent> qi :q<cr>
 
             " NOTE: no <cr> below on purpose, as a check to make sure
-            nnoremap qh :call delete(expand('%'))
-            nnoremap qn :call DeleteSession()
+            nnoremap qh :call DeleteSession()
+            nnoremap qn :call delete(expand('%'))
 
             nnoremap <silent> s :<c-u>call ScoutKey()<cr>
             "noremap sfk gg
@@ -1433,9 +1433,10 @@
     " open explorer (of windows) to current file/dir
     fun! OpenExplorer()
         if has('win32')
-            !start explorer /select,%:p
+            !start explorer .
+            "!start explorer /select,%:p
         elseif has('unix')
-            "TODO
+            !open .
         endif
     endfun
     command! FileExplorer call OpenExplorer()
