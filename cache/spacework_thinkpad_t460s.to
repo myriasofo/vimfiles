@@ -5,16 +5,13 @@ $ COMMANDS
 
 ===
 $ WORKSPACES
-# [palette
-~/Dropbox/Tasks/feelings/allFeels.to
-~/Dropbox/Tasks/cs/vimTasks.to
-===
-
-% journal: ~/Dropbox/Tasks/[gitIgnore/journal.to
-% moreTasks: ~/Dropbox/Tasks/[gitIgnore/moreTasks.to
+% forHome: ~/Dropbox/Tasks/[gitIgnore/forHome.to
 % compile: ~/Dropbox/Tasks/[gitIgnore/compile.to
+
+% forWork: ~/Dropbox/Tasks/[gitIgnore/forWork.to
 % cs: ~/Dropbox/Tasks/cs/cs.to
+% journal: ~/Dropbox/Tasks/[gitIgnore/journal.to
 ===
-(# [unloaded
+(# this is a nested folder
 (~/Dropbox/Tasks/[gitIgnore/later.to
 ===
