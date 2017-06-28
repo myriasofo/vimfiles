@@ -1585,7 +1585,7 @@ function! <SID>BuildBufferList(curBufNum)
       " If not loaded, check (saved) file
 
       let ln2 = (bufloaded(l:path) ? getbufline(l:path,2)[0] : readfile(l:path,0,2)[1])
-      let symbol = (ln2 == '======' || ln2 == '========1' || ln2 == '========2' ? ' ' : '~')
+      let symbol = (ln2 == '_top' || ln2 == '========1' || ln2 == '========2' ? ' ' : '~')
 
       "if l:path == g:todoList
       "  let firstLine = (bufloaded(l:path) ? getbufline(l:path, 1)[0] : readfile(l:path, 0, 1)[0])
