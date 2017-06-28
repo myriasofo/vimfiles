@@ -6,39 +6,32 @@
     " I use dropbox to sync vim bw several machines
         " These are DEFAULTS. Change below if needed
         set shellslash
-        let g:dir_myPlugins = expand('~') . '/Dropbox/Archives/vimfiles/'
-        let dir_palettes  = expand('~/Dropbox/Tasks/[gitIgnore/')
+        let g:dir_myPlugins = expand('~/Dropbox/Archives/vimfiles/')
+        let dir_palettes  = expand('~/Dropbox/Tasks/_gitIgnore/')
         let dir_vundle = '~/vim/bundle/'
 
-        if g:machine == 'thinkpad_t460s' && has('win32')
-            " Just use defaults
-        elseif g:machine == 'thinkpad_t460s' && has('unix')
-            " Just use defaults
-        elseif g:machine == 'macbook_aaptiv'
-            " Just use defaults
-            "let g:dir_myPlugins = expand('~/dev/vimfiles/')
-            "let dir_palettes  = expand('~/dev/palettes/')
-        else
-            echom 'NOTE: Please set "g:machine" to a valid value'
-            finish
-        endif
+        "if g:machine == 'thinkpad_t460s' && has('win32')
+        "    " Just use defaults
+        "elseif g:machine == 'thinkpad_t460s' && has('unix')
+        "    " Just use defaults
+        "elseif g:machine == 'macbook_aaptiv'
+        "    " Just use defaults
+        "else
+        "    echom 'NOTE: Please set "g:machine" to a valid value'
+        "    finish
+        "endif
 
         if !isdirectory(g:dir_myPlugins)
             echom 'NOTE: Please set "g:dir_myPlugins" to valid folder'
             finish
         endif
 
-
-        " These caches are for navkey + spacework
-        let g:NavKey_cacheLocation    = g:dir_myPlugins . 'cache/navkey_'    . g:machine . '.to'
-        let g:Spacework_cacheLocation = g:dir_myPlugins . 'cache/spacework_' . g:machine . '.to'
-
         " Locations for todo files (just notes)
         let g:todos_path = {}
         for tail in ['list', 'temp1', 'temp2']
             let g:todos_path[tail] = dir_palettes . tail . '.to'
         endfor
-        
+
         " Add my personal plugins
         let &runtimepath .= ',' . g:dir_myPlugins
         " Use vundle to manage plugins
@@ -1712,3 +1705,5 @@
     set autoread
 
 
+"!open -a Terminal.app .
+"NOTE - Don't need to open terminal bc can do all bash in vim!

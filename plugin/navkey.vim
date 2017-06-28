@@ -302,6 +302,7 @@ endfun
 
 
 " Settings
+let g:NavKey_cacheLocation = g:dir_myPlugins . 'cache/navkey.to'
 "let g:NavKey_jumpKeys = 'abcdefghijklmnopqrstuvwxyz0123456789'
 "let g:NavKey_jumpKeys = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 let g:NavKey_jumpKeys = 'abcdefghijmnopqrstuvwxyz'

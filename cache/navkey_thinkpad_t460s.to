@@ -1,9 +1,0 @@
-$ WINDOW
-getcwd
-win1
-win2
-
-$ MINE
-myPlugins: ~/Dropbox/Archives/vimfiles/plugin
-myTasks:   ~/Dropbox/Tasks
-practice:  ~/Dropbox/CS/practice

@@ -220,11 +220,11 @@ fun! RunCode()
         update
         call ExecuteInShell('node %', 'right')
 
-    elseif &filetype == 'stata'
-        update
-        "silent! !start /min "C:\Users\Abe\Dropbox\Archives\static\stata-nppp\rundo.exe" "%:p"
-        let dir_runStata = 'C:\Users\Abe\Dropbox\Archives\static\stata-nppp\'
-        silent! exe '!start /min "'.dir_runStata.'rundo.exe" "%:p"'
+    "elseif &filetype == 'stata'
+    "    update
+    "    "silent! !start /min "C:\Users\Abe\Dropbox\Archives\static\stata-nppp\rundo.exe" "%:p"
+    "    let dir_runStata = 'C:\Users\Abe\Dropbox\Archives\static\stata-nppp\'
+    "    silent! exe '!start /min "'.dir_runStata.'rundo.exe" "%:p"'
 
     elseif &filetype == 'vim'
         update
@@ -234,13 +234,14 @@ fun! RunCode()
             source ~/vimrc
         endif
 
-    "elseif &filetype == 'todo'
-    "    call RunAnalyzeLog()
+    elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
+        :w
+        call ExecuteInShell('python3 ~/dev/analyzeLog/analyzeLog.py', 'right')
 
-    elseif &filetype == 'r'
-    elseif &filetype == 'tex'
-    elseif &filetype == 'java'
-    elseif &filetype == 'cpp'
+    "elseif &filetype == 'r'
+    "elseif &filetype == 'tex'
+    "elseif &filetype == 'java'
+    "elseif &filetype == 'cpp'
     " NOTE: must put in sep plugin, like done in scoutkey
     else
         echom 'ScoutKey: Filetype not supported for RunCode()'
@@ -248,30 +249,6 @@ fun! RunCode()
 
     " Return to prev win
     exe winPrev.' wincmd w'
-endfun
-
-fun! RunAnalyzeLog()
-    "Note requires that log is in clipboard
-
-    " Close extra wins
-    if winnr('$') >= 2
-        for i in range(3, winnr('$'))
-            exe i.' wincmd w'
-            quit
-        endfor
-    endif
-
-    " Opens timeLog.txt and replaces it with contents of clip
-    let dir = "C:/Users/Abe/Dropbox/CS/apps/analyzeLog"
-    exe "edit ".dir."/timeLog.txt"
-    normal! zR
-    normal! ggVGp
-    "normal! ]p
-    update
-
-    " Open python analyzeLog.py and run it
-    exe "edit ".dir."/analyzeLog.py"
-    call ExecuteInShell('python %', 'right')
 endfun
 
 fun! RemoveBufList_fromCtrlp()
