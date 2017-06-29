@@ -1,10 +1,7 @@
 ===
 $ COMMANDS
-(@ openCache
-(@ addFile
-(% flux: ~/Dropbox/Tasks/_gitIgnore/flux.to
-% spacework: ~/Dropbox/Archives/vimfiles/cache/spacework.to
-% navkey: ~/Dropbox/Archives/vimfiles/cache/navkey.to
+% spacework: ~/dev/vimfiles/cache/spacework.to
+% navkey: ~/dev/vimfiles/cache/navkey.to
 
 ===
 $ MAIN
@@ -15,7 +12,7 @@ $ MAIN
 
 $ TRACKERS
 % journal: ~/Dropbox/Tasks/_gitIgnore/journal.to
-% log: ~/dev/analyzeLog/timeLog.to
+% log: ~/Dropbox/Tasks/_gitIgnore/timeLog.to
 ===
 (% mongoQuery: ~/dev/s_mongoQuery/scripts/countPayingUsersByDay.js
 (% output: ~/dev/Skyfit/local/output.csv

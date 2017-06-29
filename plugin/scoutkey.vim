@@ -236,7 +236,7 @@ fun! RunCode()
 
     elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
         :w
-        call ExecuteInShell('python3 ~/dev/analyzeLog/analyzeLog.py', 'right')
+        call ExecuteInShell('python3 ' . g:dir_dev . '/analyzeLog/analyzeLog.py', 'right')
 
     "elseif &filetype == 'r'
     "elseif &filetype == 'tex'

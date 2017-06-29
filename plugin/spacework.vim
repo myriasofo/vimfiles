@@ -265,5 +265,6 @@ endfun
 
 
 " Settings
+let g:Spacework_cacheLocation = g:dir_myPlugins . 'cache/spacework.to'
 let g:Spacework_jumpKeys = 'abcdefghijklmnopqrstuvwxyz3'
 

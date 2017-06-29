@@ -6,20 +6,11 @@
     " I use dropbox to sync vim bw several machines
         " These are DEFAULTS. Change below if needed
         set shellslash
-        let g:dir_myPlugins = expand('~/Dropbox/Archives/vimfiles/')
+        "let g:dir_myPlugins = expand('~/Dropbox/Archives/vimfiles/')
+        let g:dir_dev = expand('~/dev/')
+        let g:dir_myPlugins = g:dir_dev . 'vimfiles/'
         let dir_palettes  = expand('~/Dropbox/Tasks/_gitIgnore/')
         let dir_vundle = '~/vim/bundle/'
-
-        "if g:machine == 'thinkpad_t460s' && has('win32')
-        "    " Just use defaults
-        "elseif g:machine == 'thinkpad_t460s' && has('unix')
-        "    " Just use defaults
-        "elseif g:machine == 'macbook_aaptiv'
-        "    " Just use defaults
-        "else
-        "    echom 'NOTE: Please set "g:machine" to a valid value'
-        "    finish
-        "endif
 
         if !isdirectory(g:dir_myPlugins)
             echom 'NOTE: Please set "g:dir_myPlugins" to valid folder'
@@ -96,10 +87,6 @@
         " Vundle end
             call vundle#end()
             filetype plugin on
-
-        " Old pathogen cmds
-            "execute pathogen#infect()
-            "call pathogen#helptags()
 
     " Disable modeline bc of security reasons
         set nomodeline
