@@ -256,8 +256,13 @@ fun! s:pick_bookmark(jumpList)
 
         if has_key(a:jumpList, char)
             echo '  ' . char
-            call NavKey(a:jumpList[char], 0, 0)
-            return
+            let dir = a:jumpList[char]
+            if !isdirectory(dir)
+                echo "  ERROR: Not a dir: " . dir
+            else
+                call NavKey(dir, 0, 0)
+                return
+            endif
         elseif char == "\<esc>"
             set more
             redraw

@@ -115,7 +115,7 @@ fun! s:get_input(arr_displayText, hash_wsFiles, jumpList)
             let firstChar = cmd[0]
             if firstChar == "@"
                 if cmd == "@ openCache"
-                    exe "edit " g:Spacework_cacheLocation
+                    exe "find " g:Spacework_cacheLocation
                 elseif cmd == "@ addFile"
                     call s:addCurrentFileToCache('# [palette')
                 endif
@@ -126,7 +126,7 @@ fun! s:get_input(arr_displayText, hash_wsFiles, jumpList)
             elseif firstChar == "%"
                 echo 'time to open file'
                 let splitLine = split(cmd, ': ')
-                exe "edit " . splitLine[1]
+                exe "find " . splitLine[1]
                 return 0
             endif
         elseif char == "\<esc>"
@@ -164,7 +164,7 @@ fun! s:pick_wsFile(wsFiles)
         let char = ProcessChar()
 
         if has_key(jumpList, char)
-            exe "edit " jumpList[char]
+            exe "find " jumpList[char]
 
             return 0
         elseif char == "\<esc>"
