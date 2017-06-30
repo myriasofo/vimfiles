@@ -214,7 +214,7 @@ fun! RunCode()
     if &filetype == 'python'
         update
         "call ExecuteInShell('python %', a:direction)
-        call ExecuteInShell('python3 %', 'right')
+        call ExecuteInShell('python %', 'right')
 
     elseif &filetype == 'javascript'
         update
@@ -236,7 +236,7 @@ fun! RunCode()
 
     elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
         :w
-        call ExecuteInShell('python3 ' . g:dir_dev . '/analyzeLog/analyzeLog.py', 'right')
+        call ExecuteInShell('python ' . g:dir_dev . '/analyzeLog/analyzeLog.py', 'right')
 
     "elseif &filetype == 'r'
     "elseif &filetype == 'tex'
