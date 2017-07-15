@@ -1,7 +1,7 @@
 ===
 $ COMMANDS
-% spacework: ~/dev/vimfiles/cache/spacework.to
-% navkey: ~/dev/vimfiles/cache/navkey.to
+% spacework cache: ~/dev/vimfiles/cache/spacework.to
+% navkey cache: ~/dev/vimfiles/cache/navkey.to
 
 ===
 $ MAIN
