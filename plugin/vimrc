@@ -44,7 +44,7 @@
             Plugin 'altercation/vim-colors-solarized'
             "Plugin 'kien/ctrlp.vim'
             "Plugin 'FelikZ/ctrlp-py-matcher'
-            Plugin 'tpope/vim-sleuth'
+            "Plugin 'tpope/vim-sleuth'
             Plugin 'tomtom/tcomment_vim'
             Plugin 'luochen1990/rainbow'
 
@@ -68,7 +68,7 @@
             Plugin 'rking/ag.vim' "Faster grep, searching thru files for text
             "Plugin 'raimondi/delimitmate' "Auto add matching parens (so don't forget to)
             Plugin 'godlygeek/tabular' "Aligns text by char (eg. = or :)
-            Plugin 'kchmck/vim-coffee-script'
+            "Plugin 'kchmck/vim-coffee-script'
 
             "Plugin 'Valloric/YouCompleteMe'
             "Plugin 'scrooloose/syntastic'
@@ -165,7 +165,7 @@
         endtry
 
     " For sleuth
-        let g:did_indent_on = 1
+        "let g:did_indent_on = 1
 
     " For gitgutter
         let g:gitgutter_sign_removed = '-'
@@ -472,16 +472,16 @@
             endfun
 
         " Indents after newlines
-            au FileType * call IndentingForNewLines()
-            fun! IndentingForNewLines()
-                if &filetype == 'todo'
-                    setlocal autoindent
-                else
-                    setlocal autoindent
-                    "setlocal cindent "Problem is that ONLY for C -> so weird special cases
-                    "setlocal cinkeys-=0#
-                endif
-            endfun
+            "au FileType * call IndentingForNewLines()
+            "fun! IndentingForNewLines()
+            "    if &filetype == 'todo'
+            "        setlocal autoindent
+            "    else
+            "        setlocal autoindent
+            "        "setlocal cindent "Problem is that ONLY for C -> so weird special cases
+            "        "setlocal cinkeys-=0#
+            "    endif
+            "endfun
 
         " Trying for netrw
         "au FileType netrw call s:setup_vinegar()
@@ -706,6 +706,9 @@
             " autoindent is *exactly* what I want: when <CR> in insert mode, matches ind of above
             "set autoindent
             "set smartindent
+            set indentexpr=
+            filetype indent off
+
             set tabstop=4
             set shiftwidth=4
             set softtabstop=4
@@ -1694,5 +1697,4 @@
 
 "!open -a Terminal.app .
 "NOTE - Don't need to open terminal bc can do all bash in vim!
-filetype indent off
 
