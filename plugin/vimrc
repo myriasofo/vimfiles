@@ -67,7 +67,7 @@
             Plugin 'tpope/vim-surround' "Operations with surround chars, surprisingly useful
             Plugin 'rking/ag.vim' "Faster grep, searching thru files for text
             "Plugin 'raimondi/delimitmate' "Auto add matching parens (so don't forget to)
-            Plugin 'godlygeek/tabular' "Aligns text by char (eg. = or :)
+            "Plugin 'godlygeek/tabular' "Aligns text by char (eg. = or :)
             "Plugin 'kchmck/vim-coffee-script'
 
             "Plugin 'Valloric/YouCompleteMe'
@@ -123,7 +123,7 @@
 
 "| Plugin-only options
     " Self-explanatory
-        let g:matchparen_timeout = 100
+        let g:matchparen_timeout = 10
         let g:fugitive_no_maps = 1
         let g:EasyMotion_skipfoldedline = 0
         let g:session_lock_enabled = 0
@@ -704,10 +704,10 @@
 
         " Formatting of indents/tabs
             " autoindent is *exactly* what I want: when <CR> in insert mode, matches ind of above
-            "set autoindent
-            "set smartindent
+            set autoindent
             set indentexpr=
-            filetype indent off
+            filetype indent off "stop filetype-specific indent rules, eg. python
+            "set smartindent
 
             set tabstop=4
             set shiftwidth=4
