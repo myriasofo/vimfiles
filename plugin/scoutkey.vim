@@ -213,8 +213,11 @@ fun! RunCode()
 
     if &filetype == 'python'
         update
-        "call ExecuteInShell('python %', a:direction)
-        call ExecuteInShell('python %', 'right')
+        try
+            call ExecuteInShell('python3 %', 'right')
+        catch
+            call ExecuteInShell('python %', 'right')
+        endtry
 
     elseif &filetype == 'javascript'
         update
