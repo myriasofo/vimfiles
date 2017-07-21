@@ -87,7 +87,7 @@ endfun
 
 fun! Scroller_refreshSearchResults()
     let totalLine = line('$')
-    let lineNums = filter(range(totalLine), 'getline(v:val) =~ @/')
+    let lineNums = filter(range(1, totalLine), 'getline(v:val) =~ @/')
     let b:Scroller_searchNum = len(lineNums)
     let scrollerLen = Scroller_getLength()
 
@@ -125,4 +125,3 @@ endfun
 " NOTE - These cause errors if they don't exist
 "call add(g:session_persist_globals, 'b:Scroller_searchPlacement')
 "call add(g:session_persist_globals, 'b:Scroller_searchNum')
-
