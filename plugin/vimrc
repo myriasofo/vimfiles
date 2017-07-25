@@ -122,6 +122,7 @@
 
 "| Plugin-only options
     " Self-explanatory
+        "let g:loaded_matchparen = 1
         let g:matchparen_timeout = 10
         let g:fugitive_no_maps = 1
         let g:EasyMotion_skipfoldedline = 0
@@ -458,7 +459,7 @@
             "let g:indentLine_char='▌'
             let g:indentLine_maxInd = 10
 
-            au BufRead * call DrawIndentLine()
+            "au BufRead * call DrawIndentLine() "syntax match REALLY slows down big files
             fun! DrawIndentLine()
                 if &filetype == 'todo'
                     return
@@ -652,7 +653,7 @@
             set relativenumber
             set notimeout
             set hidden
-            set lazyredraw
+            "set lazyredraw "for nvim, causes 'relativenumber' to flash
             set synmaxcol=200
             set wildmenu
             set wildmode=longest:list "To list all options
