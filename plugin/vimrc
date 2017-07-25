@@ -104,7 +104,7 @@
             endif
 
         " Save history of commands (note: commands, not undo)
-            let &viminfo .= ',n~/vim/viminfo'
+            "let &viminfo .= ',n~/vim/viminfo'
             set history=100
 
         " File backups
@@ -234,8 +234,8 @@
         "colorscheme molokai
         "colorscheme hybrid
         "colorscheme lucius
-        set background=dark
-        "set background=light
+        "set background=dark
+        set background=light
         "let g:molokai_original =1
         "let g:solarized_termcolors=256
 
