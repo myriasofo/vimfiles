@@ -702,16 +702,21 @@
             endif
 
         " Formatting of indents/tabs
-            " autoindent is *exactly* what I want: when <CR> in insert mode, matches ind of above
-            set autoindent
-            set indentexpr=
-            filetype indent off "stop filetype-specific indent rules, eg. python
-            "set smartindent
-
             set tabstop=4
             set shiftwidth=4
             set softtabstop=4
             set expandtab
+
+            " autoindent is *exactly* what I want: when <CR> in insert mode, matches ind of above
+            set autoindent
+            "set smartindent
+
+            "Stop python indenting (from 'filetype indent')
+            "set indentexpr= "overwritten by vim-sleuth
+            "filetype indent off "overwritten by vim-sleuth
+            fun! GetPythonIndent(lnum)
+                return -1
+            endfun
 
     " Syntax hl and coloring
         if exists("g:colors_name")
