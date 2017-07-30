@@ -261,8 +261,8 @@ endfun
     hi link Blackout StatusLineNC
     "hi Blackout term=NONE gui=NONE guifg=fg
     hi link JumpKey_single  StatusLine
-    hi link JumpKey_double1 Special
-    hi link JumpKey_double2 Type
+    hi link JumpKey_double1 Visual
+    hi link JumpKey_double2 PMenuSel
     "hi link JumpKey1 StatusLine
     "hi link JumpKey2 Identifier
 
