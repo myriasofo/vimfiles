@@ -915,7 +915,7 @@
             nnoremap <del> "_x
 
             "Only windows
-            inoremap <c-BS> <c-w> 
+            inoremap <c-BS> <c-w>
             cnoremap <c-BS> <c-w>
 
             "Only mac (linux?)
