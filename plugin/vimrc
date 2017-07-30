@@ -912,8 +912,9 @@
             set backspace =eol,start,indent
             nnoremap <bs> "_X
             nnoremap <del> "_x
-            inoremap <c-BS> <c-w>
-            cnoremap <c-BS> <c-w>
+            inoremap <c-BS> <c-w> "Only windows
+            cnoremap <c-BS> <c-w> "Only windows
+            cnoremap <m-BS> <c-w> "Only mac (linux?)
             let g:ctrlp_prompt_mappings = {
                 \ 'PrtDeleteWord()': ['<c-bs>'],
                 \ }
