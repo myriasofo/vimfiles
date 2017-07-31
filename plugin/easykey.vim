@@ -258,13 +258,16 @@ endfun
     let EasyKey_righthand = 'jklmuiohny'
 
     " For highlighting jumpKey matches
-    hi link Blackout StatusLineNC
     "hi Blackout term=NONE gui=NONE guifg=fg
+    hi link Blackout StatusLineNC
     hi link JumpKey_single  StatusLine
-    hi link JumpKey_double1 Visual
-    hi link JumpKey_double2 PMenuSel
-    "hi link JumpKey1 StatusLine
-    "hi link JumpKey2 Identifier
+    if &background == "dark"
+        hi link JumpKey_double1 Special
+        hi link JumpKey_double2 Type
+    else
+        hi link JumpKey_double1 DiffDelete
+        hi link JumpKey_double2 DiffText
+    endif
 
     " Key bindings
     nmap <silent> f :call EasyKey('n', 2)<cr>
