@@ -85,7 +85,7 @@
 
         " Vundle end
             call vundle#end()
-            filetype plugin on
+            filetype plugin indent on
 
     " Disable modeline bc of security reasons
         set nomodeline
@@ -148,7 +148,7 @@
         endfun
 
         " Put MBE in vert, with colm 20
-        let g:miniBufExplVSplit = 20
+        let g:miniBufExplVSplit = 1
 
         " Put MBE in left
         let g:miniBufExplBRSplit = 0
@@ -164,9 +164,6 @@
         catch
             echom "NOTE: tcomment is not loaded"
         endtry
-
-    " For sleuth
-        "let g:did_indent_on = 1
 
     " For gitgutter
         let g:gitgutter_sign_removed = '-'
@@ -235,8 +232,8 @@
         "colorscheme molokai
         "colorscheme hybrid
         "colorscheme lucius
-        "set background=dark
-        set background=light
+        set background=dark
+        "set background=light
         "let g:molokai_original =1
         "let g:solarized_termcolors=256
 
@@ -342,7 +339,10 @@
             endfun
 
             au FileType javascript call JsSyntaxHl()
+            " TODO: Make below into its own file
             fun! JsSyntaxHl()
+                "syn clear "TODO: just make my own syntax file
+
                 " Literals : Including strings and booleans
                 hi link javaScriptNull Constant
                 syn match Constant "\<\d\+\>"
@@ -485,17 +485,18 @@
             "endfun
 
         " Trying for netrw
-        "au FileType netrw call s:setup_vinegar()
-        "au FileType netrw call SetupNetrw()
-        "au BufRead * call SetupNetrw()
-        "au BufNewFile * call SetupNetrw()
-        "fun! SetupNetrw()
-        "    echo 'any file'
-        "    if &filetype == 'netrw'
-        "        echom 'setup netrw!'
-        "        "nnoremap <silent> s :<c-u>call ScoutKey()<cr>
-        "    endif
-        "endfun
+            "au FileType netrw call s:setup_vinegar()
+            "au FileType netrw call SetupNetrw()
+            "au BufRead * call SetupNetrw()
+            "au BufNewFile * call SetupNetrw()
+            "fun! SetupNetrw()
+            "    echo 'any file'
+            "    if &filetype == 'netrw'
+            "        echom 'setup netrw!'
+            "        "nnoremap <silent> s :<c-u>call ScoutKey()<cr>
+            "    endif
+            "endfun
+
 
 
     " Enable folding, except for help/mbe/noname
@@ -526,18 +527,23 @@
         endif
         let g:session_directory = '~/vim/session'
 
-        au VimLeavePre * MBEClose
+        "au VimLeavePre * MBEClose "redundant with tempBuffers
         au VimLeavePre * call setqflist([]) "So session.vim doesn't save quickfix list
-        au VimLeavePre * silent! argdel *        "So session.vim doesn't save args
-        au VimLeavePre * call CloseOpenHelpWin()
-        fun! CloseOpenHelpWin()
+        au VimLeavePre * silent! argdel * "So session.vim doesn't save args
+        au VimLeavePre * call CloseTempBuffers()
+        fun! CloseTempBuffers()
             " Go thru win and close any that are &filetype == 'help'
-            for i in range(1,winnr('$'))
+            let tempBuffers = {
+                \'': 1,
+                \'help':1,
+                \'minibufexpl': 1,
+                \'qf': 1
+                \}
+            
+            for i in range(winnr('$'), 1, -1)
                 let winFileType = getwinvar(i, '&filetype') 
-                "if winFileType == 'help' || winFileType == 'qf'
-                if winFileType == 'qf'
-                    exe i.' wincmd w'
-                    quit
+                if has_key(tempBuffers, winFileType)
+                    exe i.'quit'
                 endif
             endfor
         endfun
@@ -710,15 +716,9 @@
             set expandtab
 
             " autoindent is *exactly* what I want: when <CR> in insert mode, matches ind of above
-            set autoindent
+            "set autoindent "Enabled in autocmd
             "set smartindent
 
-            "Stop python indenting (from 'filetype indent')
-            "set indentexpr= "overwritten by vim-sleuth
-            "filetype indent off "overwritten by vim-sleuth
-            fun! GetPythonIndent(lnum)
-                return -1
-            endfun
 
     " Syntax hl and coloring
         if exists("g:colors_name")
@@ -910,7 +910,7 @@
     " Actions
         " Del and Bsp
             " Make bsp work in Windows
-            set backspace =eol,start,indent
+            set backspace=eol,start,indent
             nnoremap <bs> "_X
             nnoremap <del> "_x
 
@@ -919,6 +919,7 @@
             cnoremap <c-BS> <c-w>
 
             "Only mac (linux?)
+            inoremap <m-BS> <c-w>
             cnoremap <m-BS> <c-w>
 
         " Undo
@@ -1708,4 +1709,14 @@
 
 "!open -a Terminal.app .
 "NOTE - Don't need to open terminal bc can do all bash in vim!
+
+if !exists("g:loadOnce_test")
+    let g:loadOnce_temp = 1
+
+    " Hack to turn off indentexpr
+    autocmd BufRead,BufNewFile * set indentexpr=
+    autocmd BufRead,BufNewFile * set autoindent
+    " TODO: prevent run of indent/<lang>.vim
+    "autocmd Filetype * let b:did_indent = 1
+endif
 
