@@ -32,20 +32,20 @@
 
 fun! Insertatron()
     " Start with default settings
-    let direction = 1
-    let insertMode = 1
-    let extraFrom = 0
-    let extraAway = 0
+    let indLen       = &shiftwidth
 
-    let indLen = &shiftwidth
-    let matchInd = 1
-    let indFromCurr = 0
-    let indAdjust = 0
-    let adjustRepeat = 1
+    let direction    = 1 "Direction for new lines (insertUp)
+    let insertMode   = 1 "MODE: after adding lines, proceed into vim's insert mode
+    let matchInd     = 1 "MODE: when adding new lines, give them empty str to match indent of cursor line
+    let indFromCurr  = 0 "Get matchInd from next visible line (above or below)
+
+    let extraFrom    = 0 "include additional lines between original cursor and new location
+    let extraAway    = 0 "include additional lines between new location and rest of text
+    let indAdjust    = 0 "Adjust indent up or down
 
     " Get input
     while 1
-        let char =ProcessChar()
+        let char = ProcessChar()
 
         if char == "\<esc>"
             echom 'Insertatron: Cancelled'
@@ -55,6 +55,7 @@ fun! Insertatron()
             call cursor('.', indent('.')+1)
             startinsert
             return
+        " NOTE: 'startinsert!' sucks in macvim
         elseif char == g:Insertatron_key_insertRight
             startinsert!
             return
@@ -63,22 +64,24 @@ fun! Insertatron()
             let direction = -1
             break
         elseif char == g:Insertatron_key_dn
-            break
-        elseif char == ','
-            let indFromCurr = -1
-            let direction = -1
-            break
-        elseif char == '.'
-            let indFromCurr = 1
+            "let direction = 1 "Default
             break
 
+        "elseif char == g:Insertatron_key_ ','
+        "    let indFromCurr = -1
+        "    let direction = -1
+        "    break
+        "elseif char == g:Insertatron_key_ '.'
+        "    let indFromCurr = 1
+        "    break
+        "elseif char=~'\d' "Unneeded
+        "    " vim treats str that are numbers as numbers (!)
+        "    "let repeat = char
+
         elseif char == g:Insertatron_key_left
-            let indAdjust -= (indLen * adjustRepeat)
+            let indAdjust -= indLen
         elseif char == g:Insertatron_key_right
-            let indAdjust += (indLen * adjustRepeat)
-        elseif char=~'\d'
-            " vim treats str that are numbers as numbers (!)
-            let repeat =char
+            let indAdjust += indLen
 
         elseif char == g:Insertatron_key_main
             let matchInd = 0
@@ -92,14 +95,13 @@ fun! Insertatron()
             let extraAway += 1
 
         else
-            echom 'Insertatron: Nothing happened'
+            echom 'Insertatron: Invalid key'
             return
         endif
     endwhile
 
     " Grab properly indented line
     let indFinal = DetermineIndent(direction, matchInd, indAdjust, indFromCurr)
-    echom indFinal
     let indText = repeat(' ', indFinal)
     call Inserter(direction, indText, insertMode, extraFrom, extraAway)
 endfun
