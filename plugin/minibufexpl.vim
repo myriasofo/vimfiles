@@ -1522,16 +1522,32 @@ endfunction
 " Creates the buffer list string and returns 1 if it is different than
 " last time this was called and 0 otherwise.
 "
+"let g:VERTICAL_PADDING = 5
+let g:VERTICAL_PADDING = 4
+
+function GetMinimumWidth()
+  let minimum = 5
+  for todo in keys(g:todos_path)
+    " get minimum
+    let fileTail = fnamemodify(g:todos_path[todo], ':t')
+    let len = strlen(fileTail)
+    if len > minimum
+      let minimum = len
+    endif
+  endfor
+  return minimum
+endfunction
+
 function! <SID>BuildBufferList(curBufNum)
   let g:prevLongest = (exists("g:longestFilename") ? g:longestFilename : 0)
-  let g:longestFilename = 0
+  let g:longestFilename = GetMinimumWidth()
 
   " Returns one long str (incl newline) that's pasted directly into MBE
   let l:miniBufExplBufList = ''
 
   " 1. Separate bufs in win (visible) vs not (hidden)
-  let l:bufList_visible =[]
-  let l:bufList_hidden =[]
+  let l:bufList_visible = []
+  let l:bufList_hidden = []
 
   for l:i in s:BufList
     let l:bufname =expand('#'.l:i.':t')
@@ -1577,7 +1593,7 @@ function! <SID>BuildBufferList(curBufNum)
   " 3B. Format and insert: special
   for todo in keys(g:todos_path)
     let l:path = g:todos_path[todo]
-    let fileTail = todo . ".to"
+    let fileTail = fnamemodify(l:path, ':t')
 
     " If not open in curr win (ie. hidden or unloaded)
     if bufwinnr(l:path) == -1
@@ -1643,7 +1659,7 @@ function! <SID>BuildBufferList(curBufNum)
   if (s:miniBufExplBufList != l:miniBufExplBufList)
     let s:miniBufExplBufList = l:miniBufExplBufList
     if g:longestFilename != g:prevLongest
-      let g:miniBufExplVSplit = g:longestFilename + 5
+      let g:miniBufExplVSplit = g:longestFilename + g:VERTICAL_PADDING
     endif
     return 1
   else
