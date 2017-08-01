@@ -436,8 +436,8 @@
 
         " Setup Indent lines!
             " NOTE - this must go *after* other syntax hl
-            set conceallevel=2
-            set concealcursor=nic
+            "set conceallevel=2
+            "set concealcursor=nic
 
             " about same colors as text
             "highlight Conceal guibg=NONE guifg=#586e75
