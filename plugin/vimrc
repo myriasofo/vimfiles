@@ -60,7 +60,7 @@
 
             " Fine, but never use
             "Plugin 'godlygeek/tabular' "Aligns text by char (eg. = or :)
-            "Plugin 'kchmck/vim-coffee-script'
+            Plugin 'kchmck/vim-coffee-script'
 
             " Fine, but I don't want
             "Plugin 'szw/vim-ctrlspace'
@@ -395,7 +395,7 @@
                 hi link javaScriptMessage PreProc
                 " Clear out normal keywords: window, document
                 syntax clear javaScriptGlobal javaScriptMember
-                syn keyword PreProc yield
+                syn keyword PreProc yield async
 
                 " Defined : Functions that are global
                 syn keyword jsInternal eval call apply bind create keys hasOwnProperty isArray
@@ -1357,7 +1357,7 @@
     " Trying to use ag
         if executable('ag')
             " Use Ag over Grep
-            set grepprg=ag\ -s\ --nogroup\ --nocolor\ --ignore-dir\ CVS
+            let &grepprg = 'ag -s --nogroup --nocolor --ignore-dir CVS --ignore-dir node_modules'
 
             " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
             "let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
@@ -1518,7 +1518,7 @@
         fun! GrepMe(...)
             " Format query
             " TODO: grep is fine with single quotes ('), but doesn't acknowledge double quotes (")
-            if a:0 == 0 " a:0 has number of args (here, 0 or 1) and a:1 has the arg
+            if a:0 == 0 "if no args
                 let searchQuery = getreg('/')
                 let searchQuery = (searchQuery[0:1] == '\<' && searchQuery[-2:-1] == '\>' ? searchQuery[2:-3] : searchQuery)
             else
