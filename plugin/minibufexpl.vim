@@ -1557,7 +1557,7 @@ function! <SID>BuildBufferList(curBufNum)
     endif
 
     if bufwinnr(l:i) == -1
-      if l:bufname == "" || !has_key(g:todos_path, split(l:bufname, '\.')[0])  "If buf is not a todo file
+      if l:bufname == "" || !has_key(g:todos_path, fnamemodify(l:bufname, ':r'))
         call add(l:bufList_hidden,l:i)
       endif
     else
