@@ -1593,39 +1593,48 @@ function! <SID>BuildBufferList(curBufNum)
   " 3B. Format and insert: special
   for todo in keys(g:todos_path)
     let l:path = g:todos_path[todo]
-    let fileTail = fnamemodify(l:path, ':t')
+    let fileTail = fnamemodify(l:path, ':t:r')
+    if fileTail == 'list'
+      continue
+    endif
 
     " If not open in curr win (ie. hidden or unloaded)
-    if bufwinnr(l:path) == -1
-      " Has file been loaded into a buf? (and maybe modified)
-      " If not loaded, check (saved) file
+    "if bufwinnr(l:path) == -1
+    " Has file been loaded into a buf? (and maybe modified)
+    " If not loaded, check (saved) file
 
-      let ln2 = (bufloaded(l:path) ? getbufline(l:path,2)[0] : readfile(l:path,0,2)[1])
-      let symbol = (ln2 == '_top' || ln2 == '========1' || ln2 == '========2' ? ' ' : '~')
+    let ln2 = (bufloaded(l:path) ? getbufline(l:path,2)[0] : readfile(l:path,0,2)[1])
+    let symbol = (ln2 == '_top' || ln2 == '========1' || ln2 == '========2' ? ' ' : '~')
 
-      "if l:path == g:todoList
-      "  let firstLine = (bufloaded(l:path) ? getbufline(l:path, 1)[0] : readfile(l:path, 0, 1)[0])
-      "  let symbol = (firstLine == '======' ? ' ' : '~')
-      "  "let symbol = ' '
-      "else
-      "  if bufloaded(l:path)
-      "    let lines = getbufline(l:path, 1, 2)
-      "    let symbol = (len(lines) == 1 && lines[0] == '' ? ' ' : '~')
-      "  else
-      "    let size = getfsize(l:path)
-      "    let symbol = (size <= 1 ? ' ' : '~')
-      "  endif
-      "endif
+    "if l:path == g:todoList
+    "  let firstLine = (bufloaded(l:path) ? getbufline(l:path, 1)[0] : readfile(l:path, 0, 1)[0])
+    "  let symbol = (firstLine == '======' ? ' ' : '~')
+    "  "let symbol = ' '
+    "else
+    "  if bufloaded(l:path)
+    "    let lines = getbufline(l:path, 1, 2)
+    "    let symbol = (len(lines) == 1 && lines[0] == '' ? ' ' : '~')
+    "  else
+    "    let size = getfsize(l:path)
+    "    let symbol = (size <= 1 ? ' ' : '~')
+    "  endif
+    "endif
 
-      let l:miniBufExplBufList .= "   ".symbol.fileTail."\n"
-    endif
+    let l:miniBufExplBufList .= "   ".symbol.fileTail."\n"
+    "endif
   endfor
+  "let l:miniBufExplBufList .= "\n" "Add spacer between todo
 
   " 3C. Format and insert: hidden
   "let counter = 0
   "let g:convertMbeToBuf = [0] "This first elem is never used. Space filler
   let g:convertMbeToBuf = {}
   for l:i in l:bufList_hidden
+    let fileTail = expand("#".l:i.":p:t")
+    if fileTail == 'timeLog.to'
+      continue
+    endif
+
     let l:stub =' '
 
     " Add bufnum
@@ -1647,7 +1656,7 @@ function! <SID>BuildBufferList(curBufNum)
 
     "Add bufname
     "let l:stub .=s:bufUniqNameDict[l:i]
-    let l:stub .=expand("#".l:i.":p:t")
+    let l:stub .= fileTail
     if(getbufvar(l:i, '&modified') == 1)
       let l:stub .='+'
     endif

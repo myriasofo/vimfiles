@@ -63,7 +63,8 @@ fun! ScoutKey()
     elseif char == '.'
         call LoadFile(g:todos_path.temp2)
     elseif char == '/'
-        call SetupWorkspace(g:todos_path.temp1, g:todos_path.temp2)
+        "call SetupWorkspace(g:todos_path.temp1, g:todos_path.temp2)
+        call LoadFile(g:dir_palettes . 'timeLog.to')
 
 
     elseif char == 'e'

@@ -395,7 +395,7 @@
                 hi link javaScriptMessage PreProc
                 " Clear out normal keywords: window, document
                 syntax clear javaScriptGlobal javaScriptMember
-                syn keyword PreProc yield async
+                syn keyword PreProc yield async await
 
                 " Defined : Functions that are global
                 syn keyword jsInternal eval call apply bind create keys hasOwnProperty isArray
