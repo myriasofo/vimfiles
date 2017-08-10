@@ -232,8 +232,8 @@
         "colorscheme molokai
         "colorscheme hybrid
         "colorscheme lucius
-        set background=dark
-        "set background=light
+        "set background=dark
+        set background=light
         "let g:molokai_original =1
         "let g:solarized_termcolors=256
 
