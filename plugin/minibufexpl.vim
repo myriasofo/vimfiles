@@ -1543,7 +1543,7 @@ function! <SID>BuildBufferList(curBufNum)
   let g:longestFilename = GetMinimumWidth()
 
   " Returns one long str (incl newline) that's pasted directly into MBE
-  let l:miniBufExplBufList = ''
+  let l:miniBufExplBufList = "\n"
 
   " 1. Separate bufs in win (visible) vs not (hidden)
   let l:bufList_visible = []
@@ -1588,7 +1588,11 @@ function! <SID>BuildBufferList(curBufNum)
 
     let l:miniBufExplBufList .=l:stub."\n"
   endfor
-  let l:miniBufExplBufList .="\n"
+
+  if len(l:bufList_visible) == 1
+    let l:miniBufExplBufList .= "\n"
+  endif
+  let l:miniBufExplBufList .= "\n"
 
   " 3B. Format and insert: special
   for todo in keys(g:todos_path)
@@ -1598,8 +1602,11 @@ function! <SID>BuildBufferList(curBufNum)
       continue
     endif
 
-    " If not open in curr win (ie. hidden or unloaded)
-    "if bufwinnr(l:path) == -1
+    " Don't list if already open in any win
+    "if bufwinnr(l:path) != -1
+    "  continue
+    "endif
+
     " Has file been loaded into a buf? (and maybe modified)
     " If not loaded, check (saved) file
 
@@ -1621,7 +1628,6 @@ function! <SID>BuildBufferList(curBufNum)
     "endif
 
     let l:miniBufExplBufList .= "   ".symbol.fileTail."\n"
-    "endif
   endfor
   "let l:miniBufExplBufList .= "\n" "Add spacer between todo
 
