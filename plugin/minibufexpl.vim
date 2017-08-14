@@ -1560,8 +1560,8 @@ function AddVisibleBufs(visibleBufs, curBufNum)
     endif
 
     " Add bufname
-    "let l:stub .= s:bufUniqNameDict[l:i]
-    let l:stub .= expand("#".l:i.":p:t")
+    let l:stub .= s:bufUniqNameDict[l:i]
+    "let l:stub .= expand("#".l:i.":p:t")
     if(getbufvar(l:i, '&modified') == 1)
       let l:stub .= '+'
     endif
@@ -1630,8 +1630,8 @@ function AddHiddenBufs(hiddenBufs)
 
 
     "Add bufname
-    "let l:stub .= s:bufUniqNameDict[l:i]
-    let l:stub .= fileTail
+    let l:stub .= s:bufUniqNameDict[l:i]
+    "let l:stub .= fileTail
     if(getbufvar(l:i, '&modified') == 1)
       let l:stub .= '+'
     endif
