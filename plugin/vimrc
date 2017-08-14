@@ -969,6 +969,20 @@
             imap <c-a> <nop>
             imap <c-t> <nop>
 
+            imap <d-w> <nop>
+            imap <d-r> <nop>
+            imap <d-t> <nop>
+
+            imap <d-a> <nop>
+            imap <d-s> <nop>
+            imap <d-f> <nop>
+
+            imap <d-z> <nop>
+            imap <d-x> <nop>
+            imap <d-c> <nop>
+            imap <d-v> <nop>
+
+
     " Managing files and views
         " File basics
             nnoremap qw :xa<cr>
@@ -1719,4 +1733,5 @@ if !exists("g:loadOnce_test")
     " TODO: prevent run of indent/<lang>.vim
     "autocmd Filetype * let b:did_indent = 1
 endif
+
 
