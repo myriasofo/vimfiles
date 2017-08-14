@@ -1548,8 +1548,8 @@ function DivideBufsIntoHiddenAndVisible()
   return [l:hiddenBufs, l:visibleBufs]
 endfunction
 
-function AddVisibleBufs(visibleBufs, curBufNum)
-  let l:mbeList = "\n"
+function AddVisibleBufs(mbeList, visibleBufs, curBufNum)
+  call add(a:mbeList, '') "Start with some blank space
 
   for l:i in a:visibleBufs
     " Add mark if active vs. just visible
@@ -1564,18 +1564,18 @@ function AddVisibleBufs(visibleBufs, curBufNum)
     "let l:stub .= expand("#".l:i.":p:t")
     let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
 
-    let l:mbeList .= l:stub."\n"
+    call add(a:mbeList, l:stub)
   endfor
 
-  " Usually use have 2 wins. So if only one, then add an extra linebreak
-  let l:mbeList .= len(a:visibleBufs) == 1 ? "\n\n" : "\n"
+  call add(a:mbeList, '')
 
-  return l:mbeList
+  " Usually use have 2 wins. So if only one, then add an extra linebreak
+  if len(a:visibleBufs) == 1
+    call add(a:mbeList, '')
+  endif
 endfunction
 
-function AddSpecialBufs()
-  let l:mbeList = ''
-
+function AddSpecialBufs(mbeList)
   for todo in keys(g:todos_path)
     let l:path = g:todos_path[todo]
     let fileTail = fnamemodify(l:path, ':t:r')
@@ -1586,16 +1586,13 @@ function AddSpecialBufs()
 
     let firstThreeLines = GetFileLines(l:path, 3) "If files are empty, then only 2 lines
     if len(firstThreeLines) > 2
-      let l:mbeList .= GetLeftPadding() . fileTail . "\n"
+      let l:stub = GetLeftPadding() . fileTail
+      call add(a:mbeList, l:stub)
     endif
   endfor
-
-  return l:mbeList
 endfunction
 
-function AddHiddenBufs(hiddenBufs)
-  let l:mbeList = ''
-
+function AddHiddenBufs(mbeList, hiddenBufs)
   let g:convertMbeToBuf = {}
   for l:i in a:hiddenBufs
     let fileTail = expand("#".l:i.":p:t")
@@ -1616,10 +1613,8 @@ function AddHiddenBufs(hiddenBufs)
     "let l:stub .= fileTail
     let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
 
-    let l:mbeList .= l:stub . "\n"
+    call add(a:mbeList, l:stub)
   endfor
-  
-  return l:mbeList
 endfunction
 
 
@@ -1640,8 +1635,9 @@ endfunction
 
 
 function DetermineMbeRefresh(mbeList)
-  if (s:miniBufExplBufList != a:mbeList)
-    let s:miniBufExplBufList = a:mbeList
+  let l:mbeString = join(a:mbeList, "\n")
+  if (s:miniBufExplBufList != l:mbeString)
+    let s:miniBufExplBufList = l:mbeString
     let g:miniBufExplVSplit = DetermineMbeWidth(a:mbeList)
     return 1
   else
@@ -1652,7 +1648,7 @@ endfunction
 function DetermineMbeWidth(mbeList)
   let l:mbeWidth = 6
 
-  for l:line in split(a:mbeList, "\n")
+  for l:line in a:mbeList
     if strlen(l:line) > l:mbeWidth
       let l:mbeWidth = strlen(l:line)
     endif
@@ -1663,13 +1659,13 @@ endfunction
 
 
 function! <SID>BuildBufferList(curBufNum)
-  "WHAT: Return one long string, to show in MBE window
-  let l:mbeList = ''
+  "WHAT: Return list, with each line of MBE window
+  let l:mbeList = []
   let [l:hiddenBufs, l:visibleBufs] = DivideBufsIntoHiddenAndVisible()
 
-  let l:mbeList .= AddVisibleBufs(l:visibleBufs, a:curBufNum)
-  let l:mbeList .= AddSpecialBufs()
-  let l:mbeList .= AddHiddenBufs(l:hiddenBufs)
+  call AddVisibleBufs(l:mbeList, l:visibleBufs, a:curBufNum)
+  call AddSpecialBufs(l:mbeList)
+  call AddHiddenBufs(l:mbeList, l:hiddenBufs)
 
   return DetermineMbeRefresh(l:mbeList)
 endfunction
