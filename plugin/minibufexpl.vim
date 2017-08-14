@@ -1522,11 +1522,155 @@ endfunction
 " Creates the buffer list string and returns 1 if it is different than
 " last time this was called and 0 otherwise.
 "
-"let g:VERTICAL_PADDING = 5
-let g:VERTICAL_PADDING = 4
+
+"let g:VERTICAL_PADDING = 4
+let g:LEFT_PADDING = 4
+
+function DivideBufsIntoHiddenAndVisible()
+  let l:hiddenBufs = []
+  let l:visibleBufs = []
+
+  for l:i in s:BufList
+    let l:bufname = expand('#'.l:i.':t')
+    if bufwinnr(l:i) == -1
+      if l:bufname != '' && !IsTodoFile(l:bufname)
+        call add(l:hiddenBufs, l:i)
+      endif
+    else
+      "call add(l:tabListTop, l:tab)
+      call add(l:visibleBufs, l:i)
+    endif
+  endfor
+
+  call sort(l:visibleBufs, "<SID>MyWinCmp")
+  call sort(l:hiddenBufs, "<SID>MyNameCmp")
+
+  return [l:hiddenBufs, l:visibleBufs]
+endfunction
+
+function AddVisibleBufs(visibleBufs, curBufNum)
+  let l:mbeList = "\n"
+
+  for l:i in a:visibleBufs
+    " Add mark if active vs. just visible
+    if l:i == a:curBufNum
+      let l:stub = repeat(' ', g:LEFT_PADDING - 1 ) . '*'
+    else
+      let l:stub = repeat(' ', g:LEFT_PADDING)
+    endif
+
+    " Add bufname
+    "let l:stub .= s:bufUniqNameDict[l:i]
+    let l:stub .= expand("#".l:i.":p:t")
+    if(getbufvar(l:i, '&modified') == 1)
+      let l:stub .= '+'
+    endif
+
+    let l:mbeList .= l:stub."\n"
+  endfor
+
+  if len(a:visibleBufs) == 1
+    let l:mbeList .= "\n"
+  endif
+  let l:mbeList .= "\n"
+
+  return l:mbeList
+endfunction
+
+function AddSpecialBufs()
+  let l:mbeList = ''
+
+  for todo in keys(g:todos_path)
+    let l:path = g:todos_path[todo]
+    let fileTail = fnamemodify(l:path, ':t:r')
+    if fileTail == 'list'
+      continue
+    endif
+
+    " Don't list if already open in any win
+    if bufwinnr(l:path) != -1
+      continue
+    endif
+
+    " Has file been loaded into a buf? (and maybe modified)
+    " If not loaded, check (saved) file
+
+    if bufloaded(l:path)
+      let lines = getbufline(l:path, 0, 3)
+    else
+      let lines = readfile(l:path, 0, 3)
+    endif
+
+    if len(lines) > 2
+      "let symbol = '~'
+      let l:mbeList .= repeat(' ', g:LEFT_PADDING) . fileTail . "\n"
+    endif
+  endfor
+
+  return l:mbeList
+endfunction
+
+function AddHiddenBufs(hiddenBufs)
+  let l:mbeList = ''
+
+  let g:convertMbeToBuf = {}
+  for l:i in a:hiddenBufs
+    let fileTail = expand("#".l:i.":p:t")
+
+    if fileTail == 'timeLog.to'
+      continue
+    endif
+
+    let l:stub =' '
+
+    " char "a" is 97 and "z" is 122
+    let letter = nr2char(97 + len(g:convertMbeToBuf))
+    let g:convertMbeToBuf[letter] = l:i
+    let l:stub .= ' '.letter.' '
+
+
+    "Add bufname
+    "let l:stub .= s:bufUniqNameDict[l:i]
+    let l:stub .= fileTail
+    if(getbufvar(l:i, '&modified') == 1)
+      let l:stub .= '+'
+    endif
+
+    let l:mbeList .= l:stub . "\n"
+  endfor
+  
+  return l:mbeList
+endfunction
+
+function IsTodoFile(bufname)
+  return has_key(g:todos_path, fnamemodify(a:bufname, ':r'))
+endfunction
+
+
+function DetermineMbeRefresh(mbeList)
+  if (s:miniBufExplBufList != a:mbeList)
+    let s:miniBufExplBufList = a:mbeList
+    let g:miniBufExplVSplit = DetermineMbeWidth(a:mbeList)
+    return 1
+  else
+    return 0
+  endif
+endfunction
+
+function DetermineMbeWidth(mbeList)
+  let l:mbeWidth = GetMinimumWidth()
+  for l:line in split(a:mbeList, "\n")
+    "let l:bufname = expand('#'.l:i.':t')
+    if strlen(l:line) > l:mbeWidth
+      let l:mbeWidth = strlen(l:line)
+    endif
+  endfor
+  return l:mbeWidth
+  "return l:mbeWidth + g:VERTICAL_PADDING
+endfunction
 
 function GetMinimumWidth()
-  let minimum = 5
+  let minimum = 6
   for todo in keys(g:todos_path)
     " get minimum
     let fileTail = fnamemodify(g:todos_path[todo], ':t')
@@ -1538,148 +1682,17 @@ function GetMinimumWidth()
   return minimum
 endfunction
 
+
 function! <SID>BuildBufferList(curBufNum)
-  let g:prevLongest = (exists("g:longestFilename") ? g:longestFilename : 0)
-  let g:longestFilename = GetMinimumWidth()
+  "WHAT: Return one long string, to show in MBE window
+  let l:mbeList = ''
+  let [l:hiddenBufs, l:visibleBufs] = DivideBufsIntoHiddenAndVisible()
 
-  " Returns one long str (incl newline) that's pasted directly into MBE
-  let l:miniBufExplBufList = "\n"
+  let l:mbeList .= AddVisibleBufs(l:visibleBufs, a:curBufNum)
+  let l:mbeList .= AddSpecialBufs()
+  let l:mbeList .= AddHiddenBufs(l:hiddenBufs)
 
-  " 1. Separate bufs in win (visible) vs not (hidden)
-  let l:bufList_visible = []
-  let l:bufList_hidden = []
-
-  for l:i in s:BufList
-    let l:bufname =expand('#'.l:i.':t')
-    " Grab max length of filenames, to determine mbe win width
-    if strlen(l:bufname) > g:longestFilename
-      let g:longestFilename = strlen(l:bufname)
-    endif
-
-    if bufwinnr(l:i) == -1
-      if l:bufname == "" || !has_key(g:todos_path, fnamemodify(l:bufname, ':r'))
-        call add(l:bufList_hidden,l:i)
-      endif
-    else
-      "call add(l:tabListTop, l:tab)
-      call add(l:bufList_visible,l:i)
-    endif
-  endfor
-
-  " 2. Sort appropriately
-  call sort(l:bufList_visible, "<SID>MyWinCmp")
-  call sort(l:bufList_hidden, "<SID>MyNameCmp")
-
-  " 3A. Format and insert: visible
-  for l:i in l:bufList_visible
-    " Add mark if active vs. just visible
-    if l:i == a:curBufNum
-      let l:stub ="   *"
-    else
-      let l:stub ="    "
-    endif
-
-    " Add bufname
-    "let l:stub .=s:bufUniqNameDict[l:i]
-    let l:stub .=expand("#".l:i.":p:t")
-    if(getbufvar(l:i, '&modified') == 1)
-      let l:stub .='+'
-    endif
-
-    let l:miniBufExplBufList .=l:stub."\n"
-  endfor
-
-  if len(l:bufList_visible) == 1
-    let l:miniBufExplBufList .= "\n"
-  endif
-  let l:miniBufExplBufList .= "\n"
-
-  " 3B. Format and insert: special
-  for todo in keys(g:todos_path)
-    let l:path = g:todos_path[todo]
-    let fileTail = fnamemodify(l:path, ':t:r')
-    if fileTail == 'list'
-      continue
-    endif
-
-    " Don't list if already open in any win
-    "if bufwinnr(l:path) != -1
-    "  continue
-    "endif
-
-    " Has file been loaded into a buf? (and maybe modified)
-    " If not loaded, check (saved) file
-
-    let ln2 = (bufloaded(l:path) ? getbufline(l:path,2)[0] : readfile(l:path,0,2)[1])
-    let symbol = (ln2 == '_top' || ln2 == '========1' || ln2 == '========2' ? ' ' : '~')
-
-    "if l:path == g:todoList
-    "  let firstLine = (bufloaded(l:path) ? getbufline(l:path, 1)[0] : readfile(l:path, 0, 1)[0])
-    "  let symbol = (firstLine == '======' ? ' ' : '~')
-    "  "let symbol = ' '
-    "else
-    "  if bufloaded(l:path)
-    "    let lines = getbufline(l:path, 1, 2)
-    "    let symbol = (len(lines) == 1 && lines[0] == '' ? ' ' : '~')
-    "  else
-    "    let size = getfsize(l:path)
-    "    let symbol = (size <= 1 ? ' ' : '~')
-    "  endif
-    "endif
-
-    let l:miniBufExplBufList .= "   ".symbol.fileTail."\n"
-  endfor
-  "let l:miniBufExplBufList .= "\n" "Add spacer between todo
-
-  " 3C. Format and insert: hidden
-  "let counter = 0
-  "let g:convertMbeToBuf = [0] "This first elem is never used. Space filler
-  let g:convertMbeToBuf = {}
-  for l:i in l:bufList_hidden
-    let fileTail = expand("#".l:i.":p:t")
-    if fileTail == 'timeLog.to'
-      continue
-    endif
-
-    let l:stub =' '
-
-    " Add bufnum
-    " CONVERT realBufNum to scoutNum
-    "let displayNum = len(g:convertMbeToBuf)
-    "call add(g:convertMbeToBuf, l:i)
-    "
-    "let nBase10 = float2nr(log10(displayNum))
-    "if nBase10 == 0
-    "    let l:stub .=' '
-    "endif
-    "let l:stub .=displayNum.' '
-
-    " char "a" is 97 and "z" is 122
-    let letter = nr2char(97 + len(g:convertMbeToBuf))
-    let g:convertMbeToBuf[letter] = l:i
-    let l:stub .= ' '.letter.' '
-
-
-    "Add bufname
-    "let l:stub .=s:bufUniqNameDict[l:i]
-    let l:stub .= fileTail
-    if(getbufvar(l:i, '&modified') == 1)
-      let l:stub .='+'
-    endif
-
-    let l:miniBufExplBufList .=l:stub."\n"
-  endfor
-
-  " 4. Final - Check if there were any diff
-  if (s:miniBufExplBufList != l:miniBufExplBufList)
-    let s:miniBufExplBufList = l:miniBufExplBufList
-    if g:longestFilename != g:prevLongest
-      let g:miniBufExplVSplit = g:longestFilename + g:VERTICAL_PADDING
-    endif
-    return 1
-  else
-    return 0
-  endif
+  return DetermineMbeRefresh(l:mbeList)
 endfunction
 
 
