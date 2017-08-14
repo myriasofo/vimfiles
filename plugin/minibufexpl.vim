@@ -1554,25 +1554,21 @@ function AddVisibleBufs(visibleBufs, curBufNum)
   for l:i in a:visibleBufs
     " Add mark if active vs. just visible
     if l:i == a:curBufNum
-      let l:stub = repeat(' ', g:LEFT_PADDING - 1 ) . '*'
+      let l:stub = GetLeftPadding(-1) . '*'
     else
-      let l:stub = repeat(' ', g:LEFT_PADDING)
+      let l:stub = GetLeftPadding()
     endif
 
     " Add bufname
     let l:stub .= s:bufUniqNameDict[l:i]
     "let l:stub .= expand("#".l:i.":p:t")
-    if(getbufvar(l:i, '&modified') == 1)
-      let l:stub .= '+'
-    endif
+    let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
 
     let l:mbeList .= l:stub."\n"
   endfor
 
-  if len(a:visibleBufs) == 1
-    let l:mbeList .= "\n"
-  endif
-  let l:mbeList .= "\n"
+  " Usually use have 2 wins. So if only one, then add an extra linebreak
+  let l:mbeList .= len(a:visibleBufs) == 1 ? "\n\n" : "\n"
 
   return l:mbeList
 endfunction
@@ -1583,27 +1579,14 @@ function AddSpecialBufs()
   for todo in keys(g:todos_path)
     let l:path = g:todos_path[todo]
     let fileTail = fnamemodify(l:path, ':t:r')
-    if fileTail == 'list'
+
+    if fileTail == 'list' || bufwinnr(l:path) != -1
       continue
     endif
 
-    " Don't list if already open in any win
-    if bufwinnr(l:path) != -1
-      continue
-    endif
-
-    " Has file been loaded into a buf? (and maybe modified)
-    " If not loaded, check (saved) file
-
-    if bufloaded(l:path)
-      let lines = getbufline(l:path, 0, 3)
-    else
-      let lines = readfile(l:path, 0, 3)
-    endif
-
-    if len(lines) > 2
-      "let symbol = '~'
-      let l:mbeList .= repeat(' ', g:LEFT_PADDING) . fileTail . "\n"
+    let firstThreeLines = GetFileLines(l:path, 3) "If files are empty, then only 2 lines
+    if len(firstThreeLines) > 2
+      let l:mbeList .= GetLeftPadding() . fileTail . "\n"
     endif
   endfor
 
@@ -1621,20 +1604,17 @@ function AddHiddenBufs(hiddenBufs)
       continue
     endif
 
-    let l:stub =' '
+    let l:stub = GetLeftPadding(-2)
 
     " char "a" is 97 and "z" is 122
     let letter = nr2char(97 + len(g:convertMbeToBuf))
     let g:convertMbeToBuf[letter] = l:i
-    let l:stub .= ' '.letter.' '
-
+    let l:stub .= letter . ' '
 
     "Add bufname
     let l:stub .= s:bufUniqNameDict[l:i]
     "let l:stub .= fileTail
-    if(getbufvar(l:i, '&modified') == 1)
-      let l:stub .= '+'
-    endif
+    let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
 
     let l:mbeList .= l:stub . "\n"
   endfor
@@ -1642,8 +1622,20 @@ function AddHiddenBufs(hiddenBufs)
   return l:mbeList
 endfunction
 
+
 function IsTodoFile(bufname)
   return has_key(g:todos_path, fnamemodify(a:bufname, ':r'))
+endfunction
+
+function GetLeftPadding(...)
+  "echom 'args' . a:0
+  let l:paddingAdjust = a:0 > 0 ? a:1 : 0
+  let l:padding = repeat(' ', g:LEFT_PADDING + l:paddingAdjust)
+  return l:padding
+endfunction
+
+function GetFileLines(path, nLines)
+  return bufloaded(a:path) ? getbufline(a:path, 0, a:nLines) : readfile(a:path, 0, a:nLines)
 endfunction
 
 
@@ -1658,28 +1650,15 @@ function DetermineMbeRefresh(mbeList)
 endfunction
 
 function DetermineMbeWidth(mbeList)
-  let l:mbeWidth = GetMinimumWidth()
+  let l:mbeWidth = 6
+
   for l:line in split(a:mbeList, "\n")
-    "let l:bufname = expand('#'.l:i.':t')
     if strlen(l:line) > l:mbeWidth
       let l:mbeWidth = strlen(l:line)
     endif
   endfor
-  return l:mbeWidth
-  "return l:mbeWidth + g:VERTICAL_PADDING
-endfunction
 
-function GetMinimumWidth()
-  let minimum = 6
-  for todo in keys(g:todos_path)
-    " get minimum
-    let fileTail = fnamemodify(g:todos_path[todo], ':t')
-    let len = strlen(fileTail)
-    if len > minimum
-      let minimum = len
-    endif
-  endfor
-  return minimum
+  return l:mbeWidth
 endfunction
 
 
