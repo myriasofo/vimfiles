@@ -1,13 +1,4 @@
 /*
-#Tasks:~/Dropbox/Tasks/_gitIgnore/
-flux.to
-list.to
-temp1.to
-temp2.to
-timeLog.to
-
-*/
-(/*
 #Skyfit:~/dev/Skyfit/
 api/enterpriseAdmin.js
 api/enterpriseUserGroup.js
@@ -17,6 +8,16 @@ test/api/enterpriseUserGroup.js
 
 models/enterpriseUserGroup.js
 models/enterpriseUserGroupUser.js
+
+*/
+/*
+#Tasks:~/Dropbox/Tasks/_gitIgnore/
+flux.to
+list.to
+temp1.to
+temp2.to
+timeLog.to
+
 */
 (#Comment
 (~/Dropbox/Tasks/_gitIgnore/flux.to

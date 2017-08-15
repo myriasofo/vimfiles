@@ -1240,7 +1240,7 @@ function! <SID>ResizeWindow()
 
   endif
 
-  normal! zz
+  "normal! zz "NOTE: I took this out to stop losing view
 
   let &report  = l:save_rep
   let &showcmd = l:save_sc
@@ -1595,7 +1595,6 @@ function s:layoutTwo(mbeList)
   "call s:addBufs(a:mbeList, l:special)
   call add(a:mbeList, '')
   call s:addGlasBufs(a:mbeList)
-  call add(a:mbeList, '')
   call add(a:mbeList, '    Remaining')
   call s:addBufs(a:mbeList, l:remaining)
 endfunction
