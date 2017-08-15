@@ -2,23 +2,21 @@
 $ COMMANDS
 % spacework cache: ~/dev/vimfiles/cache/spacework.to
 % navkey cache: ~/dev/vimfiles/cache/navkey.to
+% glas cache: ~/dev/vimfiles/cache/glas.to
 
 ===
 $ MAIN
-(% flux: ~/Dropbox/Tasks/_gitIgnore/flux.to
 % stable: ~/Dropbox/Tasks/_gitIgnore/stable.to
 % forWork: ~/Dropbox/Tasks/_gitIgnore/forWork.to
 % cs: ~/Dropbox/Tasks/cs/cs.to
 % journal: ~/Dropbox/Tasks/_gitIgnore/journal.to
-($ TRACKERS
+===
+(% flux: ~/Dropbox/Tasks/_gitIgnore/flux.to
 (% log: ~/Dropbox/Tasks/_gitIgnore/timeLog.to
-===
-(% mongoQuery: ~/dev/s_mongoQuery/scripts/countPayingUsersByDay.js
-(% output: ~/dev/Skyfit/local/output.csv
-(# [unloaded
 (~/Dropbox/Tasks/_gitIgnore/later.to
-===
-(# [palette
 (~/Dropbox/Tasks/feelings/allFeels.to
 (~/Dropbox/Tasks/cs/vimTasks.to
+(# [unloaded
+(% mongoQuery: ~/dev/s_mongoQuery/scripts/countPayingUsersByDay.js
+(% output: ~/dev/Skyfit/local/output.csv
 ===
