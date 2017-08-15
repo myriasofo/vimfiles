@@ -339,12 +339,12 @@ fun! ExecuteInShell(cmd, direction)
 endfun
 command! -complete=shellcmd -nargs=+ Shell call ExecuteInShell(<q-args>)
 fun! OpenBuffer(key)
-    if !exists("g:convertMbeToBuf")
+    if !exists("g:mbeHotkeysToBufs")
         return
     endif
 
-    if has_key(g:convertMbeToBuf, a:key)
-        let realBufNum = g:convertMbeToBuf[a:key]
+    if has_key(g:mbeHotkeysToBufs, a:key)
+        let realBufNum = g:mbeHotkeysToBufs[a:key]
         exe 'b '.realBufNum
     else
         echom "ERROR: No such key for buffer"
@@ -354,12 +354,12 @@ endfun
 fun! RemoveBuffer(key)
     " NOTE - is used with MBE's buf keys, so will only remove hidden bufs 
     " (ie. never have to worry about removing active bufs)
-    if !exists("g:convertMbeToBuf")
+    if !exists("g:mbeHotkeysToBufs")
         return
     endif
 
-    if has_key(g:convertMbeToBuf, a:key)
-        let realBufNum = g:convertMbeToBuf[a:key]
+    if has_key(g:mbeHotkeysToBufs, a:key)
+        let realBufNum = g:mbeHotkeysToBufs[a:key]
         "call Spacework_addFileToWs("[unloaded", bufname(realBufNum))
         exe 'bd ' realBufNum
     else

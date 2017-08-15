@@ -1531,6 +1531,7 @@ let g:MBE_IGNORED_FILES = {
   \'vimrc': 1
   \}
 
+
 function DivideBufsIntoHiddenAndVisible()
   let l:hiddenBufs = []
   let l:visibleBufs = []
@@ -1598,7 +1599,8 @@ function AddSpecialBufs(mbeList)
 endfunction
 
 function AddHiddenBufs(mbeList, hiddenBufs)
-  let g:convertMbeToBuf = {}
+  let g:mbeHotkeysToBufs = {}
+
   for l:i in a:hiddenBufs
     let fileTail = expand("#".l:i.":p:t")
 
@@ -1606,14 +1608,7 @@ function AddHiddenBufs(mbeList, hiddenBufs)
       continue
     endif
 
-    let l:stub = GetLeftPadding(-2)
-
-    " char "a" is 97 and "z" is 122
-    let letter = nr2char(97 + len(g:convertMbeToBuf))
-    let g:convertMbeToBuf[letter] = l:i
-    let l:stub .= letter . ' '
-
-    "Add bufname
+    let l:stub = GetLeftPadding(-2) . GetMbeHotkey(l:i) . ' '
     let l:stub .= s:bufUniqNameDict[l:i]
     "let l:stub .= fileTail
     let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
@@ -1636,6 +1631,13 @@ endfunction
 
 function GetFileLines(path, nLines)
   return bufloaded(a:path) ? getbufline(a:path, 0, a:nLines) : readfile(a:path, 0, a:nLines)
+endfunction
+
+function GetMbeHotkey(bufNum)
+  " char "a" is 97 and "z" is 122
+  let letter = nr2char(97 + len(g:mbeHotkeysToBufs))
+  let g:mbeHotkeysToBufs[letter] = a:bufNum
+  return letter
 endfunction
 
 
