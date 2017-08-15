@@ -1531,7 +1531,7 @@ endfunction
 
 
 "let g:VERTICAL_PADDING = 4
-let g:LEFT_PADDING = 4
+let g:MBE_LEFT_PADDING = 4
 let g:MBE_IGNORED_FILES = {
   \'timeLog.to': 1,
   \'flux.to': 1,
@@ -1539,14 +1539,14 @@ let g:MBE_IGNORED_FILES = {
   \}
 
 
-function DivideBufsIntoHiddenAndVisible()
+function s:divideBufsIntoHiddenAndVisible()
   let l:hiddenBufs = []
   let l:visibleBufs = []
 
   for l:i in s:BufList
     let l:bufname = expand('#'.l:i.':t')
     if bufwinnr(l:i) == -1
-      if l:bufname != '' && !IsTodoFile(l:bufname)
+      if l:bufname != '' && !s:isTodoFile(l:bufname)
         call add(l:hiddenBufs, l:i)
       endif
     else
@@ -1561,15 +1561,15 @@ function DivideBufsIntoHiddenAndVisible()
   return [l:hiddenBufs, l:visibleBufs]
 endfunction
 
-function AddVisibleBufs(mbeList, visibleBufs, curBufNum)
+function s:addVisibleBufs(mbeList, visibleBufs, curBufNum)
   call add(a:mbeList, '') "Start with some blank space
 
   for l:i in a:visibleBufs
     " Add mark if active vs. just visible
     if l:i == a:curBufNum
-      let l:stub = GetLeftPadding(-1) . '*'
+      let l:stub = s:getLeftPadding(-1) . '*'
     else
-      let l:stub = GetLeftPadding()
+      let l:stub = s:getLeftPadding()
     endif
 
     " Add bufname
@@ -1588,7 +1588,7 @@ function AddVisibleBufs(mbeList, visibleBufs, curBufNum)
   endif
 endfunction
 
-function AddSpecialBufs(mbeList)
+function s:addSpecialBufs(mbeList)
   for todo in keys(g:todos_path)
     let l:path = g:todos_path[todo]
     let fileTail = fnamemodify(l:path, ':t:r')
@@ -1597,15 +1597,15 @@ function AddSpecialBufs(mbeList)
       continue
     endif
 
-    let firstThreeLines = GetFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
+    let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
     if len(firstThreeLines) > 2
-      let l:stub = GetLeftPadding() . fileTail
+      let l:stub = s:getLeftPadding() . fileTail
       call add(a:mbeList, l:stub)
     endif
   endfor
 endfunction
 
-function AddHiddenBufs(mbeList, hiddenBufs)
+function s:addHiddenBufs(mbeList, hiddenBufs)
   let g:mbeHotkeysToBufs = {}
 
   for l:i in a:hiddenBufs
@@ -1615,7 +1615,7 @@ function AddHiddenBufs(mbeList, hiddenBufs)
       continue
     endif
 
-    let l:stub = GetLeftPadding(-2) . GetMbeHotkey(l:i) . ' '
+    let l:stub = s:getLeftPadding(-2) . s:getMbeHotkey(l:i) . ' '
     let l:stub .= s:bufUniqNameDict[l:i]
     "let l:stub .= fileTail
     let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
@@ -1624,15 +1624,15 @@ function AddHiddenBufs(mbeList, hiddenBufs)
   endfor
 endfunction
 
-function AddGlasBufs(mbeList)
+function s:addGlasBufs(mbeList)
   "Add all from current glas palette (global var)
   let l:glasBufs = GetGlasBufs()
   "Attach hotkeys (but watch out for text!)
   for l:line in l:glasBufs
     if l:line is text
       just add
-      let l:stub = GetLeftPadding(-2)
-      "let l:stub .= GetMbeHotkey(l:i) . ' '
+      let l:stub = s:getLeftPadding(-2)
+      "let l:stub .= s:getMbeHotkey(l:i) . ' '
       "let l:stub .= l:line
       "let l:stub .= s:bufUniqNameDict[l:i]
       "let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
@@ -1641,22 +1641,22 @@ function AddGlasBufs(mbeList)
 endfunction
 
 
-function IsTodoFile(bufname)
+function s:isTodoFile(bufname)
   return has_key(g:todos_path, fnamemodify(a:bufname, ':r'))
 endfunction
 
-function GetLeftPadding(...)
+function s:getLeftPadding(...)
   "echom 'args' . a:0
   let l:paddingAdjust = a:0 > 0 ? a:1 : 0
-  let l:padding = repeat(' ', g:LEFT_PADDING + l:paddingAdjust)
+  let l:padding = repeat(' ', g:MBE_LEFT_PADDING + l:paddingAdjust)
   return l:padding
 endfunction
 
-function GetFileLines(path, nLines)
+function s:getFileLines(path, nLines)
   return bufloaded(a:path) ? getbufline(a:path, 0, a:nLines) : readfile(a:path, 0, a:nLines)
 endfunction
 
-function GetMbeHotkey(bufNum)
+function s:getMbeHotkey(bufNum)
   " char "a" is 97 and "z" is 122
   let letter = nr2char(97 + len(g:mbeHotkeysToBufs))
   let g:mbeHotkeysToBufs[letter] = a:bufNum
@@ -1664,18 +1664,18 @@ function GetMbeHotkey(bufNum)
 endfunction
 
 
-function DetermineMbeRefresh(mbeList)
+function s:determineMbeRefresh(mbeList)
   let l:mbeString = join(a:mbeList, "\n")
   if (s:miniBufExplBufList != l:mbeString)
     let s:miniBufExplBufList = l:mbeString
-    let g:miniBufExplVSplit = DetermineMbeWidth(a:mbeList)
+    let g:miniBufExplVSplit = s:determineMbeWidth(a:mbeList)
     return 1
   else
     return 0
   endif
 endfunction
 
-function DetermineMbeWidth(mbeList)
+function s:determineMbeWidth(mbeList)
   let l:mbeWidth = 13
 
   for l:line in a:mbeList
@@ -1691,14 +1691,14 @@ endfunction
 function! <SID>BuildBufferList(curBufNum)
   "WHAT: Return list, with each line of MBE window
   let l:mbeList = []
-  let [l:hiddenBufs, l:visibleBufs] = DivideBufsIntoHiddenAndVisible()
+  let [l:hiddenBufs, l:visibleBufs] = s:divideBufsIntoHiddenAndVisible()
 
-  call AddVisibleBufs(l:mbeList, l:visibleBufs, a:curBufNum)
-  call AddSpecialBufs(l:mbeList)
-  call AddHiddenBufs(l:mbeList, l:hiddenBufs)
-  "call AddGlasBufs(l:mbeList)
+  call s:addVisibleBufs(l:mbeList, l:visibleBufs, a:curBufNum)
+  call s:addSpecialBufs(l:mbeList)
+  call s:addHiddenBufs(l:mbeList, l:hiddenBufs)
+  "call s:addGlasBufs(l:mbeList)
 
-  return DetermineMbeRefresh(l:mbeList)
+  return s:determineMbeRefresh(l:mbeList)
 endfunction
 
 
