@@ -1,8 +1,10 @@
-(#~/dev/Skyfit/
-(api/enterpriseUserGroup.js
-(models/enterpriseUserGroup.js
-(test/api/enterpriseUserGroup.js
-(
+#~/dev/Skyfit/
+api/enterpriseAdmin.js
+test/api/enterpriseAdmin.js
+api/enterpriseUserGroup.js
+test/api/enterpriseUserGroup.js
+models/enterpriseUserGroup.js
+
 (#Comment
 (~/Dropbox/Tasks/_gitIgnore/flux.to
 (~/dev/vimfiles/cache/glas.to

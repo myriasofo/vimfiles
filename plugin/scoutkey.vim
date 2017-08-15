@@ -72,12 +72,12 @@ fun! ScoutKey()
         call RemoveAllBuffers()
     elseif char == 'a'
         let char = ProcessChar()
-        call OpenBuffer(char)
+        call MbeOpenBuffer(char)
     elseif char == 's'
         redraw!
     elseif char == 'd'
         let char = ProcessChar()
-        call RemoveBuffer(char)
+        call MbeRemoveBuffer(char)
     elseif char == 'f'
         let char =ProcessChar()
         if char ==  'f'
@@ -337,48 +337,6 @@ fun! ExecuteInShell(cmd, direction)
         "redraw
     endif
 endfun
-command! -complete=shellcmd -nargs=+ Shell call ExecuteInShell(<q-args>)
-fun! OpenBuffer(key)
-    if !exists("g:mbeHotkeysToBufs")
-        return
-    endif
-
-    if has_key(g:mbeHotkeysToBufs, a:key)
-        let bufData = g:mbeHotkeysToBufs[a:key]
-        if has_key(bufData, 'bufNum')
-            exe 'b ' . bufData['bufNum']
-        elseif has_key(bufData, 'filePath')
-            exe 'e ' . bufData['filePath']
-        else
-            echom "ERROR: No bufData for hotkey"
-        endif
-    else
-        echom "ERROR: No such key for buffer"
-    endif
-endfun
-
-fun! RemoveBuffer(key)
-    " NOTE - is used with MBE's buf keys, so will only remove hidden bufs 
-    " (ie. never have to worry about removing active bufs)
-    if !exists("g:mbeHotkeysToBufs")
-        return
-    endif
-
-    if has_key(g:mbeHotkeysToBufs, a:key)
-        "call Spacework_addFileToWs("[unloaded", bufname(realBufNum))
-
-        let bufData = g:mbeHotkeysToBufs[a:key]
-        if has_key(bufData, 'bufNum')
-            exe 'bd ' . bufData['bufNum']
-        elseif has_key(bufData, 'filePath')
-            echom "ERROR: Trying to remove filePath from glas"
-        else
-            echom "ERROR: No bufData for hotkey"
-        endif
-    else
-        echom "ERROR: No such key for buffer"
-    endif
-endfun
 
 fun! RemoveAllBuffers()
     wall
@@ -400,3 +358,4 @@ fun! RemoveAllBuffers()
 endfun
 
 
+command! -complete=shellcmd -nargs=+ Shell call ExecuteInShell(<q-args>)

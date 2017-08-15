@@ -1524,6 +1524,55 @@ endfunction
 "
 
 
+" External api
+fun! MbeOpenBuffer(key)
+  if !exists("g:mbeHotkeysToBufs")
+    return
+  endif
+
+  if has_key(g:mbeHotkeysToBufs, a:key)
+    let bufData = g:mbeHotkeysToBufs[a:key]
+    if has_key(bufData, 'bufNum')
+      exe 'b ' . bufData['bufNum']
+    elseif has_key(bufData, 'filePath')
+      let filePath = bufData['filePath']
+      let currentFilePath = expand('%')
+
+      if filePath != currentFilePath
+        exe 'e ' . filePath
+      endif
+    else
+      echom "ERROR: No bufData for hotkey"
+    endif
+  else
+    echom "ERROR: No such key for buffer"
+  endif
+endfun
+
+fun! MbeRemoveBuffer(key)
+  " NOTE - is used with MBE's buf keys, so will only remove hidden bufs 
+  " (ie. never have to worry about removing active bufs)
+  if !exists("g:mbeHotkeysToBufs")
+    return
+  endif
+
+  if has_key(g:mbeHotkeysToBufs, a:key)
+    "call Spacework_addFileToWs("[unloaded", bufname(realBufNum))
+
+    let bufData = g:mbeHotkeysToBufs[a:key]
+    if has_key(bufData, 'bufNum')
+      exe 'bd ' . bufData['bufNum']
+    elseif has_key(bufData, 'filePath')
+      echom "ERROR: Trying to remove filePath from glas"
+    else
+      echom "ERROR: No bufData for hotkey"
+    endif
+  else
+    echom "ERROR: No such key for buffer"
+  endif
+endfun
+
+
 let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
 function s:getGlasCache()
   try
