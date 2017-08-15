@@ -69,7 +69,7 @@ fun! ScoutKey()
 
 
     elseif char == 'e'
-        call RemoveAllBuffers()
+        call ClearOutHiddenBuffers()
     elseif char == 'a'
         let char = ProcessChar()
         call MbeOpenBuffer(char)
@@ -350,7 +350,7 @@ fun! IsBufHidden(bufNum)
     \)
 endfun
 
-fun! RemoveAllBuffers()
+fun! ClearOutHiddenBuffers()
     wall
     for i in range(1, bufnr('$'))
         if IsBufHidden(i)
