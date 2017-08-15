@@ -1739,16 +1739,8 @@ fun! IsBufHidden(bufNum)
     return (
         \buflisted(a:bufNum)
         \&& bufwinnr(a:bufNum) == -1
-        \&& IsBufIgnored(a:bufNum)
-    \)
-endfun
-
-fun! IsBufIgnored(bufNum)
-    let path = expand('#'.a:bufNum)
-    return !(
-        \has_key(g:todos_path, fnamemodify(path, ':t:r'))
-        \|| has_key(g:mbeIgnoredFiles, fnamemodify(path, ':t'))
-        \|| has_key(g:mbeLoadedBufs, path)
-    \)
+        \&& !has_key(g:todos_path, fnamemodify(path, ':t:r'))
+        \&& !has_key(g:mbeIgnoredFiles, fnamemodify(path, ':t'))
+        \)
 endfun
 

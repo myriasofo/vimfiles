@@ -1559,6 +1559,47 @@ let g:mbeIgnoredFiles = {
   \'vimrc': 1
   \}
 
+let g:mbeLayout = 2
+
+function s:layoutSelector(mbeLayout, mbeList)
+  if a:mbeLayout == 1
+    call s:layoutOne(a:mbeList)
+  else
+    call s:layoutTwo(a:mbeList)
+  endif
+endfunction
+
+function s:layoutOne(mbeList)
+  let [l:hiddenBufs, l:visibleBufs] = s:divideBufsIntoHiddenAndVisible()
+
+  call add(a:mbeList, '')
+  call s:addBufs(a:mbeList, l:visibleBufs)
+
+  " Usually use have 2 wins. So if only one, then add an extra linebreak
+  if len(l:visibleBufs) == 1
+    call add(a:mbeList, '')
+  endif
+
+  call add(a:mbeList, '')
+  call s:addGlasBufs(a:mbeList)
+
+  call add(a:mbeList, '')
+  call s:addSpecialBufs(a:mbeList)
+  call s:addBufs(a:mbeList, l:hiddenBufs)
+endfunction
+
+function s:layoutTwo(mbeList)
+  let l:main = []
+  for l:i in s:BufList
+    call add(l:main, l:i)
+  endfor
+
+  call add(a:mbeList, '')
+  call s:addGlasBufs(a:mbeList)
+  call add(a:mbeList, '')
+  call s:addBufs(a:mbeList, l:main)
+endfunction
+
 
 function s:divideBufsIntoHiddenAndVisible()
   let l:hiddenBufs = []
@@ -1566,7 +1607,9 @@ function s:divideBufsIntoHiddenAndVisible()
 
   for l:i in s:BufList
     if bufwinnr(l:i) == -1
-      call add(l:hiddenBufs, l:i)
+      if IsBufHidden(l:i)
+        call add(l:hiddenBufs, l:i)
+      endif
     else
       call add(l:visibleBufs, l:i)
     endif
@@ -1578,29 +1621,24 @@ function s:divideBufsIntoHiddenAndVisible()
   return [l:hiddenBufs, l:visibleBufs]
 endfunction
 
-function s:addVisibleBufs(mbeList, visibleBufs, curBufNum)
-  call add(a:mbeList, '') "Start with some blank space
-
-  for l:i in a:visibleBufs
-    call add(a:mbeList, s:createStubFromBufNum(l:i))
-  endfor
-
-  call add(a:mbeList, '')
-
-  " Usually use have 2 wins. So if only one, then add an extra linebreak
-  if len(a:visibleBufs) == 1
-    call add(a:mbeList, '')
-  endif
-endfunction
-
 function s:addGlasBufs(mbeList)
   "Add all from current glas palette (global var)
   let l:folder = ''
 
+  let skip = 0
   for l:line in s:getGlasCache()
     let l:firstChar = l:line[0]
 
-    if l:firstChar == ''
+    if l:line[0:1] == '*/'
+      let skip = 0
+      continue
+    elseif l:line[0:1] == '/*'
+      let skip = 1
+      continue
+    elseif skip
+      continue
+
+    elseif l:firstChar == ''
       let l:stub = ''
     elseif l:firstChar == '('
       continue
@@ -1609,6 +1647,7 @@ function s:addGlasBufs(mbeList)
     elseif l:firstChar == '#'
       let l:folder = l:line[1:]
       let l:stub = s:getLeftPadding() . l:folder
+
     "elseif l:firstChar == '~'
     "  "let l:stub .= s:bufUniqNameDict[l:i] "TODO: get unique name?
     else
@@ -1636,9 +1675,9 @@ function s:addSpecialBufs(mbeList)
   endfor
 endfunction
 
-function s:addHiddenBufs(mbeList, hiddenBufs)
+function s:addBufs(mbeList, hiddenBufs)
   for l:i in a:hiddenBufs
-    if IsBufIgnored(l:i)
+    if !has_key(g:mbeLoadedBufs, expand('#'.l:i))
       call add(a:mbeList, s:createStubFromBufNum(l:i))
     endif
   endfor
@@ -1738,13 +1777,8 @@ function! <SID>BuildBufferList(curBufNum)
   let l:mbeList = []
   let g:mbeHotkeysToBufs = {}
   let g:mbeLoadedBufs = {}
-  let [l:hiddenBufs, l:visibleBufs] = s:divideBufsIntoHiddenAndVisible()
 
-  call s:addVisibleBufs(l:mbeList, l:visibleBufs, a:curBufNum)
-  call s:addGlasBufs(l:mbeList)
-  call s:addSpecialBufs(l:mbeList)
-  call s:addHiddenBufs(l:mbeList, l:hiddenBufs)
-
+  call s:layoutSelector(g:mbeLayout, l:mbeList)
   return s:determineMbeRefresh(l:mbeList)
 endfunction
 
