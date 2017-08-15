@@ -1551,16 +1551,21 @@ endfun
 
 
 " Constants
-let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
+let g:mbeLayout = 2
 let g:mbeLeftPadding = 4
 let g:mbeIgnoredFiles = {
   \'timeLog.to': 1,
   \'flux.to': 1,
+  \'list.to': 1,
   \'vimrc': 1
   \}
+let g:mbeTempFiles = {
+  \'temp1.to': 1,
+  \'temp2.to': 1,
+  \}
+let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
 
-let g:mbeLayout = 2
-
+" Helper functions
 function s:layoutSelector(mbeLayout, mbeList)
   if a:mbeLayout == 1
     call s:layoutOne(a:mbeList)
@@ -1626,7 +1631,7 @@ function s:divideBufsIntoHiddenAndVisible()
 
   for l:i in s:BufList
     if bufwinnr(l:i) == -1
-      if s:isSpecialBuf(l:i)
+      if !s:isSpecialBuf(l:i)
         call add(l:hiddenBufs, l:i)
       endif
     else
@@ -1679,19 +1684,15 @@ function s:addGlasBufs(mbeList)
 endfunction
 
 function s:addSpecialBufs(mbeList)
-  for todo in keys(g:todos_path)
-    let l:path = g:todos_path[todo]
-    let fileTail = fnamemodify(l:path, ':t:r')
-
-    if fileTail == 'list' || bufwinnr(l:path) != -1
+  for l:tail in keys(g:mbeTempFiles)
+    let l:path = g:dir_palettes . l:tail
+    if bufwinnr(l:path) != -1
       continue
     endif
 
     let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
     if len(firstThreeLines) > 2
-      call add(a:mbeList, s:createStub(l:path))
-      "let l:stub = s:getLeftPadding() . fileTail
-      "call add(a:mbeList, l:stub)
+      call add(a:mbeList, s:createStub(l:path, l:tail))
     endif
   endfor
 endfunction
@@ -1819,8 +1820,8 @@ function s:getMbeMarker(path)
     endif
 
   elseif s:isSpecialBuf(a:path)
-    let l:tail = fnamemodify(a:path, ':t:r')
-    if has_key(g:todos_path, l:tail) && l:tail != 'list'
+    let l:tail = fnamemodify(a:path, ':t')
+    if has_key(g:mbeTempFiles, l:tail)
       let firstThreeLines = s:getFileLines(a:path, 3) "If files are empty, they'll have exactly 2 lines
       if len(firstThreeLines) > 2
         return '~'
@@ -1843,10 +1844,6 @@ function s:isBufModified(path)
   return bufloaded(a:path) && getbufvar(bufnr(a:path), '&modified')
 endfunction
 
-function s:isTodoFile(bufname)
-  return has_key(g:todos_path, fnamemodify(a:bufname, ':r'))
-endfunction
-
 function s:getGlasCache()
   try
     return readfile(g:glasCacheLocation)
@@ -1863,7 +1860,7 @@ function s:isSpecialBuf(bufNum)
   endif
 
   return (
-    \has_key(g:todos_path, fnamemodify(a:path, ':t:r'))
+    \has_key(g:mbeTempFiles, fnamemodify(a:path, ':t'))
     \|| has_key(g:mbeIgnoredFiles, fnamemodify(a:path, ':t'))
   \)
 endfunction

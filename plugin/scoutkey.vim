@@ -55,16 +55,16 @@ fun! ScoutKey()
 
 
     elseif char == 'n'
-        "call SetupWorkspace(g:todos_path.list, g:todos_path.temp1)
+        "call SetupWorkspace(g:dir_palettes.'list.to', g:dir_palettes.'temp1.to')
         call LoadFile(g:dir_palettes . 'flux.to')
     elseif char == 'm'
-        call LoadFile(g:todos_path.list)
+        call LoadFile(g:dir_palettes . 'list.to')
     elseif char == ','
-        call LoadFile(g:todos_path.temp1)
+        call LoadFile(g:dir_palettes . 'temp1.to')
     elseif char == '.'
-        call LoadFile(g:todos_path.temp2)
+        call LoadFile(g:dir_palettes . 'temp2.to')
     elseif char == '/'
-        "call SetupWorkspace(g:todos_path.temp1, g:todos_path.temp2)
+        "call SetupWorkspace(g:dir_palettes.'temp1.to', g:dir_palettes.'temp2.to')
         call LoadFile(g:dir_palettes . 'timeLog.to')
 
 

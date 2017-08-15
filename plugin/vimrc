@@ -17,12 +17,6 @@
             finish
         endif
 
-        " Locations for todo files (just notes)
-        let g:todos_path = {}
-        for tail in ['list', 'temp1', 'temp2']
-            let g:todos_path[tail] = dir_palettes . tail . '.to'
-        endfor
-
         " Add my personal plugins
         let &runtimepath .= ',' . g:dir_myPlugins
         " Use vundle to manage plugins
@@ -1676,18 +1670,18 @@
         "    "redir @+ | pwd | redir END
         "endfun
 
-        fun! ClipBufPaths()
-            let @+ = ''
-            for i in range(1, bufnr('$'))
-                if buflisted(i)
-                    let bufPath = expand('#'.i.':p')
-                    if index(g:todos_path, bufPath) == -1 
-                        let @+ .= bufPath . "\n"
-                    endif
-                endif
-            endfor
-        endfun
-        command! CLIPBUFS call ClipBufPaths()
+        "fun! ClipBufPaths()
+        "    let @+ = ''
+        "    for i in range(1, bufnr('$'))
+        "        if buflisted(i)
+        "            let bufPath = expand('#'.i.':p')
+        "            if index(g:todos, bufPath) == -1 
+        "                let @+ .= bufPath . "\n"
+        "            endif
+        "        endif
+        "    endfor
+        "endfun
+        "command! CLIPBUFS call ClipBufPaths()
 
     fun! TestFont(val)
         if has('unix') "For linux mint, 1920x1680
@@ -1739,8 +1733,8 @@ fun! IsBufHidden(bufNum)
     return (
         \buflisted(a:bufNum)
         \&& bufwinnr(a:bufNum) == -1
-        \&& !has_key(g:todos_path, fnamemodify(path, ':t:r'))
-        \&& !has_key(g:mbeIgnoredFiles, fnamemodify(path, ':t'))
         \)
+        "\&& !has_key(g:todos, fnamemodify(path, ':t:r'))
+        "\&& !has_key(g:mbeIgnoredFiles, fnamemodify(path, ':t'))
 endfun
 
