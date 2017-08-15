@@ -1698,23 +1698,42 @@ function s:addSpecialBufs(mbeList)
 endfunction
 
 function s:addSpecialBufs2(mbeList)
-  " list/flux/timeLog => add
-  " temp1/temp2
-
-  let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to', 'timeLog.to']
+  " version 1
+  "let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to', 'timeLog.to']
+  let special = ['flux.to', 'list.to', 'temp1.to', 'temp2.to', 'timeLog.to']
   let tempFiles = {'temp1.to': 1, 'temp2.to': 2}
-
   for tail in special
     let path = fnamemodify(g:dir_palettes . tail, ':p')
-    if bufwinnr(path) != -1
-      call add(a:mbeList, s:createStub(path, tail))
-    elseif has_key(tempFiles, tail)
-      let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
-      if len(firstThreeLines) > 2
-        call add(a:mbeList, s:createStub(path, tail))
-      endif
-    endif
+    call add(a:mbeList, s:createStub(path, tail))
   endfor
+
+
+  " version 2
+  "let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to', 'timeLog.to']
+  "let tempFiles = {'temp1.to': 1, 'temp2.to': 2}
+  "for tail in special
+  "  let path = fnamemodify(g:dir_palettes . tail, ':p')
+  "
+  "  if bufwinnr(path) != -1
+  "    call add(a:mbeList, s:createStub(path, tail))
+  "  elseif has_key(tempFiles, tail)
+  "    let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
+  "    if len(firstThreeLines) > 2
+  "      call add(a:mbeList, s:createStub(path, tail))
+  "    endif
+  "  endif
+  "endfor
+
+
+  " version 3
+  "let special = ['temp1.to', 'temp2.to']
+  "for tail in special
+  "  let path = fnamemodify(g:dir_palettes . tail, ':p')
+  "  let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
+  "  if len(firstThreeLines) > 2
+  "    call add(a:mbeList, s:createStub(path, tail))
+  "  endif
+  "endfor
 endfunction
 
 function s:addBufs(mbeList, bufs)
@@ -1801,11 +1820,14 @@ function s:getMbeMarker(path)
     endif
 
   elseif s:isSpecialBuf(a:path)
-    if has_key(g:todos_path, fnamemodify(a:path, ':t:r'))
-      return '~'
-    else
-      return s:getLeftPadding()
+    let l:tail = fnamemodify(a:path, ':t:r')
+    if has_key(g:todos_path, l:tail) && l:tail != 'list'
+      let firstThreeLines = s:getFileLines(a:path, 3) "If files are empty, they'll have exactly 2 lines
+      if len(firstThreeLines) > 2
+        return '~'
+      endif
     endif
+    return s:getLeftPadding()
 
   else
     return s:getMbeHotkey(a:path) . ' '
