@@ -1,10 +1,23 @@
-#~/dev/Skyfit/
-api/enterpriseAdmin.js
-test/api/enterpriseAdmin.js
-api/enterpriseUserGroup.js
-test/api/enterpriseUserGroup.js
-models/enterpriseUserGroup.js
+/*
+#Tasks:~/Dropbox/Tasks/_gitIgnore/
+flux.to
+list.to
+temp1.to
+temp2.to
+timeLog.to
 
+*/
+(/*
+#Skyfit:~/dev/Skyfit/
+api/enterpriseAdmin.js
+api/enterpriseUserGroup.js
+
+test/api/enterpriseAdmin.js
+test/api/enterpriseUserGroup.js
+
+models/enterpriseUserGroup.js
+models/enterpriseUserGroupUser.js
+*/
 (#Comment
 (~/Dropbox/Tasks/_gitIgnore/flux.to
 (~/dev/vimfiles/cache/glas.to
@@ -13,5 +26,3 @@ models/enterpriseUserGroup.js
 (~/dev/Skyfit/local/output.csv
 (#Test
 (~/dev/Skyfit/local/output.csv
-(
-($ TEST

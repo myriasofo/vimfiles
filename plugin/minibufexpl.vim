@@ -1550,7 +1550,7 @@ fun! MbeRemoveBuffer(key)
 endfun
 
 
-
+" Constants
 let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
 let g:mbeLeftPadding = 4
 let g:mbeIgnoredFiles = {
@@ -1587,17 +1587,39 @@ function s:layoutOne(mbeList)
 endfunction
 
 function s:layoutTwo(mbeList)
-  let l:main = []
-  for l:i in s:BufList
-    call add(l:main, l:i)
-  endfor
+  let [l:special, l:remaining] = s:divideBufsIntoSpecialAndRemaining()
 
+  call add(a:mbeList, '')
+  call add(a:mbeList, '    Special')
+  call s:addSpecialBufs2(a:mbeList)
+  "call s:addBufs(a:mbeList, l:special)
   call add(a:mbeList, '')
   call s:addGlasBufs(a:mbeList)
   call add(a:mbeList, '')
-  call s:addBufs(a:mbeList, l:main)
+  call add(a:mbeList, '    Remaining')
+  call s:addBufs(a:mbeList, l:remaining)
 endfunction
 
+
+function s:divideBufsIntoSpecialAndRemaining()
+  let l:special = []
+  let l:remaining = []
+
+  for l:i in s:BufList
+    if s:isSpecialBuf(l:i)
+      if bufwinnr(l:i) != -1
+        "call add(l:remaining, l:i)
+        continue
+      endif
+    else
+      call add(l:remaining, l:i)
+    endif
+  endfor
+
+  call sort(l:special, "<SID>MyNameCmp")
+  call sort(l:remaining, "<SID>MyNameCmp")
+  return [l:special, l:remaining]
+endfunction
 
 function s:divideBufsIntoHiddenAndVisible()
   let l:hiddenBufs = []
@@ -1605,7 +1627,7 @@ function s:divideBufsIntoHiddenAndVisible()
 
   for l:i in s:BufList
     if bufwinnr(l:i) == -1
-      if IsBufHidden(l:i)
+      if s:isSpecialBuf(l:i)
         call add(l:hiddenBufs, l:i)
       endif
     else
@@ -1668,18 +1690,62 @@ function s:addSpecialBufs(mbeList)
 
     let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
     if len(firstThreeLines) > 2
-      let l:stub = s:getLeftPadding() . fileTail
-      call add(a:mbeList, l:stub)
+      call add(a:mbeList, s:createStub(l:path))
+      "let l:stub = s:getLeftPadding() . fileTail
+      "call add(a:mbeList, l:stub)
     endif
   endfor
 endfunction
 
-function s:addBufs(mbeList, hiddenBufs)
-  for l:i in a:hiddenBufs
-    if !has_key(g:mbeLoadedBufs, expand('#'.l:i))
+function s:addSpecialBufs2(mbeList)
+  " list/flux/timeLog => add
+  " temp1/temp2
+
+  let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to', 'timeLog.to']
+  let tempFiles = {'temp1.to': 1, 'temp2.to': 2}
+
+  for tail in special
+    let path = fnamemodify(g:dir_palettes . tail, ':p')
+    if bufwinnr(path) != -1
+      call add(a:mbeList, s:createStub(path, tail))
+    elseif has_key(tempFiles, tail)
+      let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
+      if len(firstThreeLines) > 2
+        call add(a:mbeList, s:createStub(path, tail))
+      endif
+    endif
+  endfor
+endfunction
+
+function s:addBufs(mbeList, bufs)
+  for l:i in a:bufs
+    if !has_key(g:mbeLoadedBufs, expand('#'.l:i.':p'))
       call add(a:mbeList, s:createStubFromBufNum(l:i))
     endif
   endfor
+endfunction
+
+function s:determineMbeRefresh(mbeList)
+  let l:mbeString = join(a:mbeList, "\n")
+  if (s:miniBufExplBufList != l:mbeString)
+    let s:miniBufExplBufList = l:mbeString
+    let g:miniBufExplVSplit = s:determineMbeWidth(a:mbeList)
+    return 1
+  else
+    return 0
+  endif
+endfunction
+
+function s:determineMbeWidth(mbeList)
+  let l:mbeWidth = 13
+
+  for l:line in a:mbeList
+    if strlen(l:line) > l:mbeWidth
+      let l:mbeWidth = strlen(l:line)
+    endif
+  endfor
+
+  return l:mbeWidth
 endfunction
 
 
@@ -1720,18 +1786,27 @@ function s:getMbeHotkey(path)
 endfunction
 
 function s:getMbeMarker(path)
-  if a:path == bufname('%')
+  if a:path == fnamemodify(bufname('%'), ':p')
     if g:mbeLayout == 1
       return '*'
     else
       return '***'
     endif
+
   elseif bufwinnr(a:path) != -1
     if g:mbeLayout == 1
       return ''
     else
       return '---'
     endif
+
+  elseif s:isSpecialBuf(a:path)
+    if has_key(g:todos_path, fnamemodify(a:path, ':t:r'))
+      return '~'
+    else
+      return s:getLeftPadding()
+    endif
+
   else
     return s:getMbeHotkey(a:path) . ' '
   endif
@@ -1759,28 +1834,17 @@ function s:getGlasCache()
   endtry
 endfunction
 
-
-function s:determineMbeRefresh(mbeList)
-  let l:mbeString = join(a:mbeList, "\n")
-  if (s:miniBufExplBufList != l:mbeString)
-    let s:miniBufExplBufList = l:mbeString
-    let g:miniBufExplVSplit = s:determineMbeWidth(a:mbeList)
-    return 1
+function s:isSpecialBuf(bufNum)
+  if type(a:bufNum) == 0
+    let a:path = expand('#'.a:bufNum.':p')
   else
-    return 0
+    let a:path = a:bufNum
   endif
-endfunction
 
-function s:determineMbeWidth(mbeList)
-  let l:mbeWidth = 13
-
-  for l:line in a:mbeList
-    if strlen(l:line) > l:mbeWidth
-      let l:mbeWidth = strlen(l:line)
-    endif
-  endfor
-
-  return l:mbeWidth
+  return (
+    \has_key(g:todos_path, fnamemodify(a:path, ':t:r'))
+    \|| has_key(g:mbeIgnoredFiles, fnamemodify(a:path, ':t'))
+  \)
 endfunction
 
 
