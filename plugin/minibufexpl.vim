@@ -1579,11 +1579,9 @@ function s:layoutOne(mbeList)
   if len(l:visibleBufs) == 1
     call add(a:mbeList, '')
   endif
-
   call add(a:mbeList, '')
+
   call s:addGlasBufs(a:mbeList)
-
-  call add(a:mbeList, '')
   call s:addSpecialBufs(a:mbeList)
   call s:addBufs(a:mbeList, l:hiddenBufs)
 endfunction
@@ -1689,8 +1687,7 @@ function s:createStub(path, line)
   let l:path = fnamemodify(a:path, ':p')
 
   let l:stub = ''
-  let l:stub .= s:getLeftPadding(-2)
-  let l:stub .= s:getMbeMarker(l:path) . ' '
+  let l:stub .= s:getStubMargin(l:path)
   let l:stub .= a:line
   let l:stub .= s:isBufModified(l:path) ? '+' : ' '
   
@@ -1724,12 +1721,23 @@ endfunction
 
 function s:getMbeMarker(path)
   if a:path == bufname('%')
-    return '*'
+    return '***'
   elseif bufwinnr(a:path) != -1
-    return bufwinnr(a:path)
+    return '---'
+    "return bufwinnr(a:path)
   else
-    return s:getMbeHotkey(a:path)
+    return s:getMbeHotkey(a:path) . ' '
   endif
+endfunction
+
+function s:getStubMargin(path)
+  let l:marker = s:getMbeMarker(a:path)
+  "if strlen(l:marker) <= 1
+  "  let l:marker .= ' '
+  "endif
+
+  let l:padding = s:getLeftPadding(strlen(l:marker) * -1)
+  return l:padding . l:marker
 endfunction
 
 function s:isBufModified(path)
