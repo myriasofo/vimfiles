@@ -1651,7 +1651,7 @@ function DetermineMbeRefresh(mbeList)
 endfunction
 
 function DetermineMbeWidth(mbeList)
-  let l:mbeWidth = 6
+  let l:mbeWidth = 13
 
   for l:line in a:mbeList
     if strlen(l:line) > l:mbeWidth
