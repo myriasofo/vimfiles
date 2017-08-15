@@ -1523,6 +1523,13 @@ endfunction
 " last time this was called and 0 otherwise.
 "
 
+function GetGlasBufs()
+  " Open cache
+  " grab files and text, ignore comments
+  "for l:line in GetGlasCache()
+endfunction
+
+
 "let g:VERTICAL_PADDING = 4
 let g:LEFT_PADDING = 4
 let g:MBE_IGNORED_FILES = {
@@ -1617,6 +1624,22 @@ function AddHiddenBufs(mbeList, hiddenBufs)
   endfor
 endfunction
 
+function AddGlasBufs(mbeList)
+  "Add all from current glas palette (global var)
+  let l:glasBufs = GetGlasBufs()
+  "Attach hotkeys (but watch out for text!)
+  for l:line in l:glasBufs
+    if l:line is text
+      just add
+      let l:stub = GetLeftPadding(-2)
+      "let l:stub .= GetMbeHotkey(l:i) . ' '
+      "let l:stub .= l:line
+      "let l:stub .= s:bufUniqNameDict[l:i]
+      "let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
+    else
+  endfor
+endfunction
+
 
 function IsTodoFile(bufname)
   return has_key(g:todos_path, fnamemodify(a:bufname, ':r'))
@@ -1673,6 +1696,7 @@ function! <SID>BuildBufferList(curBufNum)
   call AddVisibleBufs(l:mbeList, l:visibleBufs, a:curBufNum)
   call AddSpecialBufs(l:mbeList)
   call AddHiddenBufs(l:mbeList, l:hiddenBufs)
+  "call AddGlasBufs(l:mbeList)
 
   return DetermineMbeRefresh(l:mbeList)
 endfunction

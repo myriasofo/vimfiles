@@ -1,0 +1,6 @@
+
+$ comment
+
+(% flux: ~/Dropbox/Tasks/_gitIgnore/flux.to
+% glas cache: ~/dev/vimfiles/cache/glas.to
+% output: ~/dev/Skyfit/local/output.csv
