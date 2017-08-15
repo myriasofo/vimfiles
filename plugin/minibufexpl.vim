@@ -1609,13 +1609,9 @@ function s:divideBufsIntoHiddenAndVisible()
   let l:visibleBufs = []
 
   for l:i in s:BufList
-    let l:bufname = expand('#'.l:i.':t')
     if bufwinnr(l:i) == -1
-      if l:bufname != '' && !s:isTodoFile(l:bufname)
-        call add(l:hiddenBufs, l:i)
-      endif
+      call add(l:hiddenBufs, l:i)
     else
-      "call add(l:tabListTop, l:tab)
       call add(l:visibleBufs, l:i)
     endif
   endfor
@@ -1672,10 +1668,9 @@ endfunction
 
 function s:addHiddenBufs(mbeList, hiddenBufs)
   for l:i in a:hiddenBufs
-    let fileTail = expand("#".l:i.":p:t")
     let l:path = expand("#".l:i.":p")
 
-    if has_key(g:mbeIgnoredFiles, fileTail) || has_key(g:glasBufs, l:path)
+    if !IsBufHidden(l:i)
       continue
     endif
 
