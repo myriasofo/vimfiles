@@ -55,7 +55,8 @@ fun! ScoutKey()
 
 
     elseif char == 'n'
-        call SetupWorkspace(g:todos_path.list, g:todos_path.temp1)
+        "call SetupWorkspace(g:todos_path.list, g:todos_path.temp1)
+        call LoadFile(g:dir_palettes . 'flux.to')
     elseif char == 'm'
         call LoadFile(g:todos_path.list)
     elseif char == ','
@@ -374,7 +375,7 @@ fun! RemoveAllBuffers()
         if buflisted(i) && bufwinnr(i) == -1
             let bufPath = expand('#'.i.':t')
             let splitTail = split(bufPath, '\.')
-            if len(splitTail) == 0 || !has_key(g:todos_path, splitTail[0])
+            if len(splitTail) != 0 && !has_key(g:todos_path, splitTail[0]) && !has_key(g:MBE_IGNORED_FILES, bufPath)
                 call add(unloadedFiles, bufPath)
                 exe 'bd '.i
             endif

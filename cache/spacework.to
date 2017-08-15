@@ -5,14 +5,13 @@ $ COMMANDS
 
 ===
 $ MAIN
-% flux: ~/Dropbox/Tasks/_gitIgnore/flux.to
+(% flux: ~/Dropbox/Tasks/_gitIgnore/flux.to
 % stable: ~/Dropbox/Tasks/_gitIgnore/stable.to
 % forWork: ~/Dropbox/Tasks/_gitIgnore/forWork.to
 % cs: ~/Dropbox/Tasks/cs/cs.to
-
-$ TRACKERS
 % journal: ~/Dropbox/Tasks/_gitIgnore/journal.to
-% log: ~/Dropbox/Tasks/_gitIgnore/timeLog.to
+($ TRACKERS
+(% log: ~/Dropbox/Tasks/_gitIgnore/timeLog.to
 ===
 (% mongoQuery: ~/dev/s_mongoQuery/scripts/countPayingUsersByDay.js
 (% output: ~/dev/Skyfit/local/output.csv

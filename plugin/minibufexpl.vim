@@ -1525,6 +1525,11 @@ endfunction
 
 "let g:VERTICAL_PADDING = 4
 let g:LEFT_PADDING = 4
+let g:MBE_IGNORED_FILES = {
+  \'timeLog.to': 1,
+  \'flux.to': 1,
+  \'vimrc': 1
+  \}
 
 function DivideBufsIntoHiddenAndVisible()
   let l:hiddenBufs = []
@@ -1584,7 +1589,7 @@ function AddSpecialBufs(mbeList)
       continue
     endif
 
-    let firstThreeLines = GetFileLines(l:path, 3) "If files are empty, then only 2 lines
+    let firstThreeLines = GetFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
     if len(firstThreeLines) > 2
       let l:stub = GetLeftPadding() . fileTail
       call add(a:mbeList, l:stub)
@@ -1597,7 +1602,7 @@ function AddHiddenBufs(mbeList, hiddenBufs)
   for l:i in a:hiddenBufs
     let fileTail = expand("#".l:i.":p:t")
 
-    if fileTail == 'timeLog.to'
+    if has_key(g:MBE_IGNORED_FILES, fileTail)
       continue
     endif
 
