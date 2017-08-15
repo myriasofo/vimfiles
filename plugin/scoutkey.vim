@@ -338,18 +338,6 @@ fun! ExecuteInShell(cmd, direction)
     endif
 endfun
 
-fun! IsBufHidden(bufNum)
-    let path = expand('#'.a:bufNum)
-
-    return (
-        \buflisted(a:bufNum)
-        \&& bufwinnr(a:bufNum) == -1
-        \&& !has_key(g:todos_path, fnamemodify(path, ':t:r'))
-        \&& !has_key(g:mbeIgnoredFiles, fnamemodify(path, ':t'))
-        \&& !has_key(g:glasBufs, path)
-    \)
-endfun
-
 fun! ClearOutHiddenBuffers()
     wall
     for i in range(1, bufnr('$'))

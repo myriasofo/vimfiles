@@ -1550,52 +1550,8 @@ fun! MbeRemoveBuffer(key)
 endfun
 
 
+
 let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
-function s:getGlasCache()
-  try
-    return readfile(g:glasCacheLocation)
-  catch
-    return []
-  endtry
-endfunction
-
-function s:addGlasBufs(mbeList)
-  "Add all from current glas palette (global var)
-  let l:folder = ''
-
-  for l:line in s:getGlasCache()
-    let l:firstChar = l:line[0]
-
-    if l:firstChar == ''
-      let l:stub = ''
-    elseif l:firstChar == '('
-      continue
-    elseif l:firstChar == '$'
-      let l:stub = s:getLeftPadding() . l:line[2:]
-    elseif l:firstChar == '#'
-      let l:folder = l:line[1:]
-      let l:stub = s:getLeftPadding() . l:folder
-    "elseif l:firstChar == '~'
-    "  let l:stub = s:getLeftPadding(-2)
-    "  let l:stub .= s:getMbeHotkey('filePath', l:line) . ' '
-    "  let l:stub .= fnamemodify(l:line, ':t')
-    "  "let l:stub .= s:bufUniqNameDict[l:i] "TODO: get unique name?
-    "  "let l:stub .= bufloaded(l:path) && getbufvar(bufnr(l:path), '&modified') ? '+' : ' '
-    "  "let g:glasBufs[l:path] = 1
-    else
-      let l:stub = s:getLeftPadding(-2)
-      let l:path = fnamemodify(l:folder . l:line, ':p')
-      let l:stub .= s:getMbeHotkey(l:path) . ' '
-      let l:stub .= l:line
-      let l:stub .= bufloaded(l:path) && getbufvar(bufnr(l:path), '&modified') ? '+' : ' '
-      let g:glasBufs[l:path] = 1
-    endif
-
-    call add(a:mbeList, l:stub)
-  endfor
-endfunction
-
-
 let g:mbeLeftPadding = 4
 let g:mbeIgnoredFiles = {
   \'timeLog.to': 1,
@@ -1626,19 +1582,7 @@ function s:addVisibleBufs(mbeList, visibleBufs, curBufNum)
   call add(a:mbeList, '') "Start with some blank space
 
   for l:i in a:visibleBufs
-    " Add mark if active vs. just visible
-    if l:i == a:curBufNum
-      let l:stub = s:getLeftPadding(-1) . '*'
-    else
-      let l:stub = s:getLeftPadding()
-    endif
-
-    " Add bufname
-    let l:stub .= s:bufUniqNameDict[l:i]
-    "let l:stub .= expand("#".l:i.":p:t")
-    let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
-
-    call add(a:mbeList, l:stub)
+    call add(a:mbeList, s:createStubFromBufNum(l:i))
   endfor
 
   call add(a:mbeList, '')
@@ -1647,6 +1591,32 @@ function s:addVisibleBufs(mbeList, visibleBufs, curBufNum)
   if len(a:visibleBufs) == 1
     call add(a:mbeList, '')
   endif
+endfunction
+
+function s:addGlasBufs(mbeList)
+  "Add all from current glas palette (global var)
+  let l:folder = ''
+
+  for l:line in s:getGlasCache()
+    let l:firstChar = l:line[0]
+
+    if l:firstChar == ''
+      let l:stub = ''
+    elseif l:firstChar == '('
+      continue
+    elseif l:firstChar == '$'
+      let l:stub = s:getLeftPadding() . l:line[2:]
+    elseif l:firstChar == '#'
+      let l:folder = l:line[1:]
+      let l:stub = s:getLeftPadding() . l:folder
+    "elseif l:firstChar == '~'
+    "  "let l:stub .= s:bufUniqNameDict[l:i] "TODO: get unique name?
+    else
+      let l:stub = s:createStub(l:folder . l:line, l:line)
+    endif
+
+    call add(a:mbeList, l:stub)
+  endfor
 endfunction
 
 function s:addSpecialBufs(mbeList)
@@ -1668,24 +1638,30 @@ endfunction
 
 function s:addHiddenBufs(mbeList, hiddenBufs)
   for l:i in a:hiddenBufs
-    let l:path = expand("#".l:i.":p")
-
-    if !IsBufHidden(l:i)
-      continue
+    if IsBufIgnored(l:i)
+      call add(a:mbeList, s:createStubFromBufNum(l:i))
     endif
-
-    let l:stub = s:getLeftPadding(-2) . s:getMbeHotkey(l:path) . ' '
-    let l:stub .= s:bufUniqNameDict[l:i]
-    "let l:stub .= fileTail
-    let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
-
-    call add(a:mbeList, l:stub)
   endfor
 endfunction
 
 
-function s:isTodoFile(bufname)
-  return has_key(g:todos_path, fnamemodify(a:bufname, ':r'))
+function s:createStub(path, line)
+  let l:path = fnamemodify(a:path, ':p')
+
+  let l:stub = ''
+  let l:stub .= s:getLeftPadding(-2)
+  let l:stub .= s:getMbeMarker(l:path) . ' '
+  let l:stub .= a:line
+  let l:stub .= s:isBufModified(l:path) ? '+' : ' '
+  
+  let g:mbeLoadedBufs[l:path] = 1
+  return l:stub
+endfunction
+
+function s:createStubFromBufNum(bufNum)
+  let l:line = s:bufUniqNameDict[a:bufNum]
+  let l:path = expand('#' . a:bufNum . ':p')
+  return s:createStub(l:path, l:line)
 endfunction
 
 function s:getLeftPadding(...)
@@ -1699,11 +1675,37 @@ function s:getFileLines(path, nLines)
   return bufloaded(a:path) ? getbufline(a:path, 0, a:nLines) : readfile(a:path, 0, a:nLines)
 endfunction
 
-function s:getMbeHotkey(filePath)
+function s:getMbeHotkey(path)
   " char "a" is 97 and "z" is 122
   let letter = nr2char(97 + len(g:mbeHotkeysToBufs))
-  let g:mbeHotkeysToBufs[letter] = a:filePath
+  let g:mbeHotkeysToBufs[letter] = a:path
   return letter
+endfunction
+
+function s:getMbeMarker(path)
+  if a:path == bufname('%')
+    return '*'
+  elseif bufwinnr(a:path) != -1
+    return bufwinnr(a:path)
+  else
+    return s:getMbeHotkey(a:path)
+  endif
+endfunction
+
+function s:isBufModified(path)
+  return bufloaded(a:path) && getbufvar(bufnr(a:path), '&modified')
+endfunction
+
+function s:isTodoFile(bufname)
+  return has_key(g:todos_path, fnamemodify(a:bufname, ':r'))
+endfunction
+
+function s:getGlasCache()
+  try
+    return readfile(g:glasCacheLocation)
+  catch
+    return []
+  endtry
 endfunction
 
 
@@ -1735,7 +1737,7 @@ function! <SID>BuildBufferList(curBufNum)
   "WHAT: Return list, with each line of MBE window
   let l:mbeList = []
   let g:mbeHotkeysToBufs = {}
-  let g:glasBufs = {}
+  let g:mbeLoadedBufs = {}
   let [l:hiddenBufs, l:visibleBufs] = s:divideBufsIntoHiddenAndVisible()
 
   call s:addVisibleBufs(l:mbeList, l:visibleBufs, a:curBufNum)
