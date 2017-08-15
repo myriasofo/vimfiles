@@ -1645,8 +1645,9 @@ function s:addGlasBufs(mbeList)
     elseif l:firstChar == '$'
       let l:stub = s:getLeftPadding() . l:line[2:]
     elseif l:firstChar == '#'
-      let l:folder = l:line[1:]
-      let l:stub = s:getLeftPadding() . l:folder
+      let l:parts = split(l:line[1:], ':')
+      let l:folder = l:parts[1]
+      let l:stub = s:getLeftPadding() . l:parts[0]
 
     "elseif l:firstChar == '~'
     "  "let l:stub .= s:bufUniqNameDict[l:i] "TODO: get unique name?
