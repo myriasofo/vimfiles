@@ -344,8 +344,14 @@ fun! OpenBuffer(key)
     endif
 
     if has_key(g:mbeHotkeysToBufs, a:key)
-        let realBufNum = g:mbeHotkeysToBufs[a:key]
-        exe 'b '.realBufNum
+        let bufData = g:mbeHotkeysToBufs[a:key]
+        if has_key(bufData, 'bufNum')
+            exe 'b ' . bufData['bufNum']
+        elseif has_key(bufData, 'filePath')
+            exe 'e ' . bufData['filePath']
+        else
+            echom "ERROR: No bufData for hotkey"
+        endif
     else
         echom "ERROR: No such key for buffer"
     endif
@@ -359,9 +365,16 @@ fun! RemoveBuffer(key)
     endif
 
     if has_key(g:mbeHotkeysToBufs, a:key)
-        let realBufNum = g:mbeHotkeysToBufs[a:key]
         "call Spacework_addFileToWs("[unloaded", bufname(realBufNum))
-        exe 'bd ' realBufNum
+
+        let bufData = g:mbeHotkeysToBufs[a:key]
+        if has_key(bufData, 'bufNum')
+            exe 'bd ' . bufData['bufNum']
+        elseif has_key(bufData, 'filePath')
+            echom "ERROR: Trying to remove filePath from glas"
+        else
+            echom "ERROR: No bufData for hotkey"
+        endif
     else
         echom "ERROR: No such key for buffer"
     endif
@@ -375,7 +388,7 @@ fun! RemoveAllBuffers()
         if buflisted(i) && bufwinnr(i) == -1
             let bufPath = expand('#'.i.':t')
             let splitTail = split(bufPath, '\.')
-            if len(splitTail) != 0 && !has_key(g:todos_path, splitTail[0]) && !has_key(g:MBE_IGNORED_FILES, bufPath)
+            if len(splitTail) != 0 && !has_key(g:todos_path, splitTail[0]) && !has_key(g:mbeIgnoredFiles, bufPath)
                 call add(unloadedFiles, bufPath)
                 exe 'bd '.i
             endif
