@@ -338,23 +338,25 @@ fun! ExecuteInShell(cmd, direction)
     endif
 endfun
 
+fun! IsBufHidden(bufNum)
+    let path = expand('#'.a:bufNum)
+
+    return (
+        \buflisted(a:bufNum)
+        \&& bufwinnr(a:bufNum) == -1
+        \&& !has_key(g:todos_path, fnamemodify(path, ':t:r'))
+        \&& !has_key(g:mbeIgnoredFiles, fnamemodify(path, ':t'))
+        \&& !has_key(g:glasBufs, path)
+    \)
+endfun
+
 fun! RemoveAllBuffers()
     wall
-
-    let unloadedFiles = []
     for i in range(1, bufnr('$'))
-        if buflisted(i) && bufwinnr(i) == -1
-            let bufPath = expand('#'.i.':t')
-            let splitTail = split(bufPath, '\.')
-            if len(splitTail) != 0 && !has_key(g:todos_path, splitTail[0]) && !has_key(g:mbeIgnoredFiles, bufPath)
-                call add(unloadedFiles, bufPath)
-                exe 'bd '.i
-            endif
+        if IsBufHidden(i)
+            exe 'bd ' . i
         endif
     endfor
-
-    " IDEA - actually replace, not just add
-    "call Spacework_replaceWs("[unloaded", unloadedFiles)
 endfun
 
 

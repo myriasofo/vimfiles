@@ -1557,8 +1557,6 @@ fun! MbeRemoveBuffer(key)
   endif
 
   if has_key(g:mbeHotkeysToBufs, a:key)
-    "call Spacework_addFileToWs("[unloaded", bufname(realBufNum))
-
     let bufData = g:mbeHotkeysToBufs[a:key]
     if has_key(bufData, 'bufNum')
       exe 'bd ' . bufData['bufNum']
@@ -1585,7 +1583,6 @@ endfunction
 function s:addGlasBufs(mbeList)
   "Add all from current glas palette (global var)
   let l:folder = ''
-  let l:glasBufs = {}
 
   for l:line in s:getGlasCache()
     let l:firstChar = l:line[0]
@@ -1605,19 +1602,18 @@ function s:addGlasBufs(mbeList)
     "  let l:stub .= fnamemodify(l:line, ':t')
     "  "let l:stub .= s:bufUniqNameDict[l:i] "TODO: get unique name?
     "  "let l:stub .= bufloaded(l:path) && getbufvar(bufnr(l:path), '&modified') ? '+' : ' '
-    "  "let l:glasBufs[l:path] = 1
+    "  "let g:glasBufs[l:path] = 1
     else
       let l:stub = s:getLeftPadding(-2)
       let l:path = fnamemodify(l:folder . l:line, ':p')
       let l:stub .= s:getMbeHotkey('filePath', l:path) . ' '
       let l:stub .= l:line
       let l:stub .= bufloaded(l:path) && getbufvar(bufnr(l:path), '&modified') ? '+' : ' '
-      let l:glasBufs[l:path] = 1
+      let g:glasBufs[l:path] = 1
     endif
 
     call add(a:mbeList, l:stub)
   endfor
-  return l:glasBufs
 endfunction
 
 
@@ -1695,12 +1691,12 @@ function s:addSpecialBufs(mbeList)
   endfor
 endfunction
 
-function s:addHiddenBufs(mbeList, hiddenBufs, glasBufs)
+function s:addHiddenBufs(mbeList, hiddenBufs)
   for l:i in a:hiddenBufs
     let fileTail = expand("#".l:i.":p:t")
     let filePath = expand("#".l:i.":p")
 
-    if has_key(g:mbeIgnoredFiles, fileTail) || has_key(a:glasBufs, filePath)
+    if has_key(g:mbeIgnoredFiles, fileTail) || has_key(g:glasBufs, filePath)
       continue
     endif
 
@@ -1765,12 +1761,13 @@ function! <SID>BuildBufferList(curBufNum)
   "WHAT: Return list, with each line of MBE window
   let l:mbeList = []
   let g:mbeHotkeysToBufs = {}
+  let g:glasBufs = {}
   let [l:hiddenBufs, l:visibleBufs] = s:divideBufsIntoHiddenAndVisible()
 
   call s:addVisibleBufs(l:mbeList, l:visibleBufs, a:curBufNum)
-  let l:glasBufs = s:addGlasBufs(l:mbeList)
+  call s:addGlasBufs(l:mbeList)
   call s:addSpecialBufs(l:mbeList)
-  call s:addHiddenBufs(l:mbeList, l:hiddenBufs, l:glasBufs)
+  call s:addHiddenBufs(l:mbeList, l:hiddenBufs)
 
   return s:determineMbeRefresh(l:mbeList)
 endfunction

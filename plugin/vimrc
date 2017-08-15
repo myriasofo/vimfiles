@@ -989,7 +989,6 @@
             nnoremap qu :call UnloadCurrentBuffer()<cr>
             fun! UnloadCurrentBuffer()
                 update
-                "call Spacework_addFileToWs("[unloaded", expand('%:p'))
                 MBEbd
             endfun
             nnoremap qy :MBEbd! <cr>
