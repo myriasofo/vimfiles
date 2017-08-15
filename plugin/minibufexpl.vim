@@ -1526,48 +1526,27 @@ endfunction
 
 " External api
 fun! MbeOpenBuffer(key)
-  if !exists("g:mbeHotkeysToBufs")
-    return
-  endif
+  if exists('g:mbeHotkeysToBufs') && has_key(g:mbeHotkeysToBufs, a:key)
+    let filePath = g:mbeHotkeysToBufs[a:key]
+    let currentFilePath = expand('%')
 
-  if has_key(g:mbeHotkeysToBufs, a:key)
-    let bufData = g:mbeHotkeysToBufs[a:key]
-    if has_key(bufData, 'bufNum')
-      exe 'b ' . bufData['bufNum']
-    elseif has_key(bufData, 'filePath')
-      let filePath = bufData['filePath']
-      let currentFilePath = expand('%')
-
-      if filePath != currentFilePath
-        exe 'e ' . filePath
-      endif
-    else
-      echom "ERROR: No bufData for hotkey"
+    if filePath != currentFilePath
+      exe 'e ' . filePath
+      return
     endif
-  else
-    echom "ERROR: No such key for buffer"
   endif
+
+  echom "ERROR: No such key for buffer"
 endfun
 
 fun! MbeRemoveBuffer(key)
-  " NOTE - is used with MBE's buf keys, so will only remove hidden bufs 
-  " (ie. never have to worry about removing active bufs)
-  if !exists("g:mbeHotkeysToBufs")
+  if exists('g:mbeHotkeysToBufs') && has_key(g:mbeHotkeysToBufs, a:key)
+    let filePath = g:mbeHotkeysToBufs[a:key]
+    exe 'bd ' . filePath
     return
   endif
 
-  if has_key(g:mbeHotkeysToBufs, a:key)
-    let bufData = g:mbeHotkeysToBufs[a:key]
-    if has_key(bufData, 'bufNum')
-      exe 'bd ' . bufData['bufNum']
-    elseif has_key(bufData, 'filePath')
-      echom "ERROR: Trying to remove filePath from glas"
-    else
-      echom "ERROR: No bufData for hotkey"
-    endif
-  else
-    echom "ERROR: No such key for buffer"
-  endif
+  echom "ERROR: No such key for buffer"
 endfun
 
 
@@ -1606,7 +1585,7 @@ function s:addGlasBufs(mbeList)
     else
       let l:stub = s:getLeftPadding(-2)
       let l:path = fnamemodify(l:folder . l:line, ':p')
-      let l:stub .= s:getMbeHotkey('filePath', l:path) . ' '
+      let l:stub .= s:getMbeHotkey(l:path) . ' '
       let l:stub .= l:line
       let l:stub .= bufloaded(l:path) && getbufvar(bufnr(l:path), '&modified') ? '+' : ' '
       let g:glasBufs[l:path] = 1
@@ -1694,13 +1673,13 @@ endfunction
 function s:addHiddenBufs(mbeList, hiddenBufs)
   for l:i in a:hiddenBufs
     let fileTail = expand("#".l:i.":p:t")
-    let filePath = expand("#".l:i.":p")
+    let l:path = expand("#".l:i.":p")
 
-    if has_key(g:mbeIgnoredFiles, fileTail) || has_key(g:glasBufs, filePath)
+    if has_key(g:mbeIgnoredFiles, fileTail) || has_key(g:glasBufs, l:path)
       continue
     endif
 
-    let l:stub = s:getLeftPadding(-2) . s:getMbeHotkey('bufNum', l:i) . ' '
+    let l:stub = s:getLeftPadding(-2) . s:getMbeHotkey(l:path) . ' '
     let l:stub .= s:bufUniqNameDict[l:i]
     "let l:stub .= fileTail
     let l:stub .= getbufvar(l:i, '&modified') ? '+' : ' '
@@ -1725,10 +1704,10 @@ function s:getFileLines(path, nLines)
   return bufloaded(a:path) ? getbufline(a:path, 0, a:nLines) : readfile(a:path, 0, a:nLines)
 endfunction
 
-function s:getMbeHotkey(type, bufData)
+function s:getMbeHotkey(filePath)
   " char "a" is 97 and "z" is 122
   let letter = nr2char(97 + len(g:mbeHotkeysToBufs))
-  let g:mbeHotkeysToBufs[letter] = {a:type: a:bufData}
+  let g:mbeHotkeysToBufs[letter] = a:filePath
   return letter
 endfunction
 
