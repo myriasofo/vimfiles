@@ -1721,10 +1721,17 @@ endfunction
 
 function s:getMbeMarker(path)
   if a:path == bufname('%')
-    return '***'
+    if g:mbeLayout == 1
+      return '*'
+    else
+      return '***'
+    endif
   elseif bufwinnr(a:path) != -1
-    return '---'
-    "return bufwinnr(a:path)
+    if g:mbeLayout == 1
+      return ''
+    else
+      return '---'
+    endif
   else
     return s:getMbeHotkey(a:path) . ' '
   endif
@@ -1732,10 +1739,6 @@ endfunction
 
 function s:getStubMargin(path)
   let l:marker = s:getMbeMarker(a:path)
-  "if strlen(l:marker) <= 1
-  "  let l:marker .= ' '
-  "endif
-
   let l:padding = s:getLeftPadding(strlen(l:marker) * -1)
   return l:padding . l:marker
 endfunction
