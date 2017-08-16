@@ -1596,13 +1596,14 @@ endfunction
 function s:layoutTwo(mbeList)
   let [l:special, l:remaining] = s:divideBufsIntoSpecialAndRemaining()
 
-  call add(a:mbeList, '')
-  call add(a:mbeList, '    Special')
-  call s:addSpecialBufs2(a:mbeList)
+  "call add(a:mbeList, '')
+  "call add(a:mbeList, '    Special')
+  "call s:addSpecialBufs2(a:mbeList)
   "call s:addBufs(a:mbeList, l:special)
   call add(a:mbeList, '')
   call s:addGlasBufs(a:mbeList)
   call add(a:mbeList, '    Remaining')
+  call s:addSpecialBufs2(a:mbeList)
   call s:addBufs(a:mbeList, l:remaining)
 endfunction
 
