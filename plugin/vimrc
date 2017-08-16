@@ -122,6 +122,7 @@
         let g:EasyMotion_skipfoldedline = 0
         let g:session_lock_enabled = 0
         let g:session_persist_globals = []
+        call add(g:session_persist_globals, 'g:mbeLayoutMode')
 
     " For MBE
         "let g:miniBufExplStatusLineText = '\ '

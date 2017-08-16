@@ -1551,7 +1551,7 @@ endfun
 
 
 " Constants
-let g:mbeLayout = 2
+let g:mbeLayoutMode = 2
 let g:mbeLeftPadding = 4
 let g:mbeIgnoredFiles = {
   \'timeLog.to': 1,
@@ -1566,8 +1566,8 @@ let g:mbeTempFiles = {
 let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
 
 " Helper functions
-function s:layoutSelector(mbeLayout, mbeList)
-  if a:mbeLayout == 1
+function s:layoutSelector(mbeLayoutMode, mbeList)
+  if a:mbeLayoutMode == 1
     call s:layoutOne(a:mbeList)
   else
     call s:layoutTwo(a:mbeList)
@@ -1699,8 +1699,8 @@ endfunction
 
 function s:addSpecialBufs2(mbeList)
   " version 1
-  "let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to', 'timeLog.to']
   let special = ['flux.to', 'list.to', 'temp1.to', 'temp2.to', 'timeLog.to']
+  let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to', 'timeLog.to']
   let tempFiles = {'temp1.to': 1, 'temp2.to': 2}
   for tail in special
     let path = fnamemodify(g:dir_palettes . tail, ':p')
@@ -1806,14 +1806,14 @@ endfunction
 
 function s:getMbeMarker(path)
   if a:path == fnamemodify(bufname('%'), ':p')
-    if g:mbeLayout == 1
+    if g:mbeLayoutMode == 1
       return '*'
     else
       return '***'
     endif
 
   elseif bufwinnr(a:path) != -1
-    if g:mbeLayout == 1
+    if g:mbeLayoutMode == 1
       return ''
     else
       return '---'
@@ -1872,7 +1872,7 @@ function! <SID>BuildBufferList(curBufNum)
   let g:mbeHotkeysToBufs = {}
   let g:mbeLoadedBufs = {}
 
-  call s:layoutSelector(g:mbeLayout, l:mbeList)
+  call s:layoutSelector(g:mbeLayoutMode, l:mbeList)
   return s:determineMbeRefresh(l:mbeList)
 endfunction
 
