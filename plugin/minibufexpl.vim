@@ -1240,7 +1240,9 @@ function! <SID>ResizeWindow()
 
   endif
 
-  "normal! zz "NOTE: I took this out to stop losing view
+
+  "NOTE: This below defines how the view gets updated
+  normal! zb
 
   let &report  = l:save_rep
   let &showcmd = l:save_sc
@@ -1699,9 +1701,7 @@ endfunction
 
 function s:addSpecialBufs2(mbeList)
   " version 1
-  let special = ['flux.to', 'list.to', 'temp1.to', 'temp2.to', 'timeLog.to']
-  let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to', 'timeLog.to']
-  let tempFiles = {'temp1.to': 1, 'temp2.to': 2}
+  let special = ['flux.to', 'list.to', 'temp1.to', 'temp2.to']
   for tail in special
     let path = fnamemodify(g:dir_palettes . tail, ':p')
     call add(a:mbeList, s:createStub(path, tail))
