@@ -1701,15 +1701,16 @@ endfunction
 
 function s:addSpecialBufs2(mbeList)
   " version 1
-  let special = ['flux.to', 'list.to', 'temp1.to', 'temp2.to']
-  for tail in special
-    let path = fnamemodify(g:dir_palettes . tail, ':p')
-    call add(a:mbeList, s:createStub(path, tail))
-  endfor
+  "let special = ['flux.to', 'list.to', 'temp1.to', 'temp2.to']
+  "for tail in special
+  "  let path = fnamemodify(g:dir_palettes . tail, ':p')
+  "  call add(a:mbeList, s:createStub(path, tail))
+  "endfor
 
 
   " version 2
-  "let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to', 'timeLog.to']
+  " Hard to tell what's going on
+  "let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to']
   "let tempFiles = {'temp1.to': 1, 'temp2.to': 2}
   "for tail in special
   "  let path = fnamemodify(g:dir_palettes . tail, ':p')
@@ -1724,16 +1725,16 @@ function s:addSpecialBufs2(mbeList)
   "  endif
   "endfor
 
-
   " version 3
-  "let special = ['temp1.to', 'temp2.to']
-  "for tail in special
-  "  let path = fnamemodify(g:dir_palettes . tail, ':p')
-  "  let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
-  "  if len(firstThreeLines) > 2
-  "    call add(a:mbeList, s:createStub(path, tail))
-  "  endif
-  "endfor
+  " Minimal. Might be all I need
+  let special = ['temp1.to', 'temp2.to']
+  for tail in special
+    let path = fnamemodify(g:dir_palettes . tail, ':p')
+    let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
+    if len(firstThreeLines) > 2
+      call add(a:mbeList, s:createStub(path, tail))
+    endif
+  endfor
 endfunction
 
 function s:addBufs(mbeList, bufs)
