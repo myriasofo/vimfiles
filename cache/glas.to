@@ -1,13 +1,14 @@
-/*
+(/*
 #Skyfit:~/dev/Skyfit/
-api/enterpriseAdmin.js
 api/enterpriseUserGroup.js
-
-test/api/enterpriseAdmin.js
 test/api/enterpriseUserGroup.js
 
 models/enterpriseUserGroup.js
-models/enterpriseUserGroupUser.js
+(models/enterpriseUserGroupUser.js
+test/factories.js
+test/factoryHelpers.js
+api/modelers/userAuthorization.js
+(routes.coffee
 
 */
 /*

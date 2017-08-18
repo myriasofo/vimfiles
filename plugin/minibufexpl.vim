@@ -1731,6 +1731,10 @@ function s:addSpecialBufs2(mbeList)
   let special = ['temp1.to', 'temp2.to']
   for tail in special
     let path = fnamemodify(g:dir_palettes . tail, ':p')
+    if bufwinnr(path) != -1
+      continue
+    endif
+
     let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
     if len(firstThreeLines) > 2
       call add(a:mbeList, s:createStub(path, tail))
