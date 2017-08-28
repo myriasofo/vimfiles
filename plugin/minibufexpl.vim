@@ -1526,6 +1526,21 @@ endfunction
 "
 
 
+" Constants
+let g:mbeLayoutMode = 2
+let g:mbeLeftPadding = 4
+let g:mbeIgnoredFiles = {
+  \'timeLog.to': 1,
+  \'flux.to': 1,
+  \'list.to': 1,
+  \'vimrc': 1
+  \}
+let g:mbeTempFiles = {
+  \'temp1.to': 1,
+  \'temp2.to': 1,
+  \}
+let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
+
 " External api
 fun! MbeOpenBuffer(key)
   if exists('g:mbeHotkeysToBufs') && has_key(g:mbeHotkeysToBufs, a:key)
@@ -1552,20 +1567,21 @@ fun! MbeRemoveBuffer(key)
 endfun
 
 
-" Constants
-let g:mbeLayoutMode = 2
-let g:mbeLeftPadding = 4
-let g:mbeIgnoredFiles = {
-  \'timeLog.to': 1,
-  \'flux.to': 1,
-  \'list.to': 1,
-  \'vimrc': 1
-  \}
-let g:mbeTempFiles = {
-  \'temp1.to': 1,
-  \'temp2.to': 1,
-  \}
-let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
+" Helper -.to toggle glas
+fun! s:mbeToggleGlas()
+  let g:mbeLayoutMode = g:mbeLayoutMode == 1 ? 2 : 1
+  call s:refreshMbe()
+endfun
+
+fun! s:refreshMbe()
+  " Switch to diff window to trigger refresh
+  let currentWin = bufwinnr('%')
+  let diffWin = currentWin == 1 ? 2 : 1
+  exe diffWin    . ' wincmd w'
+  exe currentWin . ' wincmd w'
+endfun
+command! MbeToggleGlas call s:mbeToggleGlas()
+
 
 " Helper functions
 function s:layoutSelector(mbeLayoutMode, mbeList)
@@ -1588,7 +1604,7 @@ function s:layoutOne(mbeList)
   endif
   call add(a:mbeList, '')
 
-  call s:addGlasBufs(a:mbeList)
+  "call s:addGlasBufs(a:mbeList)
   call s:addSpecialBufs(a:mbeList)
   call s:addBufs(a:mbeList, l:hiddenBufs)
 endfunction
