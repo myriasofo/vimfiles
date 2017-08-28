@@ -1580,7 +1580,8 @@ fun! s:refreshMbe()
   exe diffWin    . ' wincmd w'
   exe currentWin . ' wincmd w'
 endfun
-command! MbeToggleGlas call s:mbeToggleGlas()
+command! GlasToggle call s:mbeToggleGlas()
+command! MbeRefresh call s:refreshMbe()
 
 
 " Helper functions

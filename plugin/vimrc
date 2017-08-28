@@ -62,7 +62,7 @@
             "Plugin 'nathanaelkane/vim-indent-guides' "Noisy-looking
             "Plugin 'raimondi/delimitmate' "Auto add matching parens (so don't forget to)
             "Plugin 'jeetsukumaran/vim-buffersaurus'
-            "Plugin 'tpope/vim-fugitive' "I prefer commandline
+            Plugin 'tpope/vim-fugitive' "I prefer commandline
             "Plugin 'airblade/vim-gitgutter' "I prefer meld
             "Plugin 'Shougo/unite.vim'
             "Plugin 'mhinz/vim-startify' "Startup screen w MRU files and sessions
@@ -531,6 +531,7 @@
             let tempBuffers = {
                 \'': 1,
                 \'help':1,
+                \'gitcommit':1,
                 \'minibufexpl': 1,
                 \'qf': 1
                 \}
@@ -1323,7 +1324,7 @@
 " Misc
     "noremap / <nop>
     "nnoremap qm :cd %:p:h <cr>
-    noremap hh :update <cr>
+    noremap hh :update <bar> MbeRefresh<cr>
 
 " Figuring out ctrlp options
     " Do not clear filenames cache, to improve CtrlP startup
