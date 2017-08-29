@@ -13,7 +13,7 @@ fun! Scroller()
     " Note - be *very* careful with floats. Essentially, always do division last
     let perc = 1.0 * currLine / totalLine
 
-    if scrollerLen < 0
+    if scrollerLen <= 0
         echom "scrollerLen: ".scrollerLen." winWidth: ".winwidth(0)
         return ''
     endif
@@ -31,7 +31,7 @@ fun! Scroller()
     endif
 
     " Constructing scrollbar
-    let scrollArr = split( repeat(' ',scrollerLen), '\zs')
+    let scrollArr = split(repeat(' ', scrollerLen), '\zs')
     "let scrollerQuarter = scrollerLen/4
     "let scrollArr[scrollerQuarter] = ' '
     "let scrollArr[scrollerQuarter*2] = '|'
