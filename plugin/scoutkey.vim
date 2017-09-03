@@ -225,6 +225,13 @@ fun! RunCode()
         update
         call ExecuteInShell('node %', 'right')
 
+    elseif &filetype == 'haskell'
+        update
+        let executablePath = expand('%:p:r')
+        silent! !ghc %
+        silent! call ExecuteInShell(executablePath, 'right')
+
+
     "elseif &filetype == 'stata'
     "    update
     "    "silent! !start /min "C:\Users\Abe\Dropbox\Archives\static\stata-nppp\rundo.exe" "%:p"
