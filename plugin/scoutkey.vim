@@ -228,9 +228,8 @@ fun! RunCode()
     elseif &filetype == 'haskell'
         update
         let executablePath = expand('%:p:r')
-        silent! !ghc %
-        silent! call ExecuteInShell(executablePath, 'right')
-
+        let compileAndRun = 'ghc % && '.executablePath
+        silent! call ExecuteInShell(compileAndRun, 'right')
 
     "elseif &filetype == 'stata'
     "    update
