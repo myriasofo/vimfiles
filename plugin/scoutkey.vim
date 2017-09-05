@@ -227,15 +227,18 @@ fun! RunCode()
 
     elseif &filetype == 'haskell'
         update
-        let executablePath = expand('%:p:r')
-        let compileAndRun = 'ghc % && '.executablePath
-        silent! call ExecuteInShell(compileAndRun, 'right')
+        let folder = expand('%:p:h')
+        let buildFolder = folder . '/.build/'
+        let executablePath = buildFolder . '/main'
 
-    "elseif &filetype == 'stata'
-    "    update
-    "    "silent! !start /min "C:\Users\Abe\Dropbox\Archives\static\stata-nppp\rundo.exe" "%:p"
-    "    let dir_runStata = 'C:\Users\Abe\Dropbox\Archives\static\stata-nppp\'
-    "    silent! exe '!start /min "'.dir_runStata.'rundo.exe" "%:p"'
+        if !isdirectory(buildFolder)
+            call mkdir(buildFolder)
+        endif
+
+
+        let compileCommand = 'ghc % -odir ' . buildFolder . ' -hidir ' . buildFolder . ' -o ' . executablePath
+        let compileAndRun = compileCommand . ' && ' . executablePath
+        silent! call ExecuteInShell(compileAndRun, 'right')
 
     elseif &filetype == 'vim'
         update
@@ -248,6 +251,12 @@ fun! RunCode()
     elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
         :w
         call ExecuteInShell('python ' . g:dir_dev . '/analyzeLog/analyzeLog.py', 'right')
+
+    "elseif &filetype == 'stata'
+        "update
+        ""silent! !start /min "C:\Users\Abe\Dropbox\Archives\static\stata-nppp\rundo.exe" "%:p"
+        "let dir_runStata = 'C:\Users\Abe\Dropbox\Archives\static\stata-nppp\'
+        "silent! exe '!start /min "'.dir_runStata.'rundo.exe" "%:p"'
 
     "elseif &filetype == 'r'
     "elseif &filetype == 'tex'
