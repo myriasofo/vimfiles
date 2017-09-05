@@ -4,9 +4,9 @@ win1
 win2
 
 $ MINE
-(home: ~
 tasks: ~/Dropbox/Tasks
-dev: ~/dev
-myPlugins: ~/dev/vimfiles/plugin
-(dashboard: ~/dev/aaptiv-data-dashboard
-(skyfit master: ~/dev/s_master
+my: ~/my
+myPlugins: ~/my/vimfiles/plugin
+(home: ~
+(dashboard: ~/aaptiv/aaptiv-data-dashboard
+(skyfit master: ~/aaptiv/Skyfit

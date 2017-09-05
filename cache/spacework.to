@@ -1,8 +1,8 @@
 ===
 $ COMMANDS
-% spacework cache: ~/dev/vimfiles/cache/spacework.to
-% navkey cache: ~/dev/vimfiles/cache/navkey.to
-% glas cache: ~/dev/vimfiles/cache/glas.to
+% spacework cache: ~/my/vimfiles/cache/spacework.to
+% navkey cache: ~/my/vimfiles/cache/navkey.to
+% glas cache: ~/my/vimfiles/cache/glas.to
 
 ===
 $ MAIN
@@ -17,6 +17,4 @@ $ MAIN
 (~/Dropbox/Tasks/feelings/allFeels.to
 (~/Dropbox/Tasks/cs/vimTasks.to
 (# [unloaded
-(% mongoQuery: ~/dev/s_mongoQuery/scripts/countPayingUsersByDay.js
-(% output: ~/dev/Skyfit/local/output.csv
 ===

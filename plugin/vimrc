@@ -7,7 +7,7 @@
         " These are DEFAULTS. Change below if needed
         set shellslash
         "let g:dir_myPlugins = expand('~/Dropbox/Archives/vimfiles/')
-        let g:dir_dev = expand('~/dev/')
+        let g:dir_dev = expand('~/my/')
         let g:dir_myPlugins = g:dir_dev . 'vimfiles/'
         let dir_palettes  = expand('~/Dropbox/Tasks/_gitIgnore/')
         let dir_vundle = '~/vim/bundle/'
@@ -510,7 +510,8 @@
         "   open vim > noname > session load > open mbe
         "   start close > close mbe > session save > exit
 
-        set sessionoptions=blank,buffers,curdir,folds,tabpages,winpos
+        set sessionoptions=blank,buffers,curdir,tabpages,winpos
+        "set sessionoptions=blank,buffers,curdir,folds,tabpages,winpos
         "set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winpos
         let g:miniBufExplAutoStart = 0
         if has("gui_running")
