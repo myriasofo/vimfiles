@@ -3,7 +3,7 @@
 " Utility
 function s:getGitOutput(cmd)
     redir => outputStr
-        silent exe a:cmd
+        silent execute a:cmd
     redir END
     let outputStr = substitute(outputStr, "\r", "", "g")
     let outputList = split(outputStr, "\n")
@@ -20,7 +20,7 @@ endfunction
 
 function s:assertNoLocalChanges()
     let gitLocalChanges = s:getGitOutput('Git status --porcelain')
-    if len(gitLocalChanges) > 1
+    if len(gitLocalChanges) != 0
         throw "ERROR: Git has local changes"
     endif
 endfunction
