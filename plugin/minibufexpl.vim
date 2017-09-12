@@ -1543,8 +1543,8 @@ let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
 
 " External api
 fun! MbeOpenBuffer(key)
-  if exists('g:mbeHotkeysToBufs') && has_key(g:mbeHotkeysToBufs, a:key)
-    let filePath = g:mbeHotkeysToBufs[a:key]
+  if exists('s:mbeHotkeysToBufs') && has_key(s:mbeHotkeysToBufs, a:key)
+    let filePath = s:mbeHotkeysToBufs[a:key]
     let currentFilePath = expand('%')
 
     if filePath != currentFilePath
@@ -1557,8 +1557,8 @@ fun! MbeOpenBuffer(key)
 endfun
 
 fun! MbeRemoveBuffer(key)
-  if exists('g:mbeHotkeysToBufs') && has_key(g:mbeHotkeysToBufs, a:key)
-    let filePath = g:mbeHotkeysToBufs[a:key]
+  if exists('s:mbeHotkeysToBufs') && has_key(s:mbeHotkeysToBufs, a:key)
+    let filePath = s:mbeHotkeysToBufs[a:key]
     exe 'bd ' . filePath
     return
   endif
@@ -1822,8 +1822,8 @@ endfunction
 
 function s:getMbeHotkey(path)
   " char "a" is 97 and "z" is 122
-  let letter = nr2char(97 + len(g:mbeHotkeysToBufs))
-  let g:mbeHotkeysToBufs[letter] = a:path
+  let letter = nr2char(97 + len(s:mbeHotkeysToBufs))
+  let s:mbeHotkeysToBufs[letter] = a:path
   return letter
 endfunction
 
@@ -1885,6 +1885,7 @@ function s:isSpecialBuf(bufNum)
   return (
     \has_key(g:mbeTempFiles, fnamemodify(a:path, ':t'))
     \|| has_key(g:mbeIgnoredFiles, fnamemodify(a:path, ':t'))
+    \|| isdirectory(bufname(a:bufNum))
   \)
 endfunction
 
@@ -1892,7 +1893,7 @@ endfunction
 function! <SID>BuildBufferList(curBufNum)
   "WHAT: Return list, with each line of MBE window
   let l:mbeList = []
-  let g:mbeHotkeysToBufs = {}
+  let s:mbeHotkeysToBufs = {}
   let g:mbeLoadedBufs = {}
 
   call s:layoutSelector(g:mbeLayoutMode, l:mbeList)
