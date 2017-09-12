@@ -1,5 +1,6 @@
 " WHAT: Helpers for git
 
+" Utility
 function s:getGitOutput(cmd)
     redir => outputStr
         silent exe a:cmd
@@ -9,6 +10,8 @@ function s:getGitOutput(cmd)
     return outputList[1:]
 endfunction
 
+
+" Asserts
 function s:assertEnvHasFugitive()
     if exists(':Git') == 0
         throw "ERROR: Fugitive not available for current file"
@@ -22,6 +25,8 @@ function s:assertNoLocalChanges()
     endif
 endfunction
 
+
+" Git commands
 function s:getCurrentBranch()
     let gitCurrentBranch = s:getGitOutput('Git symbolic-ref --short HEAD')
     if len(gitCurrentBranch) > 1 
