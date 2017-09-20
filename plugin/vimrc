@@ -122,7 +122,7 @@
         let g:EasyMotion_skipfoldedline = 0
         let g:session_lock_enabled = 0
         let g:session_persist_globals = []
-        call add(g:session_persist_globals, 'g:mbeLayoutMode')
+        call add(g:session_persist_globals, 'g:magiLayoutMode')
 
     " For MBE
         "let g:miniBufExplStatusLineText = '\ '
@@ -279,10 +279,11 @@
             au GUIEnter * set vb t_vb=
 
         " Makes help appear as vertical split (instead of horiz)
-            au FileType help call WhenHelp()
-            fun! WhenHelp()
-                wincmd L
-            endfun
+            "au FileType help call WhenHelp()
+            "fun! WhenHelp()
+            "    wincmd L
+            "endfun
+
         " Disable autocomments
             au FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
@@ -1738,6 +1739,6 @@ fun! IsBufHidden(bufNum)
         \&& bufwinnr(a:bufNum) == -1
         \)
         "\&& !has_key(g:todos, fnamemodify(path, ':t:r'))
-        "\&& !has_key(g:mbeIgnoredFiles, fnamemodify(path, ':t'))
+        "\&& !has_key(g:magiIgnoredFiles, fnamemodify(path, ':t'))
 endfun
 

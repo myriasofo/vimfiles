@@ -72,12 +72,12 @@ fun! ScoutKey()
         call ClearOutHiddenBuffers()
     elseif char == 'a'
         let char = ProcessChar()
-        call MbeOpenBuffer(char)
+        call MagiOpenBuffer(char)
     elseif char == 's'
         redraw!
     elseif char == 'd'
         let char = ProcessChar()
-        call MbeRemoveBuffer(char)
+        call MagiRemoveBuffer(char)
     elseif char == 'f'
         let char =ProcessChar()
         if char ==  'f'
