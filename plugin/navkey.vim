@@ -54,7 +54,7 @@ fun! s:get_jumps(currDir, overflowPage)
     "    "echo globpath('~/.[^.]*')
     "    "echom glob('`find ~/ -maxdepth 1 -type f`')
     "endif
-    let excludedNames = ['CVS']
+    let excludedNames = ['CVS', '.DS_Store', '.git']
     call filter(nameArr, 'index(excludedNames, fnamemodify(v:val,":t")) == -1')
 
 
