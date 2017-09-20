@@ -3,17 +3,28 @@
 let g:magiLayoutMode = 2
 let s:leftPadding = 4
 let s:minimumWidth = 13
-let s:ignoredFiles = {
-    \'timeLog.to': 1,
-    \'flux.to': 1,
-    \'list.to': 1,
-    \'stable.to':1,
-    \'vimrc': 1
-    \}
+let s:ignoredFiles = [
+    \'stable.to',
+    \'flux.to',
+    \'list.to',
+    \'temp1.to',
+    \'temp2.to',
+    \
+    \'timeLog.to',
+    \'vimrc',
+    \]
 
-let s:paletteFiles = {
-    \'temp1.to': 1,
-    \'temp2.to': 1,
+let s:decantFiles = [
+    \'temp1.to',
+    \'temp2.to',
+    \]
+
+let s:mapPaletteFiles = {
+    \'stable.to': 'A',
+    \'flux.to':   'B',
+    \'list.to':   'C',
+    \'temp1.to':  '1',
+    \'temp2.to':  '2'
     \}
 
 let s:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
@@ -164,7 +175,7 @@ function s:addGlasBufs(magiList)
 endfunction
 
 function s:addSpecialBufs(magiList)
-    for l:tail in keys(s:paletteFiles)
+    for l:tail in s:decantFiles
         let l:path = g:dir_palettes . l:tail
         if bufwinnr(l:path) != -1
             continue
@@ -228,12 +239,17 @@ function s:addBufs(magiList, bufNums)
 endfunction
 
 
-function s:createStub(path, line)
+function s:createStub(path, fileDesc)
     let l:path = fnamemodify(a:path, ':p')
+
+    let l:fileDesc = a:fileDesc
+    if has_key(s:mapPaletteFiles, a:fileDesc)
+        let l:fileDesc = s:mapPaletteFiles[a:fileDesc]
+    endif
 
     let l:stub = ''
     let l:stub .= s:getStubMargin(l:path)
-    let l:stub .= a:line
+    let l:stub .= l:fileDesc
     let l:stub .= s:isBufModified(l:path) ? '+' : ' '
   
     let s:loadedBufs[l:path] = 1
@@ -241,9 +257,9 @@ function s:createStub(path, line)
 endfunction
 
 function s:createStubFromBufNum(bufNum)
-    let l:line = s:bufUniqNameDict[a:bufNum]
+    let l:fileDesc = s:bufUniqNameDict[a:bufNum]
     let l:path = expand('#' . a:bufNum . ':p')
-    return s:createStub(l:path, l:line)
+    return s:createStub(l:path, l:fileDesc)
 endfunction
 
 function s:getLeftPadding(...)
@@ -281,7 +297,7 @@ function s:getMbeMarker(path)
 
     elseif s:isSpecialBuf(a:path)
         let l:tail = fnamemodify(a:path, ':t')
-        if has_key(s:paletteFiles, l:tail)
+        if s:hasElement(s:decantFiles, l:tail)
             let firstThreeLines = s:getFileLines(a:path, 3) "If files are empty, they'll have exactly 2 lines
             if len(firstThreeLines) > 2
                 return '~'
@@ -292,6 +308,10 @@ function s:getMbeMarker(path)
     else
         return s:getMbeHotkey(a:path) . ' '
     endif
+endfunction
+
+function s:hasElement(myList, elem)
+    return index(a:myList, a:elem) != -1
 endfunction
 
 function s:getStubMargin(path)
@@ -320,8 +340,7 @@ function s:isSpecialBuf(bufNum)
     endif
 
     return (
-        \has_key(s:paletteFiles, fnamemodify(a:path, ':t'))
-        \|| has_key(s:ignoredFiles, fnamemodify(a:path, ':t'))
+        \s:hasElement(s:ignoredFiles, fnamemodify(a:path, ':t'))
         \|| isdirectory(bufname(a:bufNum))
     \)
 endfunction
