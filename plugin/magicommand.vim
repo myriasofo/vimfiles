@@ -31,7 +31,7 @@ let s:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
 let s:hotkeysToBufPaths = {}
 
 " Helper functions
-function s:layoutOne(bufNums)
+function! s:layoutOne(bufNums)
     let [l:hiddenBufs, l:visibleBufs] = s:divideBufsIntoHiddenAndVisible(a:bufNums)
 
     let magiList = []
@@ -52,7 +52,7 @@ function s:layoutOne(bufNums)
     return magiList
 endfunction
 
-function s:layoutTwo(bufNums)
+function! s:layoutTwo(bufNums)
     let [l:special, l:remaining] = s:divideBufsIntoSpecialAndRemaining(a:bufNums)
 
     let magiList = []
@@ -63,6 +63,10 @@ function s:layoutTwo(bufNums)
     "call s:addBufs(magiList, l:special)
     call add(magiList, '')
     call s:addGlasBufs(magiList)
+    if len(magiList) > 1
+        call add(magiList, '')
+    endif
+
     call add(magiList, '    Remaining')
     call s:addSpecialBufs2(magiList)
     call s:addBufs(magiList, l:remaining)
@@ -70,7 +74,7 @@ function s:layoutTwo(bufNums)
     return magiList
 endfunction
 
-function s:divideBufsIntoSpecialAndRemaining(bufNums)
+function! s:divideBufsIntoSpecialAndRemaining(bufNums)
     let l:special = []
     let l:remaining = []
 
@@ -90,7 +94,7 @@ function s:divideBufsIntoSpecialAndRemaining(bufNums)
     return [l:special, l:remaining]
 endfunction
 
-function s:divideBufsIntoHiddenAndVisible(bufNums)
+function! s:divideBufsIntoHiddenAndVisible(bufNums)
     let l:hiddenBufs = []
     let l:visibleBufs = []
 
@@ -110,20 +114,14 @@ function s:divideBufsIntoHiddenAndVisible(bufNums)
     return [l:hiddenBufs, l:visibleBufs]
 endfunction
 
-function s:compareWinNum(bufNum1, bufNum2)
+function! s:compareWinNum(bufNum1, bufNum2)
     let l:win1 = bufwinnr(a:bufNum1)
     let l:win2 = bufwinnr(a:bufNum2)
 
     return l:win1 - l:win2
-
-    "function! <SID>MyWinCmp(tab1, tab2)
-    "let l:buf1 =str2nr(matchstr(a:tab1, '\d\+'))
-    "let l:buf2 =str2nr(matchstr(a:tab2, '\d\+'))
-    "let l:win1 = bufwinnr(l:buf1)
-    "let l:win2 = bufwinnr(l:buf2)
 endfunction
 
-function s:compareBufName(bufNum1, bufNum2)
+function! s:compareBufName(bufNum1, bufNum2)
     let l:bufName1 = expand("#".a:bufNum1.":p:t")
     let l:bufName2 = expand("#".a:bufNum2.":p:t")
 
@@ -136,7 +134,7 @@ function s:compareBufName(bufNum1, bufNum2)
     endif
 endfunction
 
-function s:addGlasBufs(magiList)
+function! s:addGlasBufs(magiList)
     "Add all from current glas palette (global var)
     let l:folder = ''
 
@@ -174,7 +172,7 @@ function s:addGlasBufs(magiList)
     endfor
 endfunction
 
-function s:addSpecialBufs(magiList)
+function! s:addSpecialBufs(magiList)
     for l:tail in s:decantFiles
         let l:path = g:dir_palettes . l:tail
         if bufwinnr(l:path) != -1
@@ -188,7 +186,7 @@ function s:addSpecialBufs(magiList)
     endfor
 endfunction
 
-function s:addSpecialBufs2(magiList)
+function! s:addSpecialBufs2(magiList)
     " version 1
     "let special = ['flux.to', 'list.to', 'temp1.to', 'temp2.to']
     "for tail in special
@@ -230,7 +228,7 @@ function s:addSpecialBufs2(magiList)
     endfor
 endfunction
 
-function s:addBufs(magiList, bufNums)
+function! s:addBufs(magiList, bufNums)
     for l:i in a:bufNums
         if !has_key(s:loadedBufs, expand('#'.l:i.':p'))
             call add(a:magiList, s:createStubFromBufNum(l:i))
@@ -239,7 +237,7 @@ function s:addBufs(magiList, bufNums)
 endfunction
 
 
-function s:createStub(path, fileDesc)
+function! s:createStub(path, fileDesc)
     let l:path = fnamemodify(a:path, ':p')
 
     let l:fileDesc = a:fileDesc
@@ -256,31 +254,31 @@ function s:createStub(path, fileDesc)
     return l:stub
 endfunction
 
-function s:createStubFromBufNum(bufNum)
+function! s:createStubFromBufNum(bufNum)
     let l:fileDesc = s:bufUniqNameDict[a:bufNum]
     let l:path = expand('#' . a:bufNum . ':p')
     return s:createStub(l:path, l:fileDesc)
 endfunction
 
-function s:getLeftPadding(...)
+function! s:getLeftPadding(...)
     "echom 'args' . a:0
     let l:paddingAdjust = a:0 > 0 ? a:1 : 0
     let l:padding = repeat(' ', s:leftPadding + l:paddingAdjust)
     return l:padding
 endfunction
 
-function s:getFileLines(path, nLines)
+function! s:getFileLines(path, nLines)
     return bufloaded(a:path) ? getbufline(a:path, 0, a:nLines) : readfile(a:path, 0, a:nLines)
 endfunction
 
-function s:getMbeHotkey(path)
+function! s:getMbeHotkey(path)
     " char "a" is 97 and "z" is 122
     let letter = nr2char(97 + len(s:hotkeysToBufPaths))
     let s:hotkeysToBufPaths[letter] = a:path
     return letter
 endfunction
 
-function s:getMbeMarker(path)
+function! s:getMbeMarker(path)
     if a:path == fnamemodify(bufname('%'), ':p')
         if g:magiLayoutMode == 1
             return '*'
@@ -310,21 +308,21 @@ function s:getMbeMarker(path)
     endif
 endfunction
 
-function s:hasElement(myList, elem)
+function! s:hasElement(myList, elem)
     return index(a:myList, a:elem) != -1
 endfunction
 
-function s:getStubMargin(path)
+function! s:getStubMargin(path)
     let l:marker = s:getMbeMarker(a:path)
     let l:padding = s:getLeftPadding(strlen(l:marker) * -1)
     return l:padding . l:marker
 endfunction
 
-function s:isBufModified(path)
+function! s:isBufModified(path)
     return bufloaded(a:path) && getbufvar(bufnr(a:path), '&modified')
 endfunction
 
-function s:getGlasCache()
+function! s:getGlasCache()
     try
         return readfile(s:glasCacheLocation)
     catch
@@ -332,7 +330,7 @@ function s:getGlasCache()
     endtry
 endfunction
 
-function s:isSpecialBuf(bufNum)
+function! s:isSpecialBuf(bufNum)
     if type(a:bufNum) == 0
         let a:path = expand('#'.a:bufNum.':p')
     else
@@ -364,7 +362,7 @@ command! GlasToggle call s:magiToggleGlas()
 command! MbeRefresh call s:refreshMbe()
 
 " External api
-function MagiOpenBuffer(key)
+function! MagiOpenBuffer(key)
     if has_key(s:hotkeysToBufPaths, a:key)
         let filePath = s:hotkeysToBufPaths[a:key]
         let currentFilePath = expand('%')
@@ -378,7 +376,7 @@ function MagiOpenBuffer(key)
     echom "ERROR: No such key for buffer"
 endfun
 
-function MagiRemoveBuffer(key)
+function! MagiRemoveBuffer(key)
     if has_key(s:hotkeysToBufPaths, a:key)
         let filePath = s:hotkeysToBufPaths[a:key]
         exe 'bd ' . filePath
@@ -388,7 +386,7 @@ function MagiRemoveBuffer(key)
     echom "ERROR: No such key for buffer"
 endfun
 
-function MagiGetViewerList(bufNums, bufUniqNameDict)
+function! MagiGetViewerList(bufNums, bufUniqNameDict)
     let s:bufUniqNameDict = a:bufUniqNameDict
     let s:hotkeysToBufPaths = {}
     let s:loadedBufs = {}
@@ -400,7 +398,7 @@ function MagiGetViewerList(bufNums, bufUniqNameDict)
     endif
 endfunction
 
-function MagiDetermineViewerWidth(magiList)
+function! MagiDetermineViewerWidth(magiList)
     let l:magiWidth = s:minimumWidth
 
     for l:line in a:magiList
