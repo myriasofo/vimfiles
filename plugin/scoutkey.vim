@@ -5,10 +5,8 @@
 fun! ScoutKey()
     let char = ProcessChar()
 
-    if char == "\<esc>"
-        echom 'ScoutKey: Cancelled'
-
-    elseif char == 'y'
+    " Keys for right hand
+    if char == 'y'
         " Open up vimrc
         if expand('%:t') != 'vimrc'
             if exists("g:dir_myPlugins")
@@ -37,7 +35,7 @@ fun! ScoutKey()
 
 
     elseif char == 'h'
-        set wrap!
+        call LoadFile(g:dir_palettes . 'stable.to')
     elseif char == 'j'
         exe "normal! \<c-w>h"
         redraw!
@@ -68,8 +66,12 @@ fun! ScoutKey()
         call LoadFile(g:dir_palettes . 'timeLog.to')
 
 
+    " Keys for left hand
     elseif char == 'e'
         call ClearOutHiddenBuffers()
+    elseif char == 'r'
+        set wrap!
+
     elseif char == 'a'
         let char = ProcessChar()
         call MagiOpenBuffer(char)
@@ -116,6 +118,10 @@ fun! ScoutKey()
         "call OnAddingWin() 
         "call HL_OrphanedWhitespace()
 
+
+    " Keys for other
+    elseif char == "\<esc>"
+        echom 'ScoutKey: Cancelled'
 
     else
         echom 'ScoutKey: Nothing happened'
