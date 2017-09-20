@@ -9,7 +9,8 @@
         "let g:dir_myPlugins = expand('~/Dropbox/Archives/vimfiles/')
         let g:dir_dev = expand('~/my/')
         let g:dir_myPlugins = g:dir_dev . 'vimfiles/'
-        let dir_palettes  = expand('~/Dropbox/Tasks/_gitIgnore/')
+        let g:dir_notes  = expand('~/Dropbox/Notes/')
+        let g:dir_palettes  = g:dir_notes . '_palettes/'
         let dir_vundle = '~/vim/bundle/'
 
         if !isdirectory(g:dir_myPlugins)

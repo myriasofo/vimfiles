@@ -63,7 +63,7 @@ fun! ScoutKey()
         call LoadFile(g:dir_palettes . 'temp2.to')
     elseif char == '/'
         "call SetupWorkspace(g:dir_palettes.'temp1.to', g:dir_palettes.'temp2.to')
-        call LoadFile(g:dir_palettes . 'timeLog.to')
+        call LoadFile(g:dir_notes . '_specials/timeLog.to')
 
 
     " Keys for left hand

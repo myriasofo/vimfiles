@@ -1,20 +1,16 @@
 ===
-$ COMMANDS
-% spacework cache: ~/my/vimfiles/cache/spacework.to
-% navkey cache: ~/my/vimfiles/cache/navkey.to
-% glas cache: ~/my/vimfiles/cache/glas.to
+$ CACHES
+% spacework: ~/my/vimfiles/cache/spacework.to
+% navkey:    ~/my/vimfiles/cache/navkey.to
+% glas:      ~/my/vimfiles/cache/glas.to
 
 ===
 $ MAIN
-% stable: ~/Dropbox/Tasks/_gitIgnore/stable.to
-% forWork: ~/Dropbox/Tasks/_gitIgnore/forWork.to
-% cs: ~/Dropbox/Tasks/cs/cs.to
-% journal: ~/Dropbox/Tasks/_gitIgnore/journal.to
+% forWork: ~/Dropbox/Notes/cs/forWork.to
+% cs:      ~/Dropbox/Notes/cs/cs.to
+% csTools: ~/Dropbox/Notes/cs/csTools.to
+% journal: ~/Dropbox/Notes/_specials/journal.to
 ===
-(% flux: ~/Dropbox/Tasks/_gitIgnore/flux.to
-(% log: ~/Dropbox/Tasks/_gitIgnore/timeLog.to
-(~/Dropbox/Tasks/_gitIgnore/later.to
-(~/Dropbox/Tasks/feelings/allFeels.to
-(~/Dropbox/Tasks/cs/vimTasks.to
+(% log: ~/Dropbox/Notes/_specials/timeLog.to
 (# [unloaded
 ===

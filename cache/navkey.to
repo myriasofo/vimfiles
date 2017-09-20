@@ -4,7 +4,7 @@ win1
 win2
 
 $ MINE
-tasks: ~/Dropbox/Tasks
+Notes: ~/Dropbox/Notes
 my: ~/my
 myPlugins: ~/my/vimfiles/plugin
 (home: ~
