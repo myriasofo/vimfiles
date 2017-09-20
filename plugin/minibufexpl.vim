@@ -1528,18 +1528,21 @@ endfunction
 
 " Constants
 let g:mbeLayoutMode = 2
-let g:mbeLeftPadding = 4
-let g:mbeIgnoredFiles = {
+let s:mbeLeftPadding = 4
+let s:mbeIgnoredFiles = {
   \'timeLog.to': 1,
   \'flux.to': 1,
   \'list.to': 1,
+  \'stable.to':1,
   \'vimrc': 1
   \}
-let g:mbeTempFiles = {
+
+let s:mbeTempFiles = {
   \'temp1.to': 1,
   \'temp2.to': 1,
   \}
-let g:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
+
+let s:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
 
 " External api
 fun! MbeOpenBuffer(key)
@@ -1704,7 +1707,7 @@ function s:addGlasBufs(mbeList)
 endfunction
 
 function s:addSpecialBufs(mbeList)
-  for l:tail in keys(g:mbeTempFiles)
+  for l:tail in keys(s:mbeTempFiles)
     let l:path = g:dir_palettes . l:tail
     if bufwinnr(l:path) != -1
       continue
@@ -1761,7 +1764,7 @@ endfunction
 
 function s:addBufs(mbeList, bufs)
   for l:i in a:bufs
-    if !has_key(g:mbeLoadedBufs, expand('#'.l:i.':p'))
+    if !has_key(s:mbeLoadedBufs, expand('#'.l:i.':p'))
       call add(a:mbeList, s:createStubFromBufNum(l:i))
     endif
   endfor
@@ -1799,7 +1802,7 @@ function s:createStub(path, line)
   let l:stub .= a:line
   let l:stub .= s:isBufModified(l:path) ? '+' : ' '
   
-  let g:mbeLoadedBufs[l:path] = 1
+  let s:mbeLoadedBufs[l:path] = 1
   return l:stub
 endfunction
 
@@ -1812,7 +1815,7 @@ endfunction
 function s:getLeftPadding(...)
   "echom 'args' . a:0
   let l:paddingAdjust = a:0 > 0 ? a:1 : 0
-  let l:padding = repeat(' ', g:mbeLeftPadding + l:paddingAdjust)
+  let l:padding = repeat(' ', s:mbeLeftPadding + l:paddingAdjust)
   return l:padding
 endfunction
 
@@ -1844,7 +1847,7 @@ function s:getMbeMarker(path)
 
   elseif s:isSpecialBuf(a:path)
     let l:tail = fnamemodify(a:path, ':t')
-    if has_key(g:mbeTempFiles, l:tail)
+    if has_key(s:mbeTempFiles, l:tail)
       let firstThreeLines = s:getFileLines(a:path, 3) "If files are empty, they'll have exactly 2 lines
       if len(firstThreeLines) > 2
         return '~'
@@ -1869,7 +1872,7 @@ endfunction
 
 function s:getGlasCache()
   try
-    return readfile(g:glasCacheLocation)
+    return readfile(s:glasCacheLocation)
   catch
     return []
   endtry
@@ -1883,8 +1886,8 @@ function s:isSpecialBuf(bufNum)
   endif
 
   return (
-    \has_key(g:mbeTempFiles, fnamemodify(a:path, ':t'))
-    \|| has_key(g:mbeIgnoredFiles, fnamemodify(a:path, ':t'))
+    \has_key(s:mbeTempFiles, fnamemodify(a:path, ':t'))
+    \|| has_key(s:mbeIgnoredFiles, fnamemodify(a:path, ':t'))
     \|| isdirectory(bufname(a:bufNum))
   \)
 endfunction
@@ -1894,7 +1897,7 @@ function! <SID>BuildBufferList(curBufNum)
   "WHAT: Return list, with each line of MBE window
   let l:mbeList = []
   let s:mbeHotkeysToBufs = {}
-  let g:mbeLoadedBufs = {}
+  let s:mbeLoadedBufs = {}
 
   call s:layoutSelector(g:mbeLayoutMode, l:mbeList)
   return s:determineMbeRefresh(l:mbeList)
