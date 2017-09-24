@@ -255,7 +255,7 @@ fun! RunCode()
         endif
 
     elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
-        :w
+        update
         call ExecuteInShell('python ' . g:dir_dev . '/analyzeLog/analyzeLog.py', 'right')
 
     "elseif &filetype == 'stata'
