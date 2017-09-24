@@ -2,7 +2,7 @@
 " Constants
 let g:magiLayoutMode = 2
 let s:leftPadding = 4
-let s:minimumWidth = 13
+let s:minimumWidth = 8
 let s:ignoredFiles = [
     \'stable.to',
     \'flux.to',
@@ -20,11 +20,12 @@ let s:decantFiles = [
     \]
 
 let s:mapPaletteFiles = {
-    \'stable.to': 'A',
-    \'flux.to':   'B',
-    \'list.to':   'C',
-    \'temp1.to':  '1',
-    \'temp2.to':  '2'
+    \'stable.to':  'A',
+    \'flux.to':    'B',
+    \'list.to':    'C',
+    \'temp1.to':   '1',
+    \'temp2.to':   '2',
+    \'timeLog.to': 'L',
     \}
 
 let s:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
