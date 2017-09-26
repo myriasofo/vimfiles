@@ -1467,10 +1467,6 @@
     let g:netrw_keepdir = 0
 
 
-    fun! IsMBEOpen()
-        return (bufname(winbufnr(1)) == "-MiniBufExplorer-")
-    endfun
-
     fun! JsonFormatAll()
         " Get only websocket data AND special lines (ie. start with '=')
         " HOW = Get only lines that start with 4::
