@@ -1,3 +1,4 @@
+" TODO: rename mbe to magi
 
 " Constants
 let g:magiLayoutMode = 2
@@ -352,6 +353,10 @@ fun! s:magiToggleGlas()
 endfun
 
 fun! s:refreshMbe()
+    if IsMBEOpen() == 0
+        return
+    endif
+
     " Switch to diff window to trigger refresh
     let currentWin = bufwinnr('%')
     let diffWin = currentWin == 1 ? 2 : 1
@@ -411,4 +416,10 @@ function! MagiDetermineViewerWidth(magiList)
     return l:magiWidth
 endfunction
 
+function! IsMBEOpen()
+    return getwinvar(1, '&filetype') == 'minibufexpl'
+    "return (bufname(winbufnr(1)) == "-MiniBufExplorer-")
+    " alt: could check each win and see if any are
+    "for i in winnr('$')
+endfun
 
