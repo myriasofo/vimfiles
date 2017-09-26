@@ -425,6 +425,7 @@
             au BufRead,BufNewFile *.to call TodoSyntaxHL()
             fun! TodoSyntaxHL()
                 set filetype=todo
+                setlocal shiftwidth=4
                 syn match Identifier "^\s*#.*"
                 syn match Statement "^\s*\$.*"
                 syn match Type "^\s*_.*"
@@ -640,7 +641,6 @@
 
     endif
 
-
 "| Appearance and formatting
     " GUI and indents
         " One-liners
@@ -709,15 +709,14 @@
             endif
 
         " Formatting of indents/tabs
-            set tabstop=4
-            set shiftwidth=4
-            set softtabstop=4
             set expandtab
+            set shiftwidth=2 "overwritten by .py (4) and .to (4)
+            "set tabstop=4 "Never used
+            "set softtabstop=4 "Never used
 
             " autoindent is *exactly* what I want: when <CR> in insert mode, matches ind of above
             "set autoindent "Enabled in autocmd
-            "set smartindent
-
+            "set smartindent "Never used
 
     " Syntax hl and coloring
         if exists("g:colors_name")
