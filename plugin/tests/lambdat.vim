@@ -1,16 +1,11 @@
 
-function! LambdatInvoke()
+function! Lambdat(cmd)
+    update
     let path = expand('%:h')
-    let terminalCommand = 'lambdat invoke ' . path
+    let terminalCommand = 'lambdat ' . a:cmd . ' ' . path
     call ExecuteInShell(terminalCommand, 'right')
 endfunction
 
-function! LambdatDeploy()
-    let path = expand('%:h')
-    let terminalCommand = 'lambdat deploy ' . path
-    call ExecuteInShell(terminalCommand, 'right')
-endfunction
 
-command! LambdatInvoke call LambdatInvoke()
-command! LambdatDeploy call LambdatDeploy()
+command! -nargs=1 Lambdat call Lambdat(<f-args>)
 
