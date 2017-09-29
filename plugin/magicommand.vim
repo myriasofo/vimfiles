@@ -3,7 +3,7 @@
 " Constants
 let g:magiLayoutMode = 2
 let s:leftPadding = 4
-let s:minimumWidth = 8
+let s:minimumWidth = 7
 let s:ignoredFiles = [
     \'stable.to',
     \'flux.to',
