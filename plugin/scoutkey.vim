@@ -16,7 +16,7 @@ fun! ScoutKey()
             endif
         endif
     elseif char == 'u'
-        call RunCode()
+        call ExecuteCurrentFile()
     elseif char == 'i'
         call Spacework_Dialog()
     elseif char == 'o'
@@ -220,68 +220,6 @@ fun! SwapWin_2and3()
     endwhile
 endfun
 
-fun! RunCode()
-    " Save prev win
-    let winPrev = winnr()
-
-    if &filetype == 'python'
-        update
-        try
-            call ExecuteInShell('python3 %', 'right')
-        catch
-            call ExecuteInShell('python %', 'right')
-        endtry
-
-    elseif &filetype == 'javascript'
-        update
-        call ExecuteInShell('node %', 'right')
-
-    elseif &filetype == 'haskell'
-        update
-        let folder = expand('%:p:h')
-        let buildFolder = folder . '/.build/'
-        let executablePath = buildFolder . '/main'
-
-        if !isdirectory(buildFolder)
-            call mkdir(buildFolder)
-        endif
-
-
-        let compileCommand = 'ghc % -odir ' . buildFolder . ' -hidir ' . buildFolder . ' -o ' . executablePath
-        let compileAndRun = compileCommand . ' && ' . executablePath
-        silent! call ExecuteInShell(compileAndRun, 'right')
-
-    elseif &filetype == 'vim'
-        update
-        if exists("g:dir_myPlugins")
-            exe 'source '.g:dir_myPlugins.'plugin/vimrc'
-        else
-            source ~/vimrc
-        endif
-
-    elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
-        update
-        call ExecuteInShell('python ' . g:dir_dev . '/analyzeLog/analyzeLog.py', 'right')
-
-    "elseif &filetype == 'stata'
-        "update
-        ""silent! !start /min "C:\Users\Abe\Dropbox\Archives\static\stata-nppp\rundo.exe" "%:p"
-        "let dir_runStata = 'C:\Users\Abe\Dropbox\Archives\static\stata-nppp\'
-        "silent! exe '!start /min "'.dir_runStata.'rundo.exe" "%:p"'
-
-    "elseif &filetype == 'r'
-    "elseif &filetype == 'tex'
-    "elseif &filetype == 'java'
-    "elseif &filetype == 'cpp'
-    " NOTE: must put in sep plugin, like done in scoutkey
-    else
-        echom 'ScoutKey: Filetype not supported for RunCode()'
-    endif
-
-    " Return to prev win
-    exe winPrev.' wincmd w'
-endfun
-
 fun! RemoveBufList_fromCtrlp()
     " Put all buffer info into string
     let bufRaw = ''
@@ -330,40 +268,6 @@ fun! Update_ctrlpCommand(excludeNew)
     endif
 endfun
 
-fun! ExecuteInShell(cmd, direction)
-    " Expand all vim symbols in cmd
-    let cmd = join(map(split(a:cmd), 'expand(v:val)'))
-
-    " If output win exists, switch. If not, create new
-    "let output_bufname = fnameescape(cmd)
-    "let winNum = bufwinnr('^'.cmd.'$')
-    let output_bufname = "[Shell output"
-    let winNum = bufwinnr(output_bufname)
-    if winNum != -1
-        exe winNum.'wincmd w'
-    else
-        if a:direction == 'down'
-            exe 'belowright new '.output_bufname
-        elseif a:direction=='right'
-            exe 'belowright vs new '.output_bufname
-        endif
-    endif
-
-    " Set options for this special win
-    setlocal buftype=nowrite bufhidden=wipe noswapfile nonumber nofoldenable
-    "nobuflisted 
-
-    " Run cmd, paste output
-    exe 'silent %!'.cmd
-
-    " If going down, resize to fit output
-    if a:direction == 'down'
-        resize 5
-        "exe 'resize '.line('$')
-        "redraw
-    endif
-endfun
-
 fun! ClearOutHiddenBuffers()
     wall
     for i in range(1, bufnr('$'))
@@ -374,4 +278,3 @@ fun! ClearOutHiddenBuffers()
 endfun
 
 
-command! -complete=shellcmd -nargs=+ Shell call ExecuteInShell(<q-args>)
