@@ -276,7 +276,7 @@ endfunction
 function! s:getMbeHotkey(path)
     " char "a" is 97 and "z" is 122
     let letter = nr2char(97 + len(s:hotkeysToBufPaths))
-    let s:hotkeysToBufPaths[letter] = a:path
+    let s:hotkeysToBufPaths[letter] = fnameescape(a:path)
     return letter
 endfunction
 
