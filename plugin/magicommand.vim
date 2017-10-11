@@ -161,13 +161,15 @@ function! s:addGlasBufs(magiList)
             let l:stub = s:getLeftPadding() . l:line[2:]
         elseif l:firstChar == '#'
             let l:parts = split(l:line[1:], ':')
-            let l:folder = l:parts[1]
-            let l:stub = s:getLeftPadding() . l:parts[0]
+            let l:desc = substitute(l:parts[0], '\v^\s*(.{-})\s*$', '\1', '')
+            let l:folder = substitute(l:parts[1], '\v^\s*(.{-})\s*$', '\1', '')
+            let l:stub = s:getLeftPadding() . l:desc
 
         "elseif l:firstChar == '~'
         "  "let l:stub .= s:bufUniqNameDict[l:i] "TODO: get unique name?
         else
-            let l:stub = s:createStub(l:folder . l:line, l:line)
+            let l:path = l:folder . '/' . l:line
+            let l:stub = s:createStub(l:path, l:line)
         endif
 
         call add(a:magiList, l:stub)

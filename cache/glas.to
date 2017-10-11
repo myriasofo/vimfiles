@@ -1,5 +1,20 @@
 (/*
-#Skyfit:~/aaptiv/Skyfit/
+#lambdat: ~/aaptiv/lambdat
+__main__.py
+
+#localExecution: ~/aaptiv/lambdat/localExecution
+runPython.py
+
+#pythonExample:~/aaptiv/lambdat/examples/pythonExample
+lambda_function.py
+lambdat.yml
+
+#pullFromPinterest:~/aaptiv/growth-etl/pullFromPinterest
+lambda_function.py
+lambdat.yml
+*/
+/*
+#Skyfit: ~/aaptiv/Skyfit/
 api/enterpriseUserGroup.js
 test/api/enterpriseUserGroup.js
 
@@ -13,7 +28,7 @@ api/modelers/subscriptions/base.js
 routes.coffee
 */
 /*
-#Tasks:~/Dropbox/Notes/_palettes/
+#Tasks: ~/Dropbox/Notes/_palettes/
 stable.to
 flux.to
 list.to
