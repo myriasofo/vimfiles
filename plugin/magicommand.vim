@@ -29,7 +29,7 @@ let s:mapPaletteFiles = {
     \'timeLog.to': 'L',
     \}
 
-let s:glasCacheLocation = g:dir_notes . '_cache/glas.to'
+let s:glasConfigLocation = g:dir_notes . '_configs/glas.to'
 let s:hotkeysToBufPaths = {}
 
 " Helper functions
@@ -141,7 +141,7 @@ function! s:addGlasBufs(magiList)
     let l:folder = ''
 
     let skip = 0
-    for l:line in s:getGlasCache()
+    for l:line in s:getGlasConfig()
         let l:firstChar = l:line[0]
 
         if l:line[0:1] == '*/'
@@ -326,9 +326,9 @@ function! s:isBufModified(path)
     return bufloaded(a:path) && getbufvar(bufnr(a:path), '&modified')
 endfunction
 
-function! s:getGlasCache()
+function! s:getGlasConfig()
     try
-        return readfile(s:glasCacheLocation)
+        return readfile(s:glasConfigLocation)
     catch
         return []
     endtry

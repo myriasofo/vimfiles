@@ -167,17 +167,17 @@ fun! NavKey_ListBookmarks()
     set nomore
     echo repeat("\n", 2)
 
-    let bookmarks = s:get_bookmarks(s:open_cache())
+    let bookmarks = s:get_bookmarks(s:open_config())
     call s:pick_bookmark(bookmarks)
 endfun
 
-fun! s:get_bookmarks(cache)
+fun! s:get_bookmarks(config)
     let jumpList = {}
     call s:reset_jumpKey()
 
     let title = ''
-    for i in range(len(a:cache))
-        let [dirPath, displayText] = s:extract_bookmarkData(a:cache[i])
+    for i in range(len(a:config))
+        let [dirPath, displayText] = s:extract_bookmarkData(a:config[i])
 
         if dirPath == "comment"
             continue
@@ -193,7 +193,7 @@ fun! s:get_bookmarks(cache)
             if g:NavKey_titleMode == 'inline'
                 echo jumpKey . ': ' . displayText
             else
-                let maxTitleLen = s:getMaxStrLen(a:cache, '$') "Redundant here, but helps compartmentalize code
+                let maxTitleLen = s:getMaxStrLen(a:config, '$') "Redundant here, but helps compartmentalize code
                 let filler = repeat(' ', maxTitleLen - len(title) + 1)
                 echo filler . title . jumpKey . ': ' . displayText
                 let title = ''
@@ -287,10 +287,10 @@ endfun
 
 
 " Helper functions
-fun! s:open_cache()
+fun! s:open_config()
     " Todo - replace this try-catch with correct conditional
     try
-        return readfile(g:NavKey_cacheLocation)
+        return readfile(g:NavKey_configLocation)
     catch
         return []
     endtry
@@ -307,7 +307,7 @@ endfun
 
 
 " Settings
-let g:NavKey_cacheLocation = g:dir_notes . '_cache/navkey.to'
+let g:NavKey_configLocation = g:dir_notes . '_configs/navkey.to'
 "let g:NavKey_jumpKeys = 'abcdefghijklmnopqrstuvwxyz0123456789'
 "let g:NavKey_jumpKeys = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 let g:NavKey_jumpKeys = 'abcdefghijmnopqrstuvwxyz'

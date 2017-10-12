@@ -8,18 +8,18 @@
 " === : marks end of workspace
 
 fun! Spacework_Dialog()
-    let [arr_displayText, hash_wsFiles] = s:process_cache()
+    let [arr_displayText, hash_wsFiles] = s:process_config()
     call s:print_dialog(arr_displayText, hash_wsFiles)
 endfun
 
-fun! s:process_cache()
-    let cache = s:getCache()
+fun! s:process_config()
+    let config = s:getConfig()
     let i = 0
     let hash_wsFiles = {}
     let arr_displayText = []
 
-    while i < len(cache)
-        let lineTrimmed = s:trimLine(cache[i])
+    while i < len(config)
+        let lineTrimmed = s:trimLine(config[i])
         let firstChar = lineTrimmed[0]
 
         if firstChar == '#'
@@ -28,7 +28,7 @@ fun! s:process_cache()
 
             " grab all until '==='
             let hash_wsFiles[wsName] = []
-            let i = s:process_workspace(cache, i+1, hash_wsFiles[wsName])
+            let i = s:process_workspace(config, i+1, hash_wsFiles[wsName])
         "elseif firstChar == '' || firstChar == '@' || firstChar == "$" || firstChar == "%"
         elseif firstChar != '(' && firstChar != '='
             call add(arr_displayText, lineTrimmed)
@@ -38,11 +38,11 @@ fun! s:process_cache()
     endwhile
     return [arr_displayText, hash_wsFiles]
 endfun
-fun! s:process_workspace(cache, iStart, wsList)
+fun! s:process_workspace(config, iStart, wsList)
     " Grab everything for this workspace, until end (ie. '===')
     let i = a:iStart
-    while i < len(a:cache)
-        let lineTrimmed = s:trimLine(a:cache[i])
+    while i < len(a:config)
+        let lineTrimmed = s:trimLine(a:config[i])
 
         if lineTrimmed[0:2] == '==='
             return i - 1
@@ -61,7 +61,7 @@ fun! s:print_dialog(arr_displayText, hash_wsFiles)
 
     let returnCode = 1
     while returnCode
-        let jumpList = s:printCache_topLevel(a:arr_displayText, a:hash_wsFiles)
+        let jumpList = s:printConfig_topLevel(a:arr_displayText, a:hash_wsFiles)
         let returnCode = s:get_input(a:arr_displayText, a:hash_wsFiles, jumpList)
     endwhile
 
@@ -69,7 +69,7 @@ fun! s:print_dialog(arr_displayText, hash_wsFiles)
     redraw
     return 
 endfun
-fun! s:printCache_topLevel(arr_displayText, hash_wsFiles)
+fun! s:printConfig_topLevel(arr_displayText, hash_wsFiles)
     echo repeat("\n", 2)
 
     let jumpList = {}
@@ -114,10 +114,10 @@ fun! s:get_input(arr_displayText, hash_wsFiles, jumpList)
             let cmd = a:jumpList[char]
             let firstChar = cmd[0]
             if firstChar == "@"
-                if cmd == "@ openCache"
-                    exe "find " g:Spacework_cacheLocation
+                if cmd == "@ openConfig"
+                    exe "find " g:Spacework_configLocation
                 elseif cmd == "@ addFile"
-                    call s:addCurrentFileToCache('# [palette')
+                    call s:addCurrentFileToConfig('# [palette')
                 endif
                 return 0
             elseif firstChar == "#"
@@ -178,28 +178,28 @@ fun! s:pick_wsFile(wsFiles)
 endfun
 
 
-" Add file to cache (based on workspace name)
-    fun! s:addCurrentFileToCache(wsName)
-        let cache = s:getCache()
-        call insert(cache, expand('%:p'), s:getInsertionIndex_forWs(cache, a:wsName))
-        call s:setCache(cache)
+" Add file to config (based on workspace name)
+    fun! s:addCurrentFileToConfig(wsName)
+        let config = s:getConfig()
+        call insert(config, expand('%:p'), s:getInsertionIndex_forWs(config, a:wsName))
+        call s:setConfig(config)
     endfun
-    fun! s:getInsertionIndex_forWs(cache, wsName)
+    fun! s:getInsertionIndex_forWs(config, wsName)
         let i = 0
-        while i < len(a:cache)
-            if a:cache[i] == a:wsName
-                let i = s:findEnd_ofWs(a:cache, i+1)
+        while i < len(a:config)
+            if a:config[i] == a:wsName
+                let i = s:findEnd_ofWs(a:config, i+1)
                 break
             endif
             let i +=1
         endwhile
         return i
     endfun
-    fun! s:findEnd_ofWs(cache, iStart)
+    fun! s:findEnd_ofWs(config, iStart)
         let i = a:iStart
-        while i < len(a:cache)
-            if a:cache[i][0:2] == "==="
-                if a:cache[i-1][0] == "("
+        while i < len(a:config)
+            if a:config[i][0:2] == "==="
+                if a:config[i-1][0] == "("
                     let i -= 1
                 endif
                 break
@@ -246,25 +246,25 @@ endfun
     endfun
 
 
-    fun! s:getCache()
+    fun! s:getConfig()
         try
-            return readfile(g:Spacework_cacheLocation)
+            return readfile(g:Spacework_configLocation)
         catch
             return []
         endtry
     endfun
 
-    fun! s:setCache(cache)
-        "Should unload cache *before* writing to it
-        if buflisted(g:Spacework_cacheLocation) 
-            exe "MBEbun " g:Spacework_cacheLocation
+    fun! s:setConfig(config)
+        "Should unload config *before* writing to it
+        if buflisted(g:Spacework_configLocation) 
+            exe "MBEbun " g:Spacework_configLocation
         endif
 
-        call writefile(a:cache, g:Spacework_cacheLocation)
+        call writefile(a:config, g:Spacework_configLocation)
     endfun
 
 
 " Settings
-let g:Spacework_cacheLocation = g:dir_notes . '_cache/spacework.to'
+let g:Spacework_configLocation = g:dir_notes . '_configs/spacework.to'
 let g:Spacework_jumpKeys = 'abcdefghijklmnopqrstuvwxyz3'
 
