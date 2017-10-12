@@ -29,7 +29,7 @@ let s:mapPaletteFiles = {
     \'timeLog.to': 'L',
     \}
 
-let s:glasCacheLocation = g:dir_myPlugins . 'cache/glas.to'
+let s:glasCacheLocation = g:dir_notes . '_cache/glas.to'
 let s:hotkeysToBufPaths = {}
 
 " Helper functions
