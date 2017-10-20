@@ -1,15 +1,16 @@
 " This provides a scroll bar in the status bar
 
 fun! Scroller()
+    let scrollerLen = Scroller_getLength()
+
     " Don't show scrollbar for small files
     if line('$') < winheight(0)
-        return ''
+        return repeat(' ', scrollerLen + 5)
     endif
 
     " Get basic data
     let currLine = line('.')
     let totalLine = line('$')
-    let scrollerLen = Scroller_getLength()
     " Note - be *very* careful with floats. Essentially, always do division last
     let perc = 1.0 * currLine / totalLine
 

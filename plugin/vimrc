@@ -681,7 +681,7 @@
             "set statusline =\ \ 
             set statusline =\ \ 
             set statusline +=%{Scroller()}
-            set statusline +=\|
+            "set statusline +=\|
             set statusline +=%5l
             set statusline +=/
             set statusline +=%L
