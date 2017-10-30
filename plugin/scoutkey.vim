@@ -38,7 +38,6 @@ fun! ScoutKey()
         call LoadFile(g:dir_palettes . 'stable.to')
     elseif char == 'j'
         exe "normal! \<c-w>h"
-        echom &filetype
         if &filetype == 'minibufexpl'
             exe "normal! \<c-w>l"
             echom "ERROR: Avoid navigating to mbe (bc of fugitive and Gstatus/Gcommit)"
