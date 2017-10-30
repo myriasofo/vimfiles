@@ -126,3 +126,45 @@ endfun
 " NOTE - These cause errors if they don't exist
 "call add(g:session_persist_globals, 'b:Scroller_searchPlacement')
 "call add(g:session_persist_globals, 'b:Scroller_searchNum')
+
+let s:MAX_WIDTH = 80
+
+" WORK IN PROGRESS
+function! s:getWindowWidth()
+    return (winwidth(0) - 2)
+endfunction
+
+function! s:getScrollerWidth()
+    let windowWidth = s:getWindowWidth()
+    let scrollerWidth = windowWidth
+    if scrollerWidth > s:MAX_WIDTH
+        return s:MAX_WIDTH
+    endif
+    return scrollerWidth
+
+    "if &hlsearch && exists("b:Scroller_searchNum") 
+    "    float2nr(log10(b:Scroller_searchNum))
+    "endif
+endfunction
+
+function! s:getLineNumberSection()
+    let currentLine = line('.')
+    let nLines = line('$')
+
+    let spacerWidth = strlen(nLines) - strlen(currentLine)
+    let spacer = repeat(' ', spacerWidth)
+
+    if currentLine == nLines
+        return 'BOT'
+    endif
+    return spacer . currentLine . '/' . nLines
+endfunction
+
+function! s:test()
+    let scrollerLen = s:getScrollerWidth()
+
+    let lineNumberPosition = s:getLineNumberSection()
+    return '|' . lineNumberPosition
+
+    let scrollerLen -= strlen(lineNumberPosition)
+endfunction
