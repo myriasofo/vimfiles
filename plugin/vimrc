@@ -72,7 +72,8 @@
 
             " To try
             "Plugin 'Valloric/YouCompleteMe'
-            "Plugin 'scrooloose/syntastic'
+            "Plugin 'tpope/vim-abolish' "not needed
+            Plugin 'scrooloose/syntastic'
             "Plugin 'wookiehangover/jshint.vim'
             "Plugin 'tpope/vim-jdaddy' "Does this format json?
             "Plugin 'klen/python-mode'
@@ -1738,3 +1739,20 @@ fun! IsBufHidden(bufNum)
         "\&& !has_key(g:magiIgnoredFiles, fnamemodify(path, ':t'))
 endfun
 
+
+let g:syntastic_mode_map = {'mode': 'passive'} "Stop auto-run on save
+let g:syntastic_always_populate_loc_list = 1 "Open with <:Errors>
+let g:syntastic_auto_loc_list = 0 "Annoying
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 0
+let g:syntastic_enable_ballons = 0
+
+" To replace highlighted camelcase: %s//\=Snakecase(submatch(0))/
+function! Snakecase(word)
+    let word = substitute(a:word,'::','/','g')
+    let word = substitute(word,'\(\u\+\)\(\u\l\)','\1_\2','g')
+    let word = substitute(word,'\(\l\|\d\)\(\u\)','\1_\2','g')
+    let word = substitute(word,'[.-]','_','g')
+    let word = tolower(word)
+    return word
+endfunction
