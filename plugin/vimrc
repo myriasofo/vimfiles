@@ -1746,6 +1746,7 @@ let g:syntastic_auto_loc_list = 0 "Annoying
 let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
 let g:syntastic_enable_ballons = 0
+let g:syntastic_loc_list_height = 5
 
 " To replace highlighted camelcase: %s//\=Snakecase(submatch(0))/
 function! Snakecase(word)
