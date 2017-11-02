@@ -141,7 +141,8 @@ function! s:addGlasBufs(magiList)
     let l:folder = ''
 
     let skip = 0
-    for l:line in s:getGlasConfig()
+    for l:rawLine in s:getGlasConfig()
+        let l:line = substitute(l:rawLine, '^\s\+', '', '')
         let l:firstChar = l:line[0]
 
         if l:line[0:1] == '*/'
