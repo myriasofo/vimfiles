@@ -74,6 +74,8 @@
             "Plugin 'Valloric/YouCompleteMe'
             "Plugin 'tpope/vim-abolish' "not needed
             Plugin 'scrooloose/syntastic'
+            "Plugin 'mtscout6/syntastic-local-eslint.vim'
+            Plugin 'gilday/syntastic-local-standard.vim'
             "Plugin 'wookiehangover/jshint.vim'
             "Plugin 'tpope/vim-jdaddy' "Does this format json?
             "Plugin 'klen/python-mode'
@@ -1747,6 +1749,7 @@ let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
 let g:syntastic_enable_ballons = 0
 let g:syntastic_loc_list_height = 5
+let g:syntastic_javascript_checkers = ["standard"]
 
 " To replace highlighted camelcase: %s//\=Snakecase(submatch(0))/
 function! Snakecase(word)
