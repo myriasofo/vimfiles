@@ -577,7 +577,7 @@
 
 
     " file is 1mb or greater (just for folding, lol)
-        let g:FileSizeMax = 1024 * 500 "0.5mb
+        let g:FileSizeMax = 1024 * 1000 "1mb
         "autocmd BufReadPre * echom "BufReadPre"
         "autocmd BufReadPost * echom "BufReadPost"
 
