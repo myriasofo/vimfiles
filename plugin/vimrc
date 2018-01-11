@@ -129,6 +129,7 @@
         call add(g:session_persist_globals, 'g:magiLayoutMode')
 
     " For MBE
+        let g:miniBufExplStatusLineText = ''
         "let g:miniBufExplStatusLineText = '\ '
         "let g:miniBufExplStatusLineText = "%{bufnr('$')}"
         "let g:miniBufExplStatusLineText = "%{fnamemodify(getcwd(),':t')}"
@@ -649,8 +650,11 @@
         " One-liners
             " Self-explanatory
             if has('unix')
-                let &guifont = "Consolas 12"
-                set linespace=3
+                set guifont=Consolas:h12
+                set linespace=1
+
+                "set guifont=Menlo\ Regular:h13
+                "set linespace=3
             elseif has('win32')
                 set guifont=Consolas:h11
                 "set linespace=5
@@ -698,8 +702,8 @@
             "hi User1 guibg=red guifg=blue
 
         " Title string
-            set titlestring=\ 
-            "set titlestring =%{PrintCurrFolder()}
+            "set titlestring=\ 
+            set titlestring =%{PrintCurrFolder()}
 
         " Dismantle any gui toolbars
             if has("gui_running")

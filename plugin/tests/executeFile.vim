@@ -6,14 +6,19 @@ function! ExecuteCurrentFile()
     
     if &filetype == 'haskell'
         call s:executeHaskell()
+
     elseif &filetype == 'javascript'
         call s:executeJavascript()
+
     elseif &filetype == 'python'
         call s:executePython()
+
     elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
         call s:executeTimeLog()
+
     elseif &filetype == 'vim'
         call s:executeVimscript()
+
     else
         echom 'ScoutKey: Filetype not supported for RunCode()'
     endif
@@ -97,7 +102,7 @@ function! s:executeStata()
 endfunction
 
 function! s:executeTimeLog()
-    call ExecuteInShell('python ' . g:dir_dev . '/analyzeLog/analyzeLog.py', 'right')
+    call ExecuteInShell('python ' . g:dir_dev . 'analyzeTimeLog/analyzeLog.py', 'right')
 endfunction
 
 function! s:executeVimscript()
