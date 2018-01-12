@@ -11,7 +11,7 @@
         let g:dir_myPlugins = g:dir_dev . 'vimfiles/'
         let g:dir_notes  = expand('~/Dropbox/Notes/')
         let g:dir_palettes  = g:dir_notes . '_palettes/'
-        let dir_vundle = '~/vim/bundle/'
+        let g:dir_vim = expand('~/.vim/')
 
         if !isdirectory(g:dir_myPlugins)
             echom 'NOTE: Please set "g:dir_myPlugins" to valid folder'
@@ -24,11 +24,12 @@
         " Vundle begin
             set nocompatible
             filetype off
+            let dir_vundle = g:dir_vim . 'bundle/'
             let &runtimepath .= ',' . dir_vundle . 'Vundle.vim'
             try
                 call vundle#begin(dir_vundle)
             catch
-                echom "NOTE: Put Vundle.vim in ~/vim/bundle"
+                echom "NOTE: Put Vundle.vim in: " . dir_vundle
                 finish
             endtry
             Plugin 'gmarik/Vundle.vim' "Vundle is required to manage itself
@@ -93,7 +94,7 @@
         " Save undo history, even after file is closed!
             if has('persistent_undo')
                 "Make sure dir exists
-                set undodir=~/vim/undofiles
+                set undodir=~/.vim/undofiles
                 if !isdirectory(&undodir)
                     call mkdir(&undodir,"p")
                 endif
@@ -102,15 +103,20 @@
             endif
 
         " Save history of commands (note: commands, not undo)
-            "let &viminfo .= ',n~/vim/viminfo'
+            let &viminfo .= ',n' . g:dir_vim . 'viminfo'
             set history=100
 
-        " File backups
-            set backupdir=~/vim/backups
-            set directory=~/vim/backups
+        " File backups + swaps
+            let &backupdir = g:dir_vim . 'backups'
             if !isdirectory(&backupdir)
-                call mkdir(&backupdir,"p")
+                call mkdir(&backupdir, "p")
             endif
+
+            let &directory = g:dir_vim . 'swaps'
+            if !isdirectory(&directory)
+                call mkdir(&directory, "p")
+            endif
+
             set backupskip=/tmp/*,/private/tmp/*
             set backup
             set writebackup
@@ -527,7 +533,7 @@
             let g:session_autosave = 'no'
             let g:session_autoload = 'no'
         endif
-        let g:session_directory = '~/vim/session'
+        let g:session_directory = g:dir_vim . 'session'
 
         "au VimLeavePre * MBEClose "redundant with tempBuffers
         au VimLeavePre * call setqflist([]) "So session.vim doesn't save quickfix list
@@ -558,13 +564,13 @@
                 MBEOpen
             endif
         endfun
-        "execute 'nnoremap xu :mksession! ~/vim/session/base.vim<cr>'
-        "execute 'nnoremap xi :source ~/vim/session/base.vim<cr>'
+        "execute 'nnoremap xu :mksession! ~/.vim/session/base.vim<cr>'
+        "execute 'nnoremap xi :source ~/.vim/session/base.vim<cr>'
 
     " Delete session
         fun! DeleteSession()
-            call delete(expand("~/vim/session/default.vim"))
-            call delete(expand("~/vim/session/default.vim.lock"))
+            call delete(expand(g:dir_vim . "session/default.vim"))
+            call delete(expand(g:dir_vim . "session/default.vim.lock"))
             let g:session_autosave = 'no'
             exe 'source '.g:dir_myPlugins.'plugin/vimrc'
             "let g:session_autoload = 'no'

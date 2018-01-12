@@ -14,7 +14,7 @@ fun! EasyKey(modes, nJumpKeys)
         setlocal modifiable
     elseif bufname('%') != "[Command Line]"
         " Save old history (bc setline below will change it)
-        exe "wundo ~/vim/tempUndoHistory"
+        exe "wundo " . g:dir_vim . "tempUndoHistory"
     endif
 
     " Prep for line-by-line insertion of jumpKeys
@@ -65,7 +65,7 @@ fun! EasyKey(modes, nJumpKeys)
         setlocal readonly
     elseif bufname('%') != "[Command Line]"
         try
-            silent exe "rundo ~/vim/tempUndoHistory"
+            silent exe "rundo " . g:dir_vim . "tempUndoHistory"
         catch
             " wundo will produce nothing if NO undo history, causing rundo to crash
             " so we simulate the above by just resetting the undo history
