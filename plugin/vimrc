@@ -129,11 +129,10 @@
         call add(g:session_persist_globals, 'g:magiLayoutMode')
 
     " For MBE
-        let g:miniBufExplStatusLineText = ''
-        "let g:miniBufExplStatusLineText = '\ '
+        let g:miniBufExplStatusLineText = '\ '
         "let g:miniBufExplStatusLineText = "%{bufnr('$')}"
         "let g:miniBufExplStatusLineText = "%{fnamemodify(getcwd(),':t')}"
-        let g:miniBufExplStatusLineText = "%{PrintCurrFolder()}"
+        "let g:miniBufExplStatusLineText = "%{PrintCurrFolder()}"
 
         fun! PrintCurrFolder()
             let raw = getcwd()
