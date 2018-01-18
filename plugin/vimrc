@@ -1380,7 +1380,12 @@
     " Trying to use ag
         if executable('ag')
             " Use Ag over Grep
-            let &grepprg = 'ag -s --nogroup --nocolor --ignore-dir CVS --ignore-dir node_modules'
+            let ignore_dirs = ['CVS', 'node_modules', '.venv']
+
+            let &grepprg = 'ag -s --nogroup --nocolor'
+            for ignore_dir in ignore_dirs
+                let &grepprg .= ' --ignore-dir ' . ignore_dir
+            endfor
 
             " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
             "let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
