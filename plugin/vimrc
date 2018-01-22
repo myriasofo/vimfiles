@@ -1,26 +1,25 @@
-" NOTE: The indenting below allows for easy folding
-"       My fold function was adapted from Steve Losh's *Learn Vimscript
-"       the Hard Way* and is provided below, called FoldByIndentHeader()
 
-"| Meta vimrc
-    " I use dropbox to sync vim bw several machines
-        " These are DEFAULTS. Change below if needed
+
+"| 0. Before everything else
+    " Define core directory paths
         set shellslash
-        "let g:dir_myPlugins = expand('~/Dropbox/Archives/vimfiles/')
+
+        let g:dir_vim = expand('~/.vim/')
+        let g:dir_notes = expand('~/Dropbox/Notes/')
+        let g:dir_palettes = g:dir_notes . '_palettes/'
         let g:dir_dev = expand('~/my/')
         let g:dir_myPlugins = g:dir_dev . 'vimfiles/'
-        let g:dir_notes  = expand('~/Dropbox/Notes/')
-        let g:dir_palettes  = g:dir_notes . '_palettes/'
-        let g:dir_vim = expand('~/.vim/')
 
         if !isdirectory(g:dir_myPlugins)
             echom 'NOTE: Please set "g:dir_myPlugins" to valid folder'
             finish
         endif
 
+
         " Add my personal plugins
         let &runtimepath .= ',' . g:dir_myPlugins
-        " Use vundle to manage plugins
+
+    " Use vundle to manage plugins
         " Vundle begin
             set nocompatible
             filetype off
@@ -86,571 +85,68 @@
             call vundle#end()
             filetype plugin indent on
 
-    " Disable modeline bc of security reasons
-        set nomodeline
-        set modelines=0
-
-    " Saving undo, cmds, backups
-        " Save undo history, even after file is closed!
-            if has('persistent_undo')
-                "Make sure dir exists
-                set undodir=~/.vim/undofiles
-                if !isdirectory(&undodir)
-                    call mkdir(&undodir,"p")
+    " Turn on syntax highlighting
+        if !exists('g:loadOnceSyntax')
+            let g:loadOnceSyntax = 1
+            " cmds 'colorscheme' and 'syntax enable' are fickle, so run only once
+                syntax enable
+                if has("gui_running")
+                    colorscheme solarized
+                    "colorscheme molokai
+                    "colorscheme hybrid
+                    "colorscheme lucius
+                else
+                    silent! colorscheme desert
                 endif
-                set undolevels=100
-                set undofile
-            endif
 
-        " Save history of commands (note: commands, not undo)
-            let &viminfo .= ',n' . g:dir_vim . 'viminfo'
-            set history=100
+                "set background=dark
+                set background=light
 
-        " File backups + swaps
-            let &backupdir = g:dir_vim . 'backups'
-            if !isdirectory(&backupdir)
-                call mkdir(&backupdir, "p")
-            endif
+                "let g:molokai_original =1
+                "let g:solarized_termcolors=256
 
-            let &directory = g:dir_vim . 'swaps'
-            if !isdirectory(&directory)
-                call mkdir(&directory, "p")
-            endif
-
-            set backupskip=/tmp/*,/private/tmp/*
-            set backup
-            set writebackup
-
-    " Set default line endings to unix for full compatability
-        set fileformats=unix,dos
-
-"| Plugin-only options
-    " Self-explanatory
-        "let g:loaded_matchparen = 1
-        let g:matchparen_timeout = 10
-        let g:fugitive_no_maps = 1
-        let g:EasyMotion_skipfoldedline = 0
-        let g:session_lock_enabled = 0
-        let g:session_persist_globals = []
-        call add(g:session_persist_globals, 'g:magiLayoutMode')
-
-    " For MBE
-        let g:miniBufExplStatusLineText = '\ '
-        "let g:miniBufExplStatusLineText = "%{bufnr('$')}"
-        "let g:miniBufExplStatusLineText = "%{fnamemodify(getcwd(),':t')}"
-        "let g:miniBufExplStatusLineText = "%{PrintCurrFolder()}"
-
-        fun! PrintCurrFolder()
-            let raw = getcwd()
-            let path = fnamemodify(raw, ':t')
-
-            "If we're at root, ie. 'C:/'
-            if path == ''
-                let path = raw
-            endif
-
-            return path
-        endfun
-
-        " Put MBE in vert, with colm 20
-        let g:miniBufExplVSplit = 1
-
-        " Put MBE in left
-        let g:miniBufExplBRSplit = 0
-
-    " For tcomment
-        let g:tcommentMaps = 0 "Don't need tcomment's key maps
-        let g:tcommentOptions = {'whitespace': 'no'}
-        try
-            call tcomment#DefineType('javascript','// %s')
-            call tcomment#DefineType('cpp','// %s')
-            call tcomment#DefineType('java','// %s')
-            call tcomment#DefineType('todo','( %s')
-        catch
-            echom "NOTE: tcomment is not loaded"
-        endtry
-
-    " For gitgutter
-        let g:gitgutter_sign_removed = '-'
-        let g:gitgutter_sign_removed_first_line = '--'
-        let g:gitgutter_sign_modified_removed = '~-'
-        let g:gitgutter_map_keys = 0
-        let g:gitgutter_realtime = 0
-        let g:gitgutter_eager = 0
-        "hi clear SignColumn "Not sure the point of this
-
-    " For rainbow parentheses
-        let g:rainbow_active = 1
-
-        if &background == "dark"
-            let brickred = '#dc322f' "best
-            let purp = '#6c71c4'
-            let teal = '#2aa198' "strangely good
-            "let orange = '#b58900' "too strange
-            let green = '#719e07' "horrifically ugly
-            let blue = '#268bd2' "not distinguishable from purp/teal
-            "let pink = '#d33682' "not distinguishable from red
-        else
-            let brickred = '#dc322f' "best
-            let green = 'darkgreen' "horrifically ugly
-            let blue = 'blue' "not distinguishable from purp/teal
         endif
 
-        let g:rainbow_conf = {
-            \'guifgs': [brickred, green, blue],
-            \'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
-            \'operators': '_,_',
-            \'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
-            \'separately': {
-                \'*': {},
-                \'vim': {
-                    \'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold',
-                    \'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody',
-                    \'start=/{/ end=/}/ fold containedin=vimFuncBody'],
-                \},
-                \'todo': 0,
-            \}
-        \}
-        "\'guifgs': ['#dc322f','#afad27','seagreen3','royalblue3','darkorchid3'],
-        "\ 'html': {
-        "    \ 'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
-        "\ },
-    " For delimitMate
-        let g:delimitMate_expand_cr = 1
-        let g:delimitMate_jump_expansion = 1
-        let g:delimitMate_excluded_regions = ''
-        let g:delimitMate_excluded_ft = 'todo'
-
-"| Load these once
-    if !exists("g:loadOnce_onFirstSource")
-    let g:loadOnce_onFirstSource = 1
-    exe "cd ~"
-
-    " cmds 'colorscheme' and 'syntax enable' are fickle, so run only once
-        syntax enable
-        if has("gui_running")
-            colorscheme solarized
-        else
-            silent! colorscheme desert
-        endif
-        "colorscheme desert
-        "colorscheme molokai
-        "colorscheme hybrid
-        "colorscheme lucius
-        "set background=dark
-        set background=light
-        "let g:molokai_original =1
-        "let g:solarized_termcolors=256
-
-    " appearance options that can be toggled, but default on
-        set nowrap
-        set hlsearch
-        set incsearch
-        "set lines=40 columns=150
-
-    " All my autocmds (almost all about appearance/formatting)
-        " For debugging autocmds
-            "set verbose=9
-            "au
-
-        " Highlight orphaned whitespace
-            "au BufRead * call HL_OrphanedWhitespace()
-
-            highlight OrphanedWhitespace guibg=grey30 ctermbg=grey
-            fun! HL_OrphanedWhitespace()
-                match OrphanedWhitespace /\s\+\%#\@<!$/
-                "match OrphanedWhitespace /\s\+$/
-            endfun
-            fun! OrphanedWhitespace_search()
-                "execute "normal! /^\\s\\+$\<cr>"
-                %s/\s\+$//c
-
-                "call HL_OrphanedWhitespace()
-                " Todo - could make this much more sophisticated
-                " 1. tells you how many orphaned blocks are left below
-                " 2. simply clears ALL orphaned
-            endfun
-
-            " Turn it off if distracting
-            "fun! HighlightWhitespace_clear()
-            "    highlight ExtraSpace guibg=NONE ctermbg=NONE
-            "endfun
-
-        " Maximize window
-            if has('win32')
-                "set lines=999 columns=999
-                au GUIEnter * simalt ~x
-            else
-                au GUIEnter * call system('wmctrl -i -b add,maximized_vert,maximized_horz -r '.v:windowid)
-                "set lines=999 columns=999
-            endif
-
-        " Turns off bells fo REAL
-            au GUIEnter * set vb t_vb=
-
-        " Makes help appear as vertical split (instead of horiz)
-            "au FileType help call WhenHelp()
-            "fun! WhenHelp()
-            "    wincmd L
-            "endfun
-
-        " Disable autocomments
-            au FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
-
-        " HL for python
-            au FileType python call PythonSyntaxHl()
-            fun! PythonSyntaxHl()
-                " All operators
-                syn match Type "="
-                syn match Type "+"
-                syn match Type "-"
-                syn match Type "/"
-                syn match Type "\*"
-                syn match Type ">"
-                syn match Type "<"
-                syn match Type ":"
-                syn match Type "!"
-
-                " All delimiters
-                "syn match Delimiter "("
-                "syn match Delimiter ")"
-                "syn match Delimiter "\["
-                "syn match Delimiter "\]"
-                "syn match Delimiter ","
-
-                " Manually add functions
-                syn keyword pythonBuiltin append insert
-                syn keyword pythonBuiltin strip split join format
-                syn keyword pythonBuiltin sleep time play floor
-                hi link pythonBuiltin Function
-
-                "syn keyword Type i
-                "syn keyword Conditional i
-                syn keyword Function i j
-                "syn keyword Function self
-
-            endfun
-
-        " HL for Javascript
-            au FileType html call HtmlSyntaxHl()
-            fun! HtmlSyntaxHl()
-                hi javaScript guifg=fg
-                "call JsSyntaxHl()
-
-                "syn keyword jsBuiltin console log trace p printType getType getProtoChain
-                "syn keyword jsBuiltin map reduce filter forEach call apply bind
-                "syn keyword jsBuiltin length join
-                "syn keyword jsBuiltin max min create
-                "hi link jsBuiltin Underlined
-            endfun
-
-            au FileType javascript call JsSyntaxHl()
-            " TODO: Make below into its own file
-            fun! JsSyntaxHl()
-                "syn clear "TODO: just make my own syntax file
-
-                " Literals : Including strings and booleans
-                hi link javaScriptNull Constant
-                syn match Constant "\<\d\+\>"
-                syn keyword Constant NaN
-
-                " Operators : Booleans
-                syn match Type "="
-                syn match Type "!"
-                syn match Type ">"
-                syn match Type "<"
-                syn match Type "&"
-                syn match Type "|"
-                syn match Type "\~"
-                syn match Type "\^"
-
-                " Operators : Math
-                syn match Type "+"
-                syn match Type "-"
-                syn match Type "\*"
-                syn match Type "\/"
-                syn match Type "%"
-
-                " Operators : Language-specific
-                "syn match Type "\."
-                syn match Type ";"
-                syn match Type "?"
-                syn match Type ":"
-
-                " Operators : Keywords
-                syn keyword jsOps var let in void of const
-                syn keyword jsOps typeof instanceof new delete
-                hi link jsOps Type
-
-                " Comments (Note: keep this at the end, after operators)
-                syn match javaScriptLineComment "\/\/.*" contains=@Spell,javaScriptCommentTodo
-                syn region javaScriptComment start="/\*"  end="\*/" contains=@Spell,javaScriptCommentTodo
-
-                " Special string (using <`>)
-                syn region javaScriptStringT start=+`+ end=+`+ contains=javaScriptSpecial,@htmlPreproc,innerExpression
-                syn region innerExpression start=+${+ end=+}+
-                hi def link javaScriptStringT String
-
-                " Functions : Special emphasis on keywords 'return', 'break', 'function'
-                hi link javaScriptFunction Special
-                hi link javaScriptStatement PreProc
-                hi link javaScriptBranch PreProc
-                " Also highlight dangerous keywords, eg. debugger, escape, alert
-                hi link javaScriptReserved PreProc
-                hi link javaScriptDeprecated PreProc
-                hi link javaScriptMessage PreProc
-                " Clear out normal keywords: window, document
-                syntax clear javaScriptGlobal javaScriptMember
-                syn keyword PreProc yield async await
-
-                " Defined : Functions that are global
-                syn keyword jsInternal eval call apply bind create keys hasOwnProperty isArray
-                syn keyword jsInternal console log addEventListener getElementById setTimeout setInterval
-                syn keyword jsInternal Math max min JSON stringify parse
-                syn keyword jsInternal splice slice push pop sort indexOf concat map reduce filter forEach
-                syn keyword jsInternal toString toFixed split substr
-                " external: jquery and my own helper fctns
-                syn keyword jsExternal extend
-                syn match   jsExternal "\$"
-                syn keyword jsExternal printType getType getProtoChain
-                hi link javaScriptType Function
-                hi link jsInternal Function
-                hi link jsExternal Function
-
-                " Use this to highlight ALL properties
-                "syn match jsMine "\.\<\w\+\>"
-                "hi link jsMine Function
-
-                " Critical : 'this' is most important word in all of js
-                " NOTE - put this section AFTER jzZebra's syn match
-                syn keyword jsThis this arguments pv self
-                hi link jsThis helpVim
-                syn match jsThis "\$\<this\w*\>"
-                syn match jsThis "\$$private"
-                syn match jsThis "\$scope"
-            endfun
-
-        " HL for new filetype, 'todo'
-            au BufRead,BufNewFile *.to call TodoSyntaxHL()
-            fun! TodoSyntaxHL()
-                set filetype=todo
-                setlocal shiftwidth=4
-                syn match Identifier "^\s*#.*"
-                syn match Statement "^\s*\$.*"
-                syn match Type "^\s*_.*"
-                syn match Special "^\s*!.*"
-            endfun
-
-        " Setup Indent lines!
-            " NOTE - this must go *after* other syntax hl
-            "set conceallevel=2
-            "set concealcursor=nic
-
-            " about same colors as text
-            "highlight Conceal guibg=NONE guifg=#586e75
-
-            " nice
-            if &background == "dark"
-                highlight Conceal guibg=NONE guifg=#214651
-            else
-                highlight Conceal guibg=NONE guifg=gray
-            endif
-
-            " too light
-            "highlight Conceal guibg=NONE guifg=0c3540
-
-            let g:indentLine_char = '¦'
-            "let g:indentLine_char='│'
-            "let g:indentLine_char='░'
-            "let g:indentLine_char='▓'
-            "let g:indentLine_char='▒'
-            "let g:indentLine_char='▌'
-            let g:indentLine_maxInd = 10
-
-            "au BufRead * call DrawIndentLine() "syntax match REALLY slows down big files
-            fun! DrawIndentLine()
-                if &filetype == 'todo'
-                    return
+"| 1. Core options
+    " Core vim options
+        " Saving undo, cmds, backups
+            " Save undo history, even after file is closed!
+                if has('persistent_undo')
+                    "Make sure dir exists
+                    set undodir=~/.vim/undofiles
+                    if !isdirectory(&undodir)
+                        call mkdir(&undodir,"p")
+                    endif
+                    set undolevels=100
+                    set undofile
                 endif
 
-                let space = &shiftwidth
-                for i in range(space+1, space * g:indentLine_maxInd + 1, space)
-                    execute 'syntax match IndentLine /\%(^\s\+\)\@<=\%'.i.'v / containedin=ALL conceal cchar='.g:indentLine_char
-                endfor
-            endfun
+            " Save history of commands (note: commands, not undo)
+                let &viminfo .= ',n' . g:dir_vim . 'viminfo'
+                set history=100
 
-        " Indents after newlines
-            "au FileType * call IndentingForNewLines()
-            "fun! IndentingForNewLines()
-            "    if &filetype == 'todo'
-            "        setlocal autoindent
-            "    else
-            "        setlocal autoindent
-            "        "setlocal cindent "Problem is that ONLY for C -> so weird special cases
-            "        "setlocal cinkeys-=0#
-            "    endif
-            "endfun
-
-        " Trying for netrw
-            "au FileType netrw call s:setup_vinegar()
-            "au FileType netrw call SetupNetrw()
-            "au BufRead * call SetupNetrw()
-            "au BufNewFile * call SetupNetrw()
-            "fun! SetupNetrw()
-            "    echo 'any file'
-            "    if &filetype == 'netrw'
-            "        echom 'setup netrw!'
-            "        "nnoremap <silent> s :<c-u>call ScoutKey()<cr>
-            "    endif
-            "endfun
-
-
-
-    " Enable folding, except for help/mbe/noname
-        "au FileType * call StartFolding()
-        au FileType * call PreventFolding()
-        fun! PreventFolding()
-            if &buftype == 'help' || &buftype == 'nofile'
-                setlocal foldmethod=manual
-                "setlocal foldexpr =0
-                "setlocal nofoldenable
-            endif
-        endfun
-
-    " Save session, load session
-        " Order
-        "   open vim > noname > session load > open mbe
-        "   start close > close mbe > session save > exit
-
-        set sessionoptions=blank,buffers,curdir,tabpages,winpos
-        "set sessionoptions=blank,buffers,curdir,folds,tabpages,winpos
-        "set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winpos
-        let g:miniBufExplAutoStart = 0
-        if has("gui_running")
-            let g:session_autosave = 'yes'
-            let g:session_autoload = 'yes'
-        else
-            let g:session_autosave = 'no'
-            let g:session_autoload = 'no'
-        endif
-        let g:session_directory = g:dir_vim . 'session'
-
-        "au VimLeavePre * MBEClose "redundant with tempBuffers
-        au VimLeavePre * call setqflist([]) "So session.vim doesn't save quickfix list
-        au VimLeavePre * silent! argdel * "So session.vim doesn't save args
-        au VimLeavePre * call CloseTempBuffers()
-        fun! CloseTempBuffers()
-            " Go thru win and close any that are &filetype == 'help'
-            let tempBuffers = {
-                \'': 1,
-                \'help':1,
-                \'gitcommit':1,
-                \'minibufexpl': 1,
-                \'qf': 1
-                \}
-            
-            for i in range(winnr('$'), 1, -1)
-                let winFileType = getwinvar(i, '&filetype') 
-                if has_key(tempBuffers, winFileType)
-                    exe i.'quit'
+            " File backups + swaps
+                let &backupdir = g:dir_vim . 'backups'
+                if !isdirectory(&backupdir)
+                    call mkdir(&backupdir, "p")
                 endif
-            endfor
-        endfun
 
-        au SessionLoadPost * call WhenSessionLoad()
-        fun! WhenSessionLoad()
-            if !exists("g:sessionHasLoaded")
-                let g:sessionHasLoaded = 1
-                MBEOpen
-            endif
-        endfun
-        "execute 'nnoremap xu :mksession! ~/.vim/session/base.vim<cr>'
-        "execute 'nnoremap xi :source ~/.vim/session/base.vim<cr>'
-
-    " Delete session
-        fun! DeleteSession()
-            call delete(expand(g:dir_vim . "session/default.vim"))
-            call delete(expand(g:dir_vim . "session/default.vim.lock"))
-            let g:session_autosave = 'no'
-            exe 'source '.g:dir_myPlugins.'plugin/vimrc'
-            "let g:session_autoload = 'no'
-        endfun
-
-    " Refresh results for Scroller()
-        " NOTE - currently using '/' instead of refresh
-        "let &ut = 300
-        "autocmd CursorHold * if line('$')<3000 | call Scroller_refreshSearchResults() | endif
-
-
-    " file is 1mb or greater (just for folding, lol)
-        let g:FileSizeMax = 1024 * 1000 "1mb
-        "autocmd BufReadPre * echom "BufReadPre"
-        "autocmd BufReadPost * echom "BufReadPost"
-
-        "BufEnter BufWinteEnter WinEnter
-
-        autocmd BufReadPre * call LargeFile('pre')
-        autocmd BufReadPost * call LargeFile('post')
-        "autocmd FileType javascript call LargeFile('filetype')
-        fun! LargeFile(event)
-            let fsize = getfsize(expand("<afile>"))
-            if fsize > g:FileSizeMax || fsize == -2
-                "if a:event == 'filetype'
-                "    let &filetype = ''
-                if a:event == 'pre'
-                    " worst iniital load: folding
-                    "echom "fsize pre"
-                    setlocal foldmethod=manual
-
-                    " worst on search/jump: syntax
-                    "setlocal eventignore+=FileType
-                    "setlocal syntax=
-                    "set filetype=nofile
-                    "let &filetype = ''
-                    "set filetype=
-
-                    " Need to the below AFTER buf is read! wowow
-                    "normal! GG
-                    "setlocal filetype=javascript
-
-
-                    "set eventignore+=FileType
-                    "setlocal eventignore=all
-                    "" save memory when other file is viewed
-                    "setlocal bufhidden=unload
-                    "" is read-only (write with :w new_filename)
-                    "setlocal buftype=nowrite
-                    "" no undo possible
-                    "setlocal undolevels=-1
-                    "setlocal nofoldenable
-
-                    " Tweaks to make vim faster
-                        "set noswapfile
-                        "set eventignore +=FileType
-                        "setlocal undolevels=-1
-                        "setlocal buftype=nowrite
-
-
-                    "setlocal statusline=
-                    "syntax off
-                elseif a:event == 'post'
-                    "echom "fsize post"
-                    "normal! GG
-                    "setlocal filetype=javascript
+                let &directory = g:dir_vim . 'swaps'
+                if !isdirectory(&directory)
+                    call mkdir(&directory, "p")
                 endif
-                "echom "file:" expand('%')
-                "echom "filetype:" &filetype
-            endif
-        endfun
-        fun! LargeFileAfter()
-        endfun
 
-    " Refresh when switching back to vim
-        autocmd FocusGained * redraw!
+                set backupskip=/tmp/*,/private/tmp/*
+                set backup
+                set writebackup
 
-    endif
+        " Disable modeline bc of security reasons
+            set nomodeline
+            set modelines=0
 
-"| Appearance and formatting
+        " Set default line endings to unix for full compatability
+            set fileformats=unix,dos
+
     " GUI and indents
         " One-liners
             " Self-explanatory
@@ -687,6 +183,7 @@
             " Turn off mouse (no cheating!)
             set mouse =
             set guicursor+=a:blinkon0
+            set autoread "Auto-update file if changed outside of vim
 
         " Status line
             set laststatus =2
@@ -774,7 +271,195 @@
 
         endif
 
-"| Keybinds
+"| 2. Plugin options
+    " For tcomment
+        let g:tcommentMaps = 0 "Don't need tcomment's key maps
+        let g:tcommentOptions = {'whitespace': 'no'}
+        try
+            call tcomment#DefineType('javascript','// %s')
+            call tcomment#DefineType('cpp','// %s')
+            call tcomment#DefineType('java','// %s')
+            call tcomment#DefineType('todo','( %s')
+        catch
+            echom "NOTE: tcomment is not loaded"
+        endtry
+
+    " For gitgutter
+        let g:gitgutter_sign_removed = '-'
+        let g:gitgutter_sign_removed_first_line = '--'
+        let g:gitgutter_sign_modified_removed = '~-'
+        let g:gitgutter_map_keys = 0
+        let g:gitgutter_realtime = 0
+        let g:gitgutter_eager = 0
+        "hi clear SignColumn "Not sure the point of this
+
+    " For rainbow parentheses
+        let g:rainbow_active = 1
+
+        if &background == "dark"
+            let brickred = '#dc322f' "best
+            let purp = '#6c71c4'
+            let teal = '#2aa198' "strangely good
+            "let orange = '#b58900' "too strange
+            let green = '#719e07' "horrifically ugly
+            let blue = '#268bd2' "not distinguishable from purp/teal
+            "let pink = '#d33682' "not distinguishable from red
+        else
+            let brickred = '#dc322f' "best
+            let green = 'darkgreen' "horrifically ugly
+            let blue = 'blue' "not distinguishable from purp/teal
+        endif
+
+        let g:rainbow_conf = {
+            \'guifgs': [brickred, green, blue],
+            \'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+            \'operators': '_,_',
+            \'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+            \'separately': {
+                \'*': {},
+                \'vim': {
+                    \'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold',
+                    \'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody',
+                    \'start=/{/ end=/}/ fold containedin=vimFuncBody'],
+                \},
+                \'todo': 0,
+            \}
+        \}
+        "\'guifgs': ['#dc322f','#afad27','seagreen3','royalblue3','darkorchid3'],
+        "\ 'html': {
+        "    \ 'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
+        "\ },
+    " For delimitMate
+        let g:delimitMate_expand_cr = 1
+        let g:delimitMate_jump_expansion = 1
+        let g:delimitMate_excluded_regions = ''
+        let g:delimitMate_excluded_ft = 'todo'
+
+    " For syntastic
+        let g:syntastic_mode_map = {'mode': 'passive'} "Stop auto-run on save
+        let g:syntastic_always_populate_loc_list = 1 "Open with <:Errors>
+        let g:syntastic_auto_loc_list = 0 "Annoying
+        let g:syntastic_check_on_open = 0
+        let g:syntastic_check_on_wq = 0
+        let g:syntastic_enable_ballons = 0
+        let g:syntastic_loc_list_height = 5
+        let g:syntastic_javascript_checkers = ["standard"]
+
+    " For netrw
+        let g:netrw_banner = 0
+        let g:netrw_keepdir = 0
+
+        let g:Netrw_UserMaps = [["s","ScoutKeyWrapper"]]
+        fun! ScoutKeyWrapper(islocal)
+            call ScoutKey()
+        endfun
+
+    " For grep and search
+        command! -nargs=? Indexer call GrepMe(<f-args>)
+        let g:ag_apply_qmappings = 0
+
+        " Use ag
+        if executable('ag')
+            " Use Ag over Grep
+            let ignore_dirs = ['CVS', 'node_modules', '.venv']
+
+            let &grepprg = 'ag -s --nogroup --nocolor'
+            for ignore_dir in ignore_dirs
+                let &grepprg .= ' --ignore-dir ' . ignore_dir
+            endfor
+
+        elseif has('win32')
+            set grepprg=findstr\ /n\ /s
+        "elseif has('unix')
+        endif
+
+    " Other
+        "let g:loaded_matchparen = 1
+        let g:matchparen_timeout = 10
+        let g:fugitive_no_maps = 1
+        let g:EasyMotion_skipfoldedline = 0
+        let g:session_lock_enabled = 0
+        let g:session_persist_globals = []
+        call add(g:session_persist_globals, 'g:magiLayoutMode')
+
+"| 3. Keybinds
+    " Core actions
+        " Del and Bsp
+            " Make bsp work in Windows
+            set backspace=eol,start,indent
+            nnoremap <bs> "_X
+            nnoremap <del> "_x
+
+            "Only windows
+            inoremap <c-BS> <c-w>
+            cnoremap <c-BS> <c-w>
+
+            "Only mac (linux?)
+            inoremap <m-BS> <c-w>
+            cnoremap <m-BS> <c-w>
+
+        " Undo
+            noremap U <c-r>
+            "noremap <silent> u :<c-u>call WrapperForKeyU()<cr>
+            "fun! WrapperForKeyU()
+            "    if v:count >= 1
+            "        call RemoveBuffer(v:count)
+            "    else
+            "        normal! u
+            "    endif
+            "endfun
+
+        " Insert and paste
+            let g:Insertatron_easykeymaps = 1
+            noremap v r
+
+        " For autocomplete
+            fun! TabToAutocomplete(direction)
+                return IsBlank('.') || IsWhitespace('.') ?
+                    \ (a:direction == 'forward' ? "\<tab>" : "\<bs>") :
+                    \ (a:direction == 'forward' ? "\<c-n>" : "\<c-p>")
+            endfun
+            inoremap <tab> <c-r>=TabToAutocomplete('forward')<CR>
+            inoremap <s-tab> <c-r>=TabToAutocomplete('backward')<CR>
+            set completeopt +=longest
+            set complete =.,w
+
+        " Action by inaction
+            " ie. train self not to use these keys
+            noremap I <nop>
+            noremap A <nop>
+            noremap O <nop>
+            noremap P <nop>
+            nnoremap $ <nop>
+            "noremap p <nop>
+            "noremap b <nop>
+            "noremap m <nop>
+            "noremap / <nop>
+            "noremap gg <nop>
+            map gg g
+            noremap gf <nop>
+            "noremap G <nop>
+            nnoremap ) <nop>
+            nnoremap ( <nop>
+
+            imap <c-a> <nop>
+            imap <c-t> <nop>
+
+            imap <d-w> <nop>
+            imap <d-r> <nop>
+            imap <d-t> <nop>
+
+            imap <d-a> <nop>
+            imap <d-s> <nop>
+            imap <d-f> <nop>
+
+            imap <d-z> <nop>
+            imap <d-x> <nop>
+            imap <d-c> <nop>
+            imap <d-v> <nop>
+
+            vmap qo <nop>
+
     " Getting around
         " Reassign hjkl
             noremap j h
@@ -815,7 +500,6 @@
             vnoremap e L
             "vnoremap <silent> w :<c-u>call MoveCursor_toWindowTop('v')<cr>
             "vnoremap <silent> e :<c-u>call MoveCursor_toWindowBottom('v')<cr>
-
 
         " Misc nav remaps
             "noremap gf G
@@ -917,487 +601,245 @@
             vmap q; <Plug>TComment_Comment
             vmap qj <Plug>TComment_Uncomment
 
-    " Actions
-        " Del and Bsp
-            " Make bsp work in Windows
-            set backspace=eol,start,indent
-            nnoremap <bs> "_X
-            nnoremap <del> "_x
+        " For vim-surround
+            let g:surround_no_mappings = 1
+            nmap ds <Plug>Dsurround
+            nmap cs <Plug>Csurround
+            nmap ts <Plug>Ysurround
+            nmap tsi <Plug>Ysurroundiw
 
-            "Only windows
-            inoremap <c-BS> <c-w>
-            cnoremap <c-BS> <c-w>
+            "Rarely useful, maybe to add more delims
+            "nmap tso <Plug>Ysurroundi
+            "nmap tss <Plug>Yssurround
+            "xmap S <Plug>VSurround
+            "nmap cS  <Plug>CSurround
+            "nmap ys  <Plug>Ysurround
+            "nmap yS  <Plug>YSurround
+            "nmap yss <Plug>Yssurround
+            "nmap ySs <Plug>YSsurround
+            "nmap ySS <Plug>YSsurround
+            "xmap S   <Plug>VSurround
+            "xmap gS  <Plug>VgSurround
 
-            "Only mac (linux?)
-            inoremap <m-BS> <c-w>
-            cnoremap <m-BS> <c-w>
-
-        " Undo
-            noremap U <c-r>
-            "noremap <silent> u :<c-u>call WrapperForKeyU()<cr>
-            "fun! WrapperForKeyU()
-            "    if v:count >= 1
-            "        call RemoveBuffer(v:count)
-            "    else
-            "        normal! u
-            "    endif
-            "endfun
-
-        " Insert and paste
-            let g:Insertatron_easykeymaps = 1
-            noremap v r
-
-        " For autocomplete
-            fun! TabToAutocomplete(direction)
-                return IsBlank('.') || IsWhitespace('.') ?
-                    \ (a:direction == 'forward' ? "\<tab>" : "\<bs>") :
-                    \ (a:direction == 'forward' ? "\<c-n>" : "\<c-p>")
-            endfun
-            inoremap <tab> <c-r>=TabToAutocomplete('forward')<CR>
-            inoremap <s-tab> <c-r>=TabToAutocomplete('backward')<CR>
-            set completeopt +=longest
-            set complete =.,w
-
-        " Action by inaction
-            " ie. train self not to use these keys
-            noremap I <nop>
-            noremap A <nop>
-            noremap O <nop>
-            noremap P <nop>
-            nnoremap $ <nop>
-            "noremap p <nop>
-            "noremap b <nop>
-            "noremap m <nop>
-            "noremap / <nop>
-            "noremap gg <nop>
-            map gg g
-            noremap gf <nop>
-            "noremap G <nop>
-            nnoremap ) <nop>
-            nnoremap ( <nop>
-
-            imap <c-a> <nop>
-            imap <c-t> <nop>
-
-            imap <d-w> <nop>
-            imap <d-r> <nop>
-            imap <d-t> <nop>
-
-            imap <d-a> <nop>
-            imap <d-s> <nop>
-            imap <d-f> <nop>
-
-            imap <d-z> <nop>
-            imap <d-x> <nop>
-            imap <d-c> <nop>
-            imap <d-v> <nop>
-
-
-    " Managing files and views
-        " File basics
+    " Other
+        " Managing files and views
+            noremap hh :update <bar> MbeRefresh<cr>
             nnoremap qw :xa<cr>
             nnoremap qu :call UnloadCurrentBuffer()<cr>
+            nnoremap qy :MBEbd! <cr>
+            nnoremap <silent> qi :q<cr>
+
             fun! UnloadCurrentBuffer()
                 update
                 MBEbd
             endfun
-            nnoremap qy :MBEbd! <cr>
-            nnoremap <silent> qi :q<cr>
 
-            " NOTE: no <cr> below on purpose, as a check to make sure
+            " NOTE: For below, didn't add <cr> on purpose, as a check to make sure
             nnoremap qh :call DeleteSession()
             nnoremap qn :call delete(expand('%'))
 
+        " Pull up recent commands + searches
+            " Most recent cmd
+            nnoremap qo :<c-p>
+
+            " All cmds (in a sep win)
+            nnoremap qp q:
+
+            " Searches (in a sep win)
+            noremap q[ q/
+
+        " Follow links in help
+            nnoremap q' <c-]>
+        " For scoutkey
             nnoremap <silent> s :<c-u>call ScoutKey()<cr>
-            "noremap sfk gg
-            "noremap sfl G
 
-            "onoremap sfl G
-            "onoremap sfk gg
-            "onoremap sf; $
-            "onoremap sfj ^
-
+            " External code can't do these moves bc of core vim limitation, so put here
             vnoremap sfl G
             vnoremap sfk gg
             vnoremap sf; $
             vnoremap sfj ^
 
-        " Follow links in help
-            nnoremap q' <c-]>
-        " Pull up most recent cmd
-            nnoremap qo :<c-p>
-        " Pull up all cmds (in a sep win)
-            nnoremap qp q:
+"| 4. Setup auto-commands
+    if !exists("g:loadOnce_onFirstSource")
+        let g:loadOnce_onFirstSource = 1
 
-"| Helper functions
-    " NOTE - Using '.' is confusing and needs to stop
-    " NOTE - 'lnum' means integer or '.' while 'num' means only integer
+        " Appearance and formatting
+            " Syntax highlighting per language
+                au FileType python call PythonSyntaxHl()
+                au FileType html call HtmlSyntaxHl()
+                au FileType javascript call JsSyntaxHl()
+                au BufRead,BufNewFile *.to call TodoSyntaxHL()
 
-    " Clean these up
-    fun! GetNextVisible(lnum, incr)
-        " WHY - get next line, in case of folded sections
-        " NOTE : incr is determined by being 1 or not 1
+            " Highlight orphaned whitespace
+                "au BufRead * call HL_OrphanedWhitespace()
 
-        let nCurr = LnumToInt(a:lnum)
-        " Can't go past EOF/BOF
-        if (nCurr == line('$') && a:incr == 1) || (nCurr == 1 && a:incr == -1)
-            "return 0
-            return nCurr
-            "return -4 "Todo
-        endif
+                highlight OrphanedWhitespace guibg=grey30 ctermbg=grey
+                fun! HL_OrphanedWhitespace()
+                    match OrphanedWhitespace /\s\+\%#\@<!$/
+                    "match OrphanedWhitespace /\s\+$/
+                endfun
+                fun! OrphanedWhitespace_search()
+                    "execute "normal! /^\\s\\+$\<cr>"
+                    %s/\s\+$//c
 
-        " Get next visible, being careful of folds
-        let nextVisible = GetFoldBounds(nCurr, a:incr) + a:incr
+                    "call HL_OrphanedWhitespace()
+                    " Todo - could make this much more sophisticated
+                    " 1. tells you how many orphaned blocks are left below
+                    " 2. simply clears ALL orphaned
+                endfun
 
-        " Also for nextVisible, make sure we're on top of any fold
-        if IsFolded(nextVisible) && a:incr == -1
-            let nextVisible = GetFoldStart(nextVisible)
-        endif
+                " Turn it off if distracting
+                "fun! HighlightWhitespace_clear()
+                "    highlight ExtraSpace guibg=NONE ctermbg=NONE
+                "endfun
 
-        return nextVisible
-    endfun
-
-    fun! IsEndMarker(lnum)
-        if &filetype == 'todo'
-            return 0
-        else
-            if &filetype == 'vim'
-                let text = substitute(getline(a:lnum), '^\s*', '', '')
-                return (text[0:2] == 'end')
-
-            elseif &filetype == 'javascript'
-                " WHY - cover if/else or chained fctns, plus commenting
-                let text = substitute(getline(a:lnum), '^\s*', '', '')
-                if text[0:1] == '//' || text[0:1] == '/*'
-                    return 0
-                elseif text[-1:] == ';' || text[-1:] == ','
-                    let text = text[:-2]
+            " Maximize window
+                if has('win32')
+                    "set lines=999 columns=999
+                    au GUIEnter * simalt ~x
+                else
+                    au GUIEnter * call system('wmctrl -i -b add,maximized_vert,maximized_horz -r '.v:windowid)
+                    "set lines=999 columns=999
                 endif
 
-                " fml: must check BOTH
-                if text[0] == '}' || text[0] == ')' || text[0] == ']' || text[0:1] == '*/'
-                    return text[-1:] == '}' || text[-1:] == ')' || text[-1:] == ']'  || text[-2:] == '*/'
-                endif
-                return 0
-            endif
-        endif
-    endfun
+            " Turns off bells fo REAL
+                au GUIEnter * set vb t_vb=
 
-    fun! Nextnonblank(lnum)
-        " NOTE : no longer needed (bc want to treat whitespace as blank)
-        " WHY : want nextnonblank() to accept whitespace as nonblank
-        let nNext = a:lnum
-        while IsBlank(nNext)
-            if nNext >= line('$')
-                return 0
-            else
-                let nNext += 1
-            endif
-        endwhile
-        return nNext
-    endfun
+            " Makes help appear as vertical split (instead of horiz)
+                "au FileType help call WhenHelp()
+                "fun! WhenHelp()
+                "    wincmd L
+                "endfun
 
-    fun! ProcessChar()
-        hi! link Cursor HideCursor
-        let char = getchar()
-        if char =~ '^\d\+$'
-            let char = nr2char(char)
-        endif
-        hi! link Cursor ShowCursor
-        return char
-    endfun
+            " Refresh when switching back to vim
+                autocmd FocusGained * redraw!
 
-    fun! HasNewlines(str)
-        return (match(a:str, "\n") > 0)
-    endfun
+            " Disable autocomments
+                au FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
-
-    " Expected input
-    " Bad : int that's past EOF or 0 or neg
-    
-    " Good : int from 1 to EOF, str that's '.' or '$'
-
-    " Take '.' but does NOT spit it out
-        fun! IsEmptyspace(lnum) "Strange - means blank or whitespace only
-            "return (getline(a:lnum) =~ '^\s*$')
-            "NOTE - nextnonblank is good for EOF (edge case)
-            return (a:lnum != nextnonblank(a:lnum))
-        endfun
-
-        fun! IsBlank(lnum)
-            return (getline(a:lnum) == '')
-        endfun
-
-        fun! IsWhitespace(lnum)
-            return (getline(a:lnum) =~ '^\s\+$')
-        endfun
-
-        fun! IsFolded(lnum)
-            return (foldclosed(a:lnum) > 0)
-        endfun
-
-        fun! IsVisible(lnum)
-            return (a:lnum == GetFoldStart(a:lnum))
-        endfun
-
-        fun! IsFoldable(lnum)
-            " Line is a fold header that's not already folded
-            " NOTE - line must be visible, could potentially be folded to another header above it
-            return (!IsFolded(a:lnum) && FoldByIndentHeader(a:lnum)[0] == ">")
-        endfun
-
-    " For these, can take in '.', but always return int
-        fun! LnumToInt(lnum)
-            return (type(a:lnum) == 0 ? a:lnum : line(a:lnum))
-        endfun
-
-        fun! GetFoldStart(lnum)
-            "return (IsFolded(lnum) ? foldclosed(a:lnum) : a:lnum)
-            return (!IsFolded(a:lnum) ? LnumToInt(a:lnum) : foldclosed(a:lnum))
-        endfun
-
-        fun! GetFoldEnd(lnum)
-            return (!IsFolded(a:lnum) ? LnumToInt(a:lnum) : foldclosedend(a:lnum))
-        endfun
-
-        fun! GetFoldBounds(lnum, incr)
-            " WHAT : get fold start/end, based on direction
-            " NOTE : incr is determined by being 1 or not 1
-            if !IsFolded(a:lnum)
-                return LnumToInt(a:lnum)
-            else
-                return (a:incr == 1 ? GetFoldEnd(a:lnum) : GetFoldStart(a:lnum))
-            endif
-        endfun
-
-"| Old things
-    " For python (in progress)
-        " For python­mode plugin
-        "let g:pymode = 0
-        "let g:pymode_run = 0
-        "let g:pymode_breakpoint = 0
-        "let g:pymode_folding = 0
-        "let g:pymode_trim_whitespaces = 0
-        "let g:pymode_options = 0
-        "let g:pymode_lint = 0
-        "let g:pymode_rope = 0
-        "let g:pymode_motion = 0
-        "let g:pymode_virtualenv = 0
-        "let g:pymode_doc = 1
-        "let g:pymode_doc_bind = 'K'
-        "" pymode breakpoint? cool
-        """ pymodelint/pep8/pyflakes
-
-    " Save/load fold views
-        if !exists("g:loadOnce_temp")
-            let g:loadOnce_temp = 1
-            " Discovering au more
-                "au BufNewFile * call PrintFileInfo('new file')
-                "au BufNew * call PrintFileInfo('buf new')
-                "au BufAdd * call PrintFileInfo('buf add')
-                "au BufRead * call PrintFileInfo('buf read')
-                "au BufHidden * call PrintFileInfo('buf hidden')
-                "au BufUnload * call PrintFileInfo('buf unload')
-                "au FileType * call PrintFileInfo('filetype')
-
-                fun! PrintFileInfo(event)
-                    echom a:event."| file:".expand('%')
-                    echom "ft:".&ft."| buftype:".&buftype
-                    echom "curr win: ".winnr()
-                    echom "buf # in curr win: ".winbufnr(winnr())
-                endfun
-                "let winOf1 = winbufnr(1)
-                "let exists1 = bufnr(1)
-
-            " How to save folds reliably?
-                set viewoptions =folds
-                fun! SaveFold()
-                    "if expand('%') != '' && &buftype!~'nofile'
-                    if &buftype != 'help' && &buftype != 'nofile'
-                        if bufnr(1) == -1
-                            mkview
-                            echom 'actually saved folds'
-                        endif
+            " Stop folding for help/mbe/noname
+                "au FileType * call StartFolding()
+                au FileType * call PreventFolding()
+                fun! PreventFolding()
+                    if &buftype == 'help' || &buftype == 'nofile'
+                        setlocal foldmethod=manual
+                        "setlocal foldexpr =0
+                        "setlocal nofoldenable
                     endif
                 endfun
-                fun! SaveFoldAll()
-                    for i in range(bufnr('$'))
-                        if &buftype != 'help' && &buftype != 'nofile'
-                            exe 'b'.i
-                            mkview
-                        endif
-                    endfor
-                endfun
-                fun! LoadFold()
-                    "echom "trying to load fold"
-                    if &buftype != 'help' && &buftype != 'nofile'
-                        if bufnr(1) == -1
-                            loadview
-                            echom 'actually loaded folds'
-                            "let g:accum .= &ft.' '
-                        endif
-                    endif
-                endfun
-        endif
 
-    " Trying out ctrlspace (concl: doesn't improve on ctrlp)
-        "let g:CtrlSpaceSymbols = { "File": "░", "CTab": "▌", "Tabs": "▓" }
-        "let g:CtrlSpaceUseUnicode = 0
+            " Stop folding for large files (1mb or bigger)
+                let g:FileSizeMax = 1024 * 1000 "1mb
+                autocmd BufReadPre * call HandleLargeFile('pre')
+                autocmd BufReadPost * call HandleLargeFile('post')
+                "autocmd FileType javascript call LargeFile('filetype')
 
-        " use ag  (something lelse?)
-        "if executable("ag")
-        "    let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
-        "endif
+        " Save session, load session
+            " Order
+            "   open vim > noname > session load > open mbe
+            "   start close > close mbe > session save > exit
 
-        " <b> to add proj to bookmark
-        " <o> to open files
-        " <w> to save worspace
+            set sessionoptions=blank,buffers,curdir,tabpages,winpos
+            "set sessionoptions=blank,buffers,curdir,folds,tabpages,winpos
+            "set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winpos
+            if has("gui_running")
+                let g:session_autosave = 'yes'
+                let g:session_autoload = 'yes'
+            else
+                let g:session_autosave = 'no'
+                let g:session_autoload = 'no'
+            endif
+            let g:session_directory = g:dir_vim . 'session'
 
-        " <h> for home - see all buffers
+            "au VimLeavePre * MBEClose "redundant with tempBuffers
+            au VimLeavePre * call setqflist([]) "So session.vim doesn't save quickfix list
+            au VimLeavePre * silent! argdel * "So session.vim doesn't save args
+            au VimLeavePre * call CloseTempBuffers()
+            au SessionLoadPost * call WhenSessionLoad()
 
-        " CtrlSpaceAddProjectRoot -
-        " My maps are interferring w ctrlspace's maps (annoying)
+            "execute 'nnoremap xu :mksession! ~/.vim/session/base.vim<cr>'
+            "execute 'nnoremap xi :source ~/.vim/session/base.vim<cr>'
 
-    " Options for IndentGuides
-        "let g:indent_guides_enable_on_vim_startup = 1
-        "let g:indent_guides_auto_colors = 0
-        "hi IndentGuidesOdd  guibg=bg
-        "hi IndentGuidesEven guibg=#214651
-        "
-        "hi IndentGuidesOdd  guibg=#214651
-        "hi IndentGuidesEven guibg=bg
-        "hi IndentGuidesEven guibg=#657b83
-        "hi IndentGuidesEven guibg=#0c3540
-        "hi IndentGuidesEven guibg=#07313c
-        "let g:indent_guides_color_change_percent = 7
+        " Other
+            " NOT autocmd, but want default on (but can be toggled off later)
+                set nowrap
+                set hlsearch
+                set incsearch
+                "set lines=40 columns=150
 
-    fun! TestSignColumn()
-        sign define tester text=| texthl=Folded
-        exe ":sign place 2 line=5 name=tester buffer=" . winbufnr(0)
+                " Set cwd to home
+                exe "cd ~"
+            " For debugging autocmds
+                "set verbose=9
+                "au
 
-        "sign define piet text=>> texthl=Search
-        "hi SignColumn
-        "sign place 2
-        "sign place 2 line=23 name=tester buffer=winbufnr(0)
-        "sign unplace 2
-        hi Folded guibg=black guifg=white
-        hi FoldColumn guibg=blue guifg=white
-        "omg what is foldcolumn?
-        set foldcolumn=1
-    endfun
+            " Hack to turn off indentexpr (esp. for python)
+                autocmd BufRead,BufNewFile * set indentexpr=
+                autocmd BufRead,BufNewFile * set autoindent
+
+    endif
 
 
-" New things below
-" Keys for navigating jumps (setting marks, walking thru jump history)
-    "noremap hs mH
-    "noremap hd `H
-    noremap hs :call SetMark()<cr>
-    noremap hd :call JumpToMark()<cr>
-    noremap ha <c-o>
-    noremap hf <c-i>
-    "noremap hg :call JumpReset()<cr>
-    "fun! JumpReset()
-    "    normal! <C-I>
-    "endfun
-    "TODO - simply press <c-i> 10 times (hackish = close enough)
-    fun! SetMark()
-        normal! mH
-        echom "Custom mark was set"
-    endfun
-    fun! JumpToMark()
-        normal! `H
-        echom "Jumped to mark"
-    endfun
+" Stuff I'm trying out
+    " Keys for navigating marks
+        "noremap hs mH
+        "noremap hd `H
+        noremap hs :call SetMark()<cr>
+        noremap hd :call JumpToMark()<cr>
+        noremap ha <c-o>
+        noremap hf <c-i>
+        "noremap hg :call JumpReset()<cr>
+        "fun! JumpReset()
+        "    normal! <C-I>
+        "endfun
+        "TODO - simply press <c-i> 10 times (hackish = close enough)
+        fun! SetMark()
+            normal! mH
+            echom "Custom mark was set"
+        endfun
+        fun! JumpToMark()
+            normal! `H
+            echom "Jumped to mark"
+        endfun
 
-" Learn vim-surround
-    let g:surround_no_mappings = 1
-    nmap ds <Plug>Dsurround
-    nmap cs <Plug>Csurround
-    nmap ts <Plug>Ysurround
-    nmap tsi <Plug>Ysurroundiw
+    " Jump to fold?
+        map p :call JumpToFold(1)<cr>
+        map P :call JumpToFold(-1)<cr>
+        fun! JumpToFold(direction)
+            let nCurr = GetFoldBounds('.', a:direction)
+            let nBound = (a:direction == 1 ? line('$') : 1)
+            if nCurr == nBound
+                return
+            endif
 
-    "Rarely useful, maybe to add more delims
-    "nmap tso <Plug>Ysurroundi
-    "nmap tss <Plug>Yssurround
-    "xmap S <Plug>VSurround
-    "nmap cS  <Plug>CSurround
-    "nmap ys  <Plug>Ysurround
-    "nmap yS  <Plug>YSurround
-    "nmap yss <Plug>Yssurround
-    "nmap ySs <Plug>YSsurround
-    "nmap ySS <Plug>YSsurround
-    "xmap S   <Plug>VSurround
-    "xmap gS  <Plug>VgSurround
+            let i = nCurr + a:direction
+            while !IsFolded(i) && i != nBound
+                let i += a:direction
+            endwhile
+            call cursor(i, 0)
+        endfun
 
-    noremap <tab> v
-    noremap q[ q/
-    vmap qo <nop>
-    map p :call JumpToFold(1)<cr>
-    map P :call JumpToFold(-1)<cr>
+    " Tab is never used in normal mode (!!!)
+        noremap <tab> v
 
-" Misc
-    "noremap / <nop>
-    "nnoremap qm :cd %:p:h <cr>
-    noremap hh :update <bar> MbeRefresh<cr>
+    " Open terminal in vim? open mac explorer?
+        "!open -a Terminal.app .
+        "NOTE - Don't need to open terminal bc can do all bash in vim!
 
-" Figuring out ctrlp options
-    " Do not clear filenames cache, to improve CtrlP startup
-    " For ctrlp: don't clear cache (to manually clear, <f5>)
-    "let g:ctrlp_clear_cache_on_exit = 0
-    let g:ctrlp_working_path_mode = 0
-    let g:ctrlp_show_hidden = 1
-    let g:ctrlp_user_command = 'dir %s /-n /b /s /a-d'
-    "let g:ctrlp_user_command = 'dir %s /-n /b /ad'
-    let g:ctrlp_custom_ignore = {
-        \ 'dir': '\v(
-            \Dropbox\\Art
-            \|projects\\CMB
-            \|vimfiles\\backup|vimfiles\\undofiles|vimfiles\\session
-            \|Archives\\documentation|reinstallation|Archives\\static|\.git
-            \|CS\\books_algorithms
-            \|CVS
-            \|Tasks\\[discard
-        \)'
-    \ }
-    let g:ctrlp_prompt_mappings = {
-        \ 'PrtDeleteWord()': ['<c-bs>'],
-        \ }
+        command! FileExplorer call OpenExplorer()
+        fun! OpenExplorer()
+            if has('win32')
+                !start explorer .
+                "!start explorer /select,%:p
+            elseif has('unix')
+                !open .
+            endif
+        endfun
 
-    " Set delay to prevent extra search
-    "let g:ctrlp_lazy_update = 350
-    "let g:ctrlp_use_caching = 0
+    " TODO: figure out why I had this
+        "set viewoptions =folds
 
-    " Set no file limit, we are building a big project
-    let g:ctrlp_max_files = 0
 
-    " Trying to use pymatcher
-        if has('python')
-            let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' }
-        else
-            "echom 'pymatcher requires python'
-        endif
-
-    " Trying to use ag
-        if executable('ag')
-            " Use Ag over Grep
-            let ignore_dirs = ['CVS', 'node_modules', '.venv']
-
-            let &grepprg = 'ag -s --nogroup --nocolor'
-            for ignore_dir in ignore_dirs
-                let &grepprg .= ' --ignore-dir ' . ignore_dir
-            endfor
-
-            " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-            "let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
-
-            " ag is fast enough that CtrlP doesn't need to cache
-        elseif has('win32')
-            set grepprg=findstr\ /n\ /s
-        "elseif has('unix')
-        "   e
-        endif
-
-" Unorgz/New
     fun! FindNextIndentError()
         " Todo - Doesn't handle folding. Not worth it
 
@@ -1449,41 +891,6 @@
         echom "Ind errors remaining: " . numFound
     endfun
 
-    "map <silent> hm :Spacework<cr> "Can just type it in
-    "let g:ctrlp_max_depth = 0
-    " for ctrlp: while in dir mode, press ".." to move up
-
-    " open explorer (of windows) to current file/dir
-    fun! OpenExplorer()
-        if has('win32')
-            !start explorer .
-            "!start explorer /select,%:p
-        elseif has('unix')
-            !open .
-        endif
-    endfun
-    command! FileExplorer call OpenExplorer()
-
-
-    fun! JumpToFold(direction)
-        let nCurr = GetFoldBounds('.', a:direction)
-        let nBound = (a:direction == 1 ? line('$') : 1)
-        if nCurr == nBound
-            return
-        endif
-
-        let i = nCurr + a:direction
-        while !IsFolded(i) && i != nBound
-            let i += a:direction
-        endwhile
-        call cursor(i, 0)
-    endfun
-
-
-    let g:netrw_banner = 0
-    let g:netrw_keepdir = 0
-
-
     fun! ClearAllUndoHistory()
         let old_undolevels = &undolevels
         let old_modified = &modified
@@ -1498,256 +905,3 @@
     endfun
 
 
-    " Grep and search
-        command! -nargs=? Indexer call GrepMe(<f-args>)
-        fun! GrepMe(...)
-            " Format query
-            " TODO: grep is fine with single quotes ('), but doesn't acknowledge double quotes (")
-            if a:0 == 0 "if no args
-                let searchQuery = getreg('/')
-                let searchQuery = (searchQuery[0:1] == '\<' && searchQuery[-2:-1] == '\>' ? searchQuery[2:-3] : searchQuery)
-            else
-                let searchQuery = a:1
-                let @/ = a:1
-            endif
-
-            " Execute grep
-            try
-                exe 'silent grep' '"'.searchQuery.'" *'
-            catch
-                echom "invalid input"
-                return
-            endtry
-
-            " Format result
-            set hlsearch
-            set foldlevel=99
-            redraw!
-
-            " Prep quickfix window
-            copen
-            if &filetype == "qf"
-                call setwinvar(0, "&statusline", '  Found '.len(getqflist())." for [".searchQuery."]")
-                "set ffs=dos
-                "silent g/\\\$/s///
-                redraw!
-            endif
-        endfun
-
-        " Testing why "set hlsearch" does not work on initial run *within function body*
-            "fun! Tester()
-            "    "nohlsearch
-            "    let @/='string'
-            "    setglobal hls
-            "    ":nnoremap <F8> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
-            "endfun
-            "nnoremap <F8> :set hls<CR>
-            "nnoremap <F8> :call Tester()<CR>
-
-        let g:ag_apply_qmappings = 0
-
-    " Manage dups for MBE fname tails
-        "GIVEN
-        let bufs = [1,7,3,9,10,2, 4]
-        let g:correspondence = {
-            \'1':  'C:\f2',
-            \'7':  'C:\g\a\f',
-            \'3':  'C:\h\b\f',
-            \'9':  'C:\i\c\b\f',
-            \'10': 'C:\f3',
-            \'2':  'C:\j\d\b\f',
-            \'4':  'C:\k\e\d\b\f',
-        \}
-        "WANT
-        let want = [ [1,""], [7,"a"], [3, "h" ], [9, "c"], [10, ""], [2, "j"], [4,"e"]]
-
-        "let bufs = [7,3]
-        "let g:correspondence = {
-        "    \'7':  'C:\a\f',
-        "    \'3':  'C:\b\f',
-        "\}
-        "let want = [ [7,"a"], [3, "b" ]]
-
-
-        fun! Manage(bufNums)
-            " Assume fnameArr has *full path* (not tail or shortened path)
-            let dct = {}
-            for bufNum in a:bufNums
-                let fullPath = g:correspondence[bufNum]
-
-                let tail = fnamemodify(fullPath, ':t')
-                if has_key(dct, tail)
-                    call add(dct[tail], bufNum)
-                else
-                    let dct[tail] = [bufNum]
-                endif
-            endfor
-            echo dct
-
-            for tail in keys(dct)
-                let bufNums = dct[tail]
-                if len(bufNums) > 1
-                    call s:manage(bufNums)
-                endif
-            endfor
-        endfun
-
-        " NOTE: only use bufNums and finished
-        fun! s:manage(bufNums)
-            echo 'yes' a:bufNums
-
-            " Race!
-            let finished = []
-            let level = -1
-            "while len(a:bufNums) > 0
-            "while level > -5
-            while len(a:bufNums) > 0
-                let level -= 1
-                call s:manage2(a:bufNums, level, finished)
-            endwhile
-
-            echo finished
-            "return finished
-        endfun
-
-        fun! s:manage2(bufNums, level, finished)
-            " Are there any diff parents in this level?
-            let parents = {}
-            for bufNum in a:bufNums
-                let splitPath = split(g:correspondence[bufNum], '\')
-                "echo 'splitPath:' splitPath
-                let parent = splitPath[a:level]
-                "echo 'parent:' parent
-
-                if has_key(parents, parent)
-                    call add(parents[parent], bufNum)
-                else
-                    let parents[parent] = [bufNum]
-                endif
-            endfor
-            "echo 'parents' parents
-
-            " TODO: any are not dups?
-            for parentName in keys(parents)
-                let bufNums = parents[parentName]
-                if(len(bufNums) == 1)
-                    let bufNum = bufNums[0]
-                    echo 'bufNum' bufNum
-                    call add(a:finished, [bufNum, parentName])
-                    call remove(a:bufNums, index(bufNums, bufNum))
-                endif
-            endfor
-        endfun
-
-    " Clip the file paths of bufs (for the caches of navkey/spacework)
-        "fun! ClipFile()
-        "    let @+ = expand('%:p') . "\n"
-        "endfun
-        "fun! ClipDir()
-        "    let @+ = expand('%:p:h') . "\n"
-        "    "redir @+ | pwd | redir END
-        "endfun
-
-        "fun! ClipBufPaths()
-        "    let @+ = ''
-        "    for i in range(1, bufnr('$'))
-        "        if buflisted(i)
-        "            let bufPath = expand('#'.i.':p')
-        "            if index(g:todos, bufPath) == -1 
-        "                let @+ .= bufPath . "\n"
-        "            endif
-        "        endif
-        "    endfor
-        "endfun
-        "command! CLIPBUFS call ClipBufPaths()
-
-    fun! TestFont(val)
-        if has('unix') "For linux mint, 1920x1680
-            if a:val == 1
-                let &guifont = "Consolas 12"
-                "let &guifont = "Consolas 15"
-                set linespace=5
-            elseif a:val == 2
-                let &guifont = "Inconsolata Medium 13"
-                set linespace=1
-            else
-                let &guifont = "Source Code Pro Regular 13" 
-                "let &guifont = "Source Code Pro Regular 15"
-                set linespace=0
-            endif
-
-        else "For win10 (50% scaling)
-            if a:val == 1
-                let &guifont = "Source_Code_Pro:h9"
-                "let &guifont = "Source_Code_Pro:h10"
-            else
-                let &guifont = "Consolas:h9"
-                "let &guifont = "Consolas:h11"
-            endif
-        endif
-
-    endfun
-
-
-    set autoread
-
-
-"!open -a Terminal.app .
-"NOTE - Don't need to open terminal bc can do all bash in vim!
-
-if !exists("g:loadOnce_test")
-    let g:loadOnce_temp = 1
-
-    " Hack to turn off indentexpr
-    autocmd BufRead,BufNewFile * set indentexpr=
-    autocmd BufRead,BufNewFile * set autoindent
-    " TODO: prevent run of indent/<lang>.vim
-    "autocmd Filetype * let b:did_indent = 1
-endif
-
-fun! IsBufHidden(bufNum)
-    let path = expand('#'.a:bufNum)
-
-    return (
-        \buflisted(a:bufNum)
-        \&& bufwinnr(a:bufNum) == -1
-        \)
-        "\&& !has_key(g:todos, fnamemodify(path, ':t:r'))
-        "\&& !has_key(g:magiIgnoredFiles, fnamemodify(path, ':t'))
-endfun
-
-
-let g:syntastic_mode_map = {'mode': 'passive'} "Stop auto-run on save
-let g:syntastic_always_populate_loc_list = 1 "Open with <:Errors>
-let g:syntastic_auto_loc_list = 0 "Annoying
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 0
-let g:syntastic_enable_ballons = 0
-let g:syntastic_loc_list_height = 5
-let g:syntastic_javascript_checkers = ["standard"]
-
-" To replace highlighted camelcase: %s//\=Snakecase(submatch(0))/
-function! Snakecase(word)
-    let word = substitute(a:word,'::','/','g')
-    let word = substitute(word,'\(\u\+\)\(\u\l\)','\1_\2','g')
-    let word = substitute(word,'\(\l\|\d\)\(\u\)','\1_\2','g')
-    let word = substitute(word,'[.-]','_','g')
-    let word = tolower(word)
-    return word
-endfunction
-
-function! OpenFile(filename)
-    let l:filename = StripWhitespace(a:filename)
-    let l:currentFilename = bufname('%')
-
-    if expand(l:currentFilename) == expand(l:filename)
-        echom "Warning: Not reopening same file: " . l:filename
-        return
-    endif
-
-    exe "find " . l:filename
-endfunction
-
-function! StripWhitespace(string)
-    return substitute(a:string, '\v^\s*(.{-})\s*$', '\1', '')
-endfunction
