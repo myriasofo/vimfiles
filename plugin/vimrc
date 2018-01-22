@@ -1774,3 +1774,19 @@ function! Snakecase(word)
     let word = tolower(word)
     return word
 endfunction
+
+function! OpenFile(filename)
+    let l:filename = StripWhitespace(a:filename)
+    let l:currentFilename = bufname('%')
+
+    if expand(l:currentFilename) == expand(l:filename)
+        echom "Warning: Not reopening same file: " . l:filename
+        return
+    endif
+
+    exe "find " . l:filename
+endfunction
+
+function! StripWhitespace(string)
+    return substitute(a:string, '\v^\s*(.{-})\s*$', '\1', '')
+endfunction

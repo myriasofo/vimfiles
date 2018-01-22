@@ -77,8 +77,9 @@ fun! s:printConfig_topLevel(arr_displayText, hash_wsFiles)
     let maxStr = s:findMaxStrLen(keys(a:hash_wsFiles), 0)
 
     let printLine = ''
-    for line in a:arr_displayText
+    for l:line in a:arr_displayText
         "echo line
+        let line = StripWhitespace(l:line)
         let firstChar = line[0]
         if firstChar == "$"
             let printLine = line[2:] . "\n"
@@ -115,18 +116,19 @@ fun! s:get_input(arr_displayText, hash_wsFiles, jumpList)
             let firstChar = cmd[0]
             if firstChar == "@"
                 if cmd == "@ openConfig"
-                    exe "find " g:Spacework_configLocation
+                    call OpenFile(g:Spacework_configLocation)
                 elseif cmd == "@ addFile"
                     call s:addCurrentFileToConfig('# [palette')
                 endif
                 return 0
             elseif firstChar == "#"
-                echo '  ' . char
+                "echo '  ' . char
                 return s:pick_wsFile(a:hash_wsFiles[cmd])
             elseif firstChar == "%"
-                echo 'time to open file'
+                "echo 'time to open file'
                 let splitLine = split(cmd, ': ')
-                exe "find " . splitLine[1]
+                let l:filename = StripWhitespace(splitLine[1])
+                call OpenFile(l:filename)
                 return 0
             endif
         elseif char == "\<esc>"
@@ -164,7 +166,7 @@ fun! s:pick_wsFile(wsFiles)
         let char = ProcessChar()
 
         if has_key(jumpList, char)
-            exe "find " jumpList[char]
+            call OpenFile(jumpList[char])
 
             return 0
         elseif char == "\<esc>"
