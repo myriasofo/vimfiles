@@ -1,3 +1,4 @@
+" (2018/1/21) I never use this but I should!
 
 function! Lambdat(cmd)
     update

@@ -1,6 +1,6 @@
 " WHAT: Helpers for git
-" Why do this in vimscript? bc Fugitive is good at finding repo info
-" TODO: But python probably has a good way too. Switch below to python
+" Could export this to python, but using vimscript bc Fugitive is good at finding repo info
+" (2018/1/21) I never use this bc I want to have full control in terminal
 
 " Utility
 function s:getGitOutput(cmd)
