@@ -1484,45 +1484,6 @@
     let g:netrw_keepdir = 0
 
 
-    fun! JsonFormatAll()
-        " Get only websocket data AND special lines (ie. start with '=')
-        " HOW = Get only lines that start with 4::
-        " HOW = Get only lines that are longer than 10 char (not incl ind) - more safe
-        "g/^[^4:|^===]/d
-
-        " open up jstester2
-        " clear out old
-        " paste current clip into it
-        " then run below
-
-        "edit C:/test/js/js_tester2.js
-        "%d
-        "normal! "+]p
-
-        set foldlevel=99
-        for i in range(line('$'), 1, -1)
-            let lineText = getline(i)
-            let textOnly = lineText[indent(i):]
-            if len(textOnly) < 60 && textOnly[0] != "="
-                exe i."delete"
-            endif
-        endfor
-
-        " Main action
-        "%FormatJson
-        for i in range(line('$'), 1, -1)
-            let lineText = getline(i)
-            let textOnly = lineText[indent(i):]
-            if textOnly[0] != "="
-                exe i."FormatJson"
-            endif
-        endfor
-
-        " Cleanup
-        silent! g/^\s*\t/d
-    endfun
-    command! JsonFormatAll call JsonFormatAll()
-
     fun! ClearAllUndoHistory()
         let old_undolevels = &undolevels
         let old_modified = &modified
