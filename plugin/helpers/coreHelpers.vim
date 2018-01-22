@@ -1,189 +1,180 @@
 
-function! OpenFile(filename)
-    let l:filename = StripWhitespace(a:filename)
-    let l:currentFilename = bufname('%')
+" Small functions
+" Base
+    function! OpenFile(filename)
+        let l:filename = StripWhitespace(a:filename)
+        let l:currentFilename = bufname('%')
 
-    if expand(l:currentFilename) == expand(l:filename)
-        echom "Warning: Not reopening same file: " . l:filename
-        return
-    endif
+        if expand(l:currentFilename) == expand(l:filename)
+            echom "Warning: Not reopening same file: " . l:filename
+            return
+        endif
 
-    exe "find " . l:filename
-endfunction
+        exe "find " . l:filename
+    endfunction
 
-function! StripWhitespace(string)
-    return substitute(a:string, '\v^\s*(.{-})\s*$', '\1', '')
-endfunction
-fun! IsBufHidden(bufNum)
-    let path = expand('#'.a:bufNum)
+    function! StripWhitespace(string)
+        return substitute(a:string, '\v^\s*(.{-})\s*$', '\1', '')
+    endfunction
+    fun! IsBufHidden(bufNum)
+        let path = expand('#'.a:bufNum)
 
-    return (
-        \buflisted(a:bufNum)
-        \&& bufwinnr(a:bufNum) == -1
-        \)
-        "\&& !has_key(g:todos, fnamemodify(path, ':t:r'))
-        "\&& !has_key(g:magiIgnoredFiles, fnamemodify(path, ':t'))
-endfun
+        return (
+            \buflisted(a:bufNum)
+            \&& bufwinnr(a:bufNum) == -1
+            \)
+            "\&& !has_key(g:todos, fnamemodify(path, ':t:r'))
+            "\&& !has_key(g:magiIgnoredFiles, fnamemodify(path, ':t'))
+    endfun
 
-fun! PrintCurrFolder()
-    let raw = getcwd()
-    let path = fnamemodify(raw, ':t')
+    fun! PrintCurrFolder()
+        let raw = getcwd()
+        let path = fnamemodify(raw, ':t')
 
-    "If we're at root, ie. 'C:/'
-    if path == ''
-        let path = raw
-    endif
+        "If we're at root, ie. 'C:/'
+        if path == ''
+            let path = raw
+        endif
 
-    return path
-endfun
-
+        return path
+    endfun
 
 " Clean these up
-fun! GetNextVisible(lnum, incr)
-    " WHY - get next line, in case of folded sections
-    " NOTE : incr is determined by being 1 or not 1
+    fun! GetNextVisible(lnum, incr)
+        " WHY - get next line, in case of folded sections
+        " NOTE : incr is determined by being 1 or not 1
 
-    let nCurr = LnumToInt(a:lnum)
-    " Can't go past EOF/BOF
-    if (nCurr == line('$') && a:incr == 1) || (nCurr == 1 && a:incr == -1)
-        "return 0
-        return nCurr
-        "return -4 "Todo
-    endif
-
-    " Get next visible, being careful of folds
-    let nextVisible = GetFoldBounds(nCurr, a:incr) + a:incr
-
-    " Also for nextVisible, make sure we're on top of any fold
-    if IsFolded(nextVisible) && a:incr == -1
-        let nextVisible = GetFoldStart(nextVisible)
-    endif
-
-    return nextVisible
-endfun
-
-fun! IsEndMarker(lnum)
-    if &filetype == 'todo'
-        return 0
-    else
-        if &filetype == 'vim'
-            let text = substitute(getline(a:lnum), '^\s*', '', '')
-            return (text[0:2] == 'end')
-
-        elseif &filetype == 'javascript'
-            " WHY - cover if/else or chained fctns, plus commenting
-            let text = substitute(getline(a:lnum), '^\s*', '', '')
-            if text[0:1] == '//' || text[0:1] == '/*'
-                return 0
-            elseif text[-1:] == ';' || text[-1:] == ','
-                let text = text[:-2]
-            endif
-
-            " fml: must check BOTH
-            if text[0] == '}' || text[0] == ')' || text[0] == ']' || text[0:1] == '*/'
-                return text[-1:] == '}' || text[-1:] == ')' || text[-1:] == ']'  || text[-2:] == '*/'
-            endif
-            return 0
+        let nCurr = LnumToInt(a:lnum)
+        " Can't go past EOF/BOF
+        if (nCurr == line('$') && a:incr == 1) || (nCurr == 1 && a:incr == -1)
+            "return 0
+            return nCurr
+            "return -4 "Todo
         endif
-    endif
-endfun
 
-fun! Nextnonblank(lnum)
-    " NOTE : no longer needed (bc want to treat whitespace as blank)
-    " WHY : want nextnonblank() to accept whitespace as nonblank
-    let nNext = a:lnum
-    while IsBlank(nNext)
-        if nNext >= line('$')
+        " Get next visible, being careful of folds
+        let nextVisible = GetFoldBounds(nCurr, a:incr) + a:incr
+
+        " Also for nextVisible, make sure we're on top of any fold
+        if IsFolded(nextVisible) && a:incr == -1
+            let nextVisible = GetFoldStart(nextVisible)
+        endif
+
+        return nextVisible
+    endfun
+
+    fun! IsEndMarker(lnum)
+        if &filetype == 'todo'
             return 0
         else
-            let nNext += 1
+            if &filetype == 'vim'
+                let text = substitute(getline(a:lnum), '^\s*', '', '')
+                return (text[0:2] == 'end')
+
+            elseif &filetype == 'javascript'
+                " WHY - cover if/else or chained fctns, plus commenting
+                let text = substitute(getline(a:lnum), '^\s*', '', '')
+                if text[0:1] == '//' || text[0:1] == '/*'
+                    return 0
+                elseif text[-1:] == ';' || text[-1:] == ','
+                    let text = text[:-2]
+                endif
+
+                " fml: must check BOTH
+                if text[0] == '}' || text[0] == ')' || text[0] == ']' || text[0:1] == '*/'
+                    return text[-1:] == '}' || text[-1:] == ')' || text[-1:] == ']'  || text[-2:] == '*/'
+                endif
+                return 0
+            endif
         endif
-    endwhile
-    return nNext
-endfun
+    endfun
 
-fun! ProcessChar()
-    hi! link Cursor HideCursor
-    let char = getchar()
-    if char =~ '^\d\+$'
-        let char = nr2char(char)
-    endif
-    hi! link Cursor ShowCursor
-    return char
-endfun
+    fun! Nextnonblank(lnum)
+        " NOTE : no longer needed (bc want to treat whitespace as blank)
+        " WHY : want nextnonblank() to accept whitespace as nonblank
+        let nNext = a:lnum
+        while IsBlank(nNext)
+            if nNext >= line('$')
+                return 0
+            else
+                let nNext += 1
+            endif
+        endwhile
+        return nNext
+    endfun
 
-fun! HasNewlines(str)
-    return (match(a:str, "\n") > 0)
-endfun
+    fun! ProcessChar()
+        hi! link Cursor HideCursor
+        let char = getchar()
+        if char =~ '^\d\+$'
+            let char = nr2char(char)
+        endif
+        hi! link Cursor ShowCursor
+        return char
+    endfun
 
+    fun! HasNewlines(str)
+        return (match(a:str, "\n") > 0)
+    endfun
 
 " Take '.' but does NOT spit it out
-fun! IsEmptyspace(lnum) "Strange - means blank or whitespace only
-    "return (getline(a:lnum) =~ '^\s*$')
-    "NOTE - nextnonblank is good for EOF (edge case)
-    return (a:lnum != nextnonblank(a:lnum))
-endfun
+    fun! IsEmptyspace(lnum) "Strange - means blank or whitespace only
+        "return (getline(a:lnum) =~ '^\s*$')
+        "NOTE - nextnonblank is good for EOF (edge case)
+        return (a:lnum != nextnonblank(a:lnum))
+    endfun
 
-fun! IsBlank(lnum)
-    return (getline(a:lnum) == '')
-endfun
+    fun! IsBlank(lnum)
+        return (getline(a:lnum) == '')
+    endfun
 
-fun! IsWhitespace(lnum)
-    return (getline(a:lnum) =~ '^\s\+$')
-endfun
+    fun! IsWhitespace(lnum)
+        return (getline(a:lnum) =~ '^\s\+$')
+    endfun
 
-fun! IsFolded(lnum)
-    return (foldclosed(a:lnum) > 0)
-endfun
+    fun! IsFolded(lnum)
+        return (foldclosed(a:lnum) > 0)
+    endfun
 
-fun! IsVisible(lnum)
-    return (a:lnum == GetFoldStart(a:lnum))
-endfun
+    fun! IsVisible(lnum)
+        return (a:lnum == GetFoldStart(a:lnum))
+    endfun
 
-fun! IsFoldable(lnum)
-    " Line is a fold header that's not already folded
-    " NOTE - line must be visible, could potentially be folded to another header above it
-    return (!IsFolded(a:lnum) && FoldByIndentHeader(a:lnum)[0] == ">")
-endfun
-
+    fun! IsFoldable(lnum)
+        " Line is a fold header that's not already folded
+        " NOTE - line must be visible, could potentially be folded to another header above it
+        return (!IsFolded(a:lnum) && FoldByIndentHeader(a:lnum)[0] == ">")
+    endfun
 
 " For these, can take in '.', but always return int
-fun! LnumToInt(lnum)
-    return (type(a:lnum) == 0 ? a:lnum : line(a:lnum))
-endfun
+    fun! LnumToInt(lnum)
+        return (type(a:lnum) == 0 ? a:lnum : line(a:lnum))
+    endfun
 
-fun! GetFoldStart(lnum)
-    "return (IsFolded(lnum) ? foldclosed(a:lnum) : a:lnum)
-    return (!IsFolded(a:lnum) ? LnumToInt(a:lnum) : foldclosed(a:lnum))
-endfun
+    fun! GetFoldStart(lnum)
+        "return (IsFolded(lnum) ? foldclosed(a:lnum) : a:lnum)
+        return (!IsFolded(a:lnum) ? LnumToInt(a:lnum) : foldclosed(a:lnum))
+    endfun
 
-fun! GetFoldEnd(lnum)
-    return (!IsFolded(a:lnum) ? LnumToInt(a:lnum) : foldclosedend(a:lnum))
-endfun
+    fun! GetFoldEnd(lnum)
+        return (!IsFolded(a:lnum) ? LnumToInt(a:lnum) : foldclosedend(a:lnum))
+    endfun
 
-fun! GetFoldBounds(lnum, incr)
-    " WHAT : get fold start/end, based on direction
-    " NOTE : incr is determined by being 1 or not 1
-    if !IsFolded(a:lnum)
-        return LnumToInt(a:lnum)
-    else
-        return (a:incr == 1 ? GetFoldEnd(a:lnum) : GetFoldStart(a:lnum))
-    endif
-endfun
+    fun! GetFoldBounds(lnum, incr)
+        " WHAT : get fold start/end, based on direction
+        " NOTE : incr is determined by being 1 or not 1
+        if !IsFolded(a:lnum)
+            return LnumToInt(a:lnum)
+        else
+            return (a:incr == 1 ? GetFoldEnd(a:lnum) : GetFoldStart(a:lnum))
+        endif
+    endfun
 
 
-" More
-fun! OpenExplorer()
-    if has('win32')
-        !start explorer .
-        "!start explorer /select,%:p
-    elseif has('unix')
-        !open .
-    endif
-endfun
-
-" To replace highlighted camelcase: %s//\=Snakecase(submatch(0))/
+" Big functions/utilities
 function! Snakecase(word)
+    " To replace highlighted camelcase: %s//\=Snakecase(submatch(0))/
+
     let word = substitute(a:word,'::','/','g')
     let word = substitute(word,'\(\u\+\)\(\u\l\)','\1_\2','g')
     let word = substitute(word,'\(\l\|\d\)\(\u\)','\1_\2','g')
@@ -191,7 +182,6 @@ function! Snakecase(word)
     let word = tolower(word)
     return word
 endfunction
-
 
 " Syntax highlighting
     fun! PythonSyntaxHl()
@@ -330,7 +320,6 @@ endfunction
         syn match Special "^\s*!.*"
     endfun
 
-
 " Session
     fun! DeleteSession()
         call delete(expand(g:dir_vim . "session/default.vim"))
@@ -415,3 +404,39 @@ endfunction
 
         endif
     endfun
+
+fun! GrepMe(...)
+    " Format query
+    " TODO: grep is fine with single quotes ('), but doesn't acknowledge double quotes (")
+    if a:0 == 0 "if no args
+        let searchQuery = getreg('/')
+        let searchQuery = (searchQuery[0:1] == '\<' && searchQuery[-2:-1] == '\>' ? searchQuery[2:-3] : searchQuery)
+    else
+        let searchQuery = a:1
+        let @/ = a:1
+    endif
+
+    " Execute grep
+    try
+        exe 'silent grep' '"'.searchQuery.'" *'
+    catch
+        echom "invalid input"
+        return
+    endtry
+
+    " Format result
+    set hlsearch
+    set foldlevel=99
+    redraw!
+
+    " Prep quickfix window
+    copen
+    if &filetype == "qf"
+        call setwinvar(0, "&statusline", '  Found '.len(getqflist())." for [".searchQuery."]")
+        "set ffs=dos
+        "silent g/\\\$/s///
+        redraw!
+    endif
+endfun
+
+

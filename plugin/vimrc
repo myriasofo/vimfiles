@@ -345,6 +345,34 @@
         let g:syntastic_loc_list_height = 5
         let g:syntastic_javascript_checkers = ["standard"]
 
+    " For netrw
+        let g:netrw_banner = 0
+        let g:netrw_keepdir = 0
+
+        let g:Netrw_UserMaps = [["s","ScoutKeyWrapper"]]
+        fun! ScoutKeyWrapper(islocal)
+            call ScoutKey()
+        endfun
+
+    " For grep and search
+        command! -nargs=? Indexer call GrepMe(<f-args>)
+        let g:ag_apply_qmappings = 0
+
+        " Use ag
+        if executable('ag')
+            " Use Ag over Grep
+            let ignore_dirs = ['CVS', 'node_modules', '.venv']
+
+            let &grepprg = 'ag -s --nogroup --nocolor'
+            for ignore_dir in ignore_dirs
+                let &grepprg .= ' --ignore-dir ' . ignore_dir
+            endfor
+
+        elseif has('win32')
+            set grepprg=findstr\ /n\ /s
+        "elseif has('unix')
+        endif
+
     " Other
         "let g:loaded_matchparen = 1
         let g:matchparen_timeout = 10
@@ -595,6 +623,7 @@
 
     " Other
         " Managing files and views
+            noremap hh :update <bar> MbeRefresh<cr>
             nnoremap qw :xa<cr>
             nnoremap qu :call UnloadCurrentBuffer()<cr>
             nnoremap qy :MBEbd! <cr>
@@ -732,7 +761,7 @@
             "execute 'nnoremap xi :source ~/.vim/session/base.vim<cr>'
 
         " Other
-            " not autocmd, but want default on (but can be toggled off later)
+            " NOT autocmd, but want default on (but can be toggled off later)
                 set nowrap
                 set hlsearch
                 set incsearch
@@ -744,11 +773,15 @@
                 "set verbose=9
                 "au
 
+            " Hack to turn off indentexpr (esp. for python)
+                autocmd BufRead,BufNewFile * set indentexpr=
+                autocmd BufRead,BufNewFile * set autoindent
+
     endif
 
 
-""" Trying this stuff out
-    " Keys for navigating jumps (setting marks, walking thru jump history)
+" Stuff I'm trying out
+    " Keys for navigating marks
         "noremap hs mH
         "noremap hd `H
         noremap hs :call SetMark()<cr>
@@ -769,42 +802,43 @@
             echom "Jumped to mark"
         endfun
 
+    " Jump to fold?
+        map p :call JumpToFold(1)<cr>
+        map P :call JumpToFold(-1)<cr>
+        fun! JumpToFold(direction)
+            let nCurr = GetFoldBounds('.', a:direction)
+            let nBound = (a:direction == 1 ? line('$') : 1)
+            if nCurr == nBound
+                return
+            endif
 
-    noremap <tab> v
-    map p :call JumpToFold(1)<cr>
-    map P :call JumpToFold(-1)<cr>
-    "noremap / <nop>
-    "nnoremap qm :cd %:p:h <cr>
-    noremap hh :update <bar> MbeRefresh<cr>
+            let i = nCurr + a:direction
+            while !IsFolded(i) && i != nBound
+                let i += a:direction
+            endwhile
+            call cursor(i, 0)
+        endfun
 
-    fun! JumpToFold(direction)
-        let nCurr = GetFoldBounds('.', a:direction)
-        let nBound = (a:direction == 1 ? line('$') : 1)
-        if nCurr == nBound
-            return
-        endif
+    " Tab is never used in normal mode (!!!)
+        noremap <tab> v
 
-        let i = nCurr + a:direction
-        while !IsFolded(i) && i != nBound
-            let i += a:direction
-        endwhile
-        call cursor(i, 0)
-    endfun
+    " Open terminal in vim? open mac explorer?
+        "!open -a Terminal.app .
+        "NOTE - Don't need to open terminal bc can do all bash in vim!
 
+        command! FileExplorer call OpenExplorer()
+        fun! OpenExplorer()
+            if has('win32')
+                !start explorer .
+                "!start explorer /select,%:p
+            elseif has('unix')
+                !open .
+            endif
+        endfun
 
-    if !exists("g:loadOnce_test")
-        let g:loadOnce_temp = 1
+    " TODO: figure out why I had this
+        "set viewoptions =folds
 
-        " Hack to turn off indentexpr (for python)
-        autocmd BufRead,BufNewFile * set indentexpr=
-        autocmd BufRead,BufNewFile * set autoindent
-        " TODO: prevent run of indent/<lang>.vim
-        "autocmd Filetype * let b:did_indent = 1
-    endif
-
-
-    "!open -a Terminal.app .
-    "NOTE - Don't need to open terminal bc can do all bash in vim!
 
     fun! FindNextIndentError()
         " Todo - Doesn't handle folding. Not worth it
@@ -857,10 +891,6 @@
         echom "Ind errors remaining: " . numFound
     endfun
 
-
-    let g:netrw_banner = 0
-    let g:netrw_keepdir = 0
-
     fun! ClearAllUndoHistory()
         let old_undolevels = &undolevels
         let old_modified = &modified
@@ -875,178 +905,3 @@
     endfun
 
 
-    " Grep and search
-        command! -nargs=? Indexer call GrepMe(<f-args>)
-
-        fun! GrepMe(...)
-            " Format query
-            " TODO: grep is fine with single quotes ('), but doesn't acknowledge double quotes (")
-            if a:0 == 0 "if no args
-                let searchQuery = getreg('/')
-                let searchQuery = (searchQuery[0:1] == '\<' && searchQuery[-2:-1] == '\>' ? searchQuery[2:-3] : searchQuery)
-            else
-                let searchQuery = a:1
-                let @/ = a:1
-            endif
-
-            " Execute grep
-            try
-                exe 'silent grep' '"'.searchQuery.'" *'
-            catch
-                echom "invalid input"
-                return
-            endtry
-
-            " Format result
-            set hlsearch
-            set foldlevel=99
-            redraw!
-
-            " Prep quickfix window
-            copen
-            if &filetype == "qf"
-                call setwinvar(0, "&statusline", '  Found '.len(getqflist())." for [".searchQuery."]")
-                "set ffs=dos
-                "silent g/\\\$/s///
-                redraw!
-            endif
-        endfun
-
-        " Testing why "set hlsearch" does not work on initial run *within function body*
-            "fun! Tester()
-            "    "nohlsearch
-            "    let @/='string'
-            "    setglobal hls
-            "    ":nnoremap <F8> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
-            "endfun
-            "nnoremap <F8> :set hls<CR>
-            "nnoremap <F8> :call Tester()<CR>
-
-        let g:ag_apply_qmappings = 0
-
-
-    " Manage dups for MBE fname tails
-        "GIVEN
-        let bufs = [1,7,3,9,10,2, 4]
-        let g:correspondence = {
-            \'1':  'C:\f2',
-            \'7':  'C:\g\a\f',
-            \'3':  'C:\h\b\f',
-            \'9':  'C:\i\c\b\f',
-            \'10': 'C:\f3',
-            \'2':  'C:\j\d\b\f',
-            \'4':  'C:\k\e\d\b\f',
-        \}
-        "WANT
-        let want = [ [1,""], [7,"a"], [3, "h" ], [9, "c"], [10, ""], [2, "j"], [4,"e"]]
-
-        "let bufs = [7,3]
-        "let g:correspondence = {
-        "    \'7':  'C:\a\f',
-        "    \'3':  'C:\b\f',
-        "\}
-        "let want = [ [7,"a"], [3, "b" ]]
-
-
-        fun! Manage(bufNums)
-            " Assume fnameArr has *full path* (not tail or shortened path)
-            let dct = {}
-            for bufNum in a:bufNums
-                let fullPath = g:correspondence[bufNum]
-
-                let tail = fnamemodify(fullPath, ':t')
-                if has_key(dct, tail)
-                    call add(dct[tail], bufNum)
-                else
-                    let dct[tail] = [bufNum]
-                endif
-            endfor
-            echo dct
-
-            for tail in keys(dct)
-                let bufNums = dct[tail]
-                if len(bufNums) > 1
-                    call s:manage(bufNums)
-                endif
-            endfor
-        endfun
-
-        " NOTE: only use bufNums and finished
-        fun! s:manage(bufNums)
-            echo 'yes' a:bufNums
-
-            " Race!
-            let finished = []
-            let level = -1
-            "while len(a:bufNums) > 0
-            "while level > -5
-            while len(a:bufNums) > 0
-                let level -= 1
-                call s:manage2(a:bufNums, level, finished)
-            endwhile
-
-            echo finished
-            "return finished
-        endfun
-
-        fun! s:manage2(bufNums, level, finished)
-            " Are there any diff parents in this level?
-            let parents = {}
-            for bufNum in a:bufNums
-                let splitPath = split(g:correspondence[bufNum], '\')
-                "echo 'splitPath:' splitPath
-                let parent = splitPath[a:level]
-                "echo 'parent:' parent
-
-                if has_key(parents, parent)
-                    call add(parents[parent], bufNum)
-                else
-                    let parents[parent] = [bufNum]
-                endif
-            endfor
-            "echo 'parents' parents
-
-            " TODO: any are not dups?
-            for parentName in keys(parents)
-                let bufNums = parents[parentName]
-                if(len(bufNums) == 1)
-                    let bufNum = bufNums[0]
-                    echo 'bufNum' bufNum
-                    call add(a:finished, [bufNum, parentName])
-                    call remove(a:bufNums, index(bufNums, bufNum))
-                endif
-            endfor
-        endfun
-
-
-
-    " Trying to use ag
-        if executable('ag')
-            " Use Ag over Grep
-            let ignore_dirs = ['CVS', 'node_modules', '.venv']
-
-            let &grepprg = 'ag -s --nogroup --nocolor'
-            for ignore_dir in ignore_dirs
-                let &grepprg .= ' --ignore-dir ' . ignore_dir
-            endfor
-
-            " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-            "let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
-
-            " ag is fast enough that CtrlP doesn't need to cache
-        elseif has('win32')
-            set grepprg=findstr\ /n\ /s
-        "elseif has('unix')
-        "   e
-        endif
-
-
-    command! FileExplorer call OpenExplorer()
-
-    " TODO: figure out why I had this
-    "set viewoptions =folds
-
-    " Refresh results for Scroller()
-        " NOTE - currently using '/' instead of refresh
-        "let &ut = 300
-        "autocmd CursorHold * if line('$')<3000 | call Scroller_refreshSearchResults() | endif
