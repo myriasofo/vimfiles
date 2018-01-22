@@ -32,6 +32,21 @@ let s:mapPaletteFiles = {
 let s:glasConfigLocation = g:dir_notes . '_configs/glas.to'
 let s:hotkeysToBufPaths = {}
 
+" Settings for MBE
+    let g:miniBufExplStatusLineText = '\ '
+    "let g:miniBufExplStatusLineText = "%{bufnr('$')}"
+    "let g:miniBufExplStatusLineText = "%{fnamemodify(getcwd(),':t')}"
+    "let g:miniBufExplStatusLineText = "%{PrintCurrFolder()}"
+
+    " Put MBE in vert, with colm 20
+    let g:miniBufExplVSplit = 1
+
+    " Put MBE in left
+    let g:miniBufExplBRSplit = 0
+
+    let g:miniBufExplAutoStart = 0
+
+
 " Helper functions
 function! s:layoutOne(bufNums)
     let [l:hiddenBufs, l:visibleBufs] = s:divideBufsIntoHiddenAndVisible(a:bufNums)
