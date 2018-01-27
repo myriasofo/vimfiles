@@ -80,9 +80,6 @@ function! s:layoutTwo(bufNums)
     "call s:addBufs(magiList, l:special)
     call add(magiList, '')
     call s:addGlasBufs(magiList)
-    if len(magiList) > 1
-        call add(magiList, '')
-    endif
 
     call add(magiList, '    Remaining')
     call s:addSpecialBufs2(magiList)
@@ -153,44 +150,62 @@ endfunction
 
 function! s:addGlasBufs(magiList)
     "Add all from current glas palette (global var)
-    let l:folder = ''
 
-    let skip = 0
+    let l:glasLines = []
+
+    let l:skip = 0
     for l:rawLine in s:getGlasConfig()
         let l:line = substitute(l:rawLine, '^\s\+', '', '')
         let l:firstChar = l:line[0]
 
-        if l:line[0:1] == '*/'
-            let skip = 0
+        if l:firstChar == '/'
+            let l:skip = 0
             continue
-        elseif l:line[0:1] == '/*'
-            let skip = 1
+        elseif l:firstChar == '*'
+            let l:skip = 1
             continue
-        elseif skip
+        elseif l:skip
             continue
-
-        elseif l:firstChar == ''
-            let l:stub = ''
-        elseif l:firstChar == '('
+        elseif l:firstChar == '' || l:firstChar == '('
             continue
-        elseif l:firstChar == '$'
-            let l:stub = s:getLeftPadding() . l:line[2:]
-        elseif l:firstChar == '#'
-            let l:parts = split(l:line[1:], ':')
-            let l:desc = substitute(l:parts[0], '\v^\s*(.{-})\s*$', '\1', '')
-            let l:folder = substitute(l:parts[1], '\v^\s*(.{-})\s*$', '\1', '')
-            let l:stub = s:getLeftPadding() . l:desc
-
-        "elseif l:firstChar == '~'
-        "  "let l:stub .= s:bufUniqNameDict[l:i] "TODO: get unique name?
-        else
-            let l:path = l:folder . '/' . l:line
-            let l:stub = s:createStub(l:path, l:line)
         endif
 
-        call add(a:magiList, l:stub)
+        call add(l:glasLines, l:line)
     endfor
+
+
+    let l:folderPath = ''
+    for l:line in l:glasLines
+        let l:firstChar = l:line[0]
+        let l:content = StripWhitespace(l:line[1:])
+
+        if l:firstChar == '$' "Comment
+            let l:stub = s:getLeftPadding() . l:content
+            call add(a:magiList, l:stub)
+
+        elseif l:firstChar == '#' "Folder
+            if l:folderPath != ''
+                call add(a:magiList, '')
+            endif
+                
+            let l:parts = split(l:content, ':')
+            let l:folderDesc = StripWhitespace(l:parts[0])
+            let l:folderPath = StripWhitespace(l:parts[1])
+            let l:stub = s:getLeftPadding() . l:folderDesc
+            call add(a:magiList, l:stub)
+
+        else "File
+            "s:bufUniqNameDict[l:i] "TODO: get unique name?
+            let l:path = l:folderPath . '/' . l:line
+            let l:stub = s:createStub(l:path, l:line)
+            call add(a:magiList, l:stub)
+        endif
+    endfor
+
+    call add(a:magiList, '')
+
 endfunction
+
 
 function! s:addSpecialBufs(magiList)
     for l:tail in s:decantFiles
