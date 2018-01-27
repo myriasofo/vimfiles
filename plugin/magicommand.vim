@@ -174,12 +174,17 @@ function! s:addGlasBufs(magiList)
     endfor
 
 
+    let l:rootPath = ''
     let l:folderPath = ''
     for l:line in l:glasLines
         let l:firstChar = l:line[0]
         let l:content = StripWhitespace(l:line[1:])
 
-        if l:firstChar == '$' "Comment
+        if l:firstChar == '@' "Set root path
+            let l:parts = split(l:content, ':')
+            let l:rootPath = StripWhitespace(l:parts[1])
+
+        elseif l:firstChar == '$' "Comment
             let l:stub = s:getLeftPadding() . l:content
             call add(a:magiList, l:stub)
 
@@ -190,7 +195,9 @@ function! s:addGlasBufs(magiList)
                 
             let l:parts = split(l:content, ':')
             let l:folderDesc = StripWhitespace(l:parts[0])
-            let l:folderPath = StripWhitespace(l:parts[1])
+            let l:rawFolderPath = StripWhitespace(l:parts[1])
+            let l:folderPath = substitute(l:rawFolderPath, '{root}', l:rootPath, '')
+
             let l:stub = s:getLeftPadding() . l:folderDesc
             call add(a:magiList, l:stub)
 
