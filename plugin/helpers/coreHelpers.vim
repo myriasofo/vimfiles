@@ -318,6 +318,7 @@ endfunction
         syn match Statement "^\s*\$.*"
         syn match Type "^\s*_.*"
         syn match Special "^\s*!.*"
+        syn match Comment "^\s*(.*"
     endfun
 
 " Session

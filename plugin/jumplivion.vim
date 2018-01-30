@@ -66,21 +66,35 @@ fun! Jumplivion(incr, modes, type)
         " If headermode == 1, go up to branch head 
             elseif a:type == 'headers'
                 let flag = a:type
+
                 " If blank, move to root
                 if IsEmptyspace(nStart)
-                    let nEnd = GetNextForBlank(nStart)
+                    let nEnd = GetNextVisible(nStart, a:incr)
+                    if a:incr == 1
+                        let nEnd = nextnonblank(nEnd)
+                    else
+                        let nEnd = prevnonblank(nEnd)
+                    endif
                     call cursor(nEnd, indent(nEnd)+1)
                     return
+                endif
+
                 " If already at root, just do nothing
-                elseif indent(nStart) == 0
+                if a:incr == -1 && indent(nStart) == 0
                     "echo 'ERROR: Already at root'
                     return
+                endif
+
+                if a:incr == 1 && (indStart == indNext || indNext == -1)
+                    let indStart -= &shiftwidth
                 endif
             endif
 
     " Section 3: Main loop of movements
+        "echom 1
         "echom 'nStart '.nStart . ', indStart' . indStart
         while 1
+            "echom nNext
             "echom 'nNext '.nNext .', indNext' . indNext
             " Check whether next line fits movement condition
             if nNext <= 1 || nNext >= line('$')
@@ -89,12 +103,13 @@ fun! Jumplivion(incr, modes, type)
 
             if (flag == "sameSection" && indNext != indStart)
                 \ || (flag == "diffSection" && indNext == indStart)
-                \ || (flag == 'headers' && !IsEmptyspace(nNext) && indNext < indStart)
-                return Jumplivion_mover(flag, a:modes, a:incr, nNext)
+                \ || (flag == 'headers' && a:incr == -1 && !IsEmptyspace(nNext) && indNext < indStart)
+                \ || (flag == 'headers' && a:incr == 1 && !IsEmptyspace(nNext) && indNext <= indStart)
+                return Jumplivion_mover(flag, a:modes, a:incr, nNext, nStart, indStart)
             elseif nNext <= 1
-                return Jumplivion_mover("none", a:modes, a:incr, 1)
+                return Jumplivion_mover("none", a:modes, a:incr, 1, nStart, indStart)
             elseif nNext >= line('$')
-                return Jumplivion_mover("none", a:modes, a:incr, EOF)
+                return Jumplivion_mover("none", a:modes, a:incr, EOF, nStart, indStart)
             endif
 
             " Grab next line to check
@@ -103,13 +118,32 @@ fun! Jumplivion(incr, modes, type)
         endwhile
 endfun
 
-fun! Jumplivion_mover(exit, modes, incr, nNext)
+fun! Jumplivion_mover(flag, modes, incr, nNext, nStart, indStart)
     " Start with the final line
         let nEnd = a:nNext
 
     " If moving by same indent, ended when hit first diff indent - so need to go back one line
-        if a:exit == "sameSection"
+        if a:flag == "sameSection"
             let nEnd = GetNextVisible(nEnd, -a:incr)
+        elseif a:flag == 'headers' && a:incr == 1
+            " Method 1
+            let nEnd = GetNextVisible(nEnd, -a:incr)
+            let nEnd = prevnonblank(nEnd)
+            let nEnd = GetFoldStart(nEnd)
+
+            if nEnd != a:nNext 
+                let indGoal = a:indStart + &shiftwidth
+                if indent(nEnd) != indGoal
+                    " Keep moving up
+                    while 1
+                        if nEnd <= a:nStart || indent(nEnd) == indGoal
+                            break
+                        endif
+                        let nEnd -= 1
+                    endwhile
+                endif
+            endif
+
         endif
 
     " Normal mode movement
@@ -123,7 +157,7 @@ fun! Jumplivion_mover(exit, modes, incr, nNext)
 
             " FEATURE 2: For going up as diff, and only single line (think about it)
             "let vLen = line("'>") -line("'<") +1
-            "if a:exit == "diffSection" && a:incr == -1 && vLen == 1
+            "if a:flag == "diffSection" && a:incr == -1 && vLen == 1
             "    "echom "singleline up diff"
             "    execute "normal! \<esc>"
             "    normal! kV
@@ -132,7 +166,7 @@ fun! Jumplivion_mover(exit, modes, incr, nNext)
     " Operator-pending
         elseif a:modes == 'o'
         " Pick an intelligent start and end
-            "if a:exit == "diffSection"
+            "if a:flag == "diffSection"
             "    if a:incr == 1
             "        let nEnd = GetNextVisible(nEnd, -a:incr)
             "    elseif a:incr == -1
@@ -185,17 +219,19 @@ let g:Jumplivion_saveIndent = -3
     let g:Jumplivion_key_indentsUp = ','
     let g:Jumplivion_key_indentsDn = '.'
     let g:Jumplivion_key_headersUp = 'm'
+    let g:Jumplivion_key_headersDn = 'M'
 
     if exists("g:Jumplivion_easykeymaps")
-        let Types = [
+        let types = [
         \   [g:Jumplivion_key_indentsUp, -1, "'indents'"], 
         \   [g:Jumplivion_key_indentsDn, 1, "'indents'"], 
         \   [g:Jumplivion_key_headersUp, -1, "'headers'"], 
+        \   [g:Jumplivion_key_headersDn, 1, "'headers'"], 
         \]
 
         for Mode in ['n', 'v', 'o']
-            for Type in Types
-                exe Mode.'noremap <silent>'.Type[0].' :<c-u>call Jumplivion('.Type[1].",'".Mode."',".Type[2].')<cr>'
+            for type in types
+                exe Mode.'noremap <silent>'.type[0].' :<c-u>call Jumplivion('.type[1].",'".Mode."',".type[2].')<cr>'
             endfor
         endfor
     endif

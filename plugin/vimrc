@@ -624,6 +624,7 @@
     " Other
         " Managing files and views
             noremap hh :update <bar> MbeRefresh<cr>
+            noremap hj :wall <bar> MbeRefresh<cr>
             nnoremap qw :xa<cr>
             nnoremap qu :call UnloadCurrentBuffer()<cr>
             nnoremap qy :MBEbd! <cr>
@@ -803,8 +804,8 @@
         endfun
 
     " Jump to fold?
-        map p :call JumpToFold(1)<cr>
-        map P :call JumpToFold(-1)<cr>
+        "map p :call JumpToFold(1)<cr>
+        "map P :call JumpToFold(-1)<cr>
         fun! JumpToFold(direction)
             let nCurr = GetFoldBounds('.', a:direction)
             let nBound = (a:direction == 1 ? line('$') : 1)
@@ -903,5 +904,6 @@
         unlet old_undolevels
         unlet old_modified
     endfun
+
 
 
