@@ -78,7 +78,6 @@ function! s:layoutTwo(bufNums)
     "call add(magiList, '    Special')
     "call s:addSpecialBufs2(magiList)
     "call s:addBufs(magiList, l:special)
-    call add(magiList, '')
     call s:addGlasBufs(magiList)
 
     call add(magiList, '    Remaining')
@@ -151,7 +150,7 @@ endfunction
 function! s:addGlasBufs(magiList)
     "Add all from current glas palette (global var)
 
-    let l:glasLines = []
+    let l:glasRaw = []
 
     let l:skip = 0
     for l:rawLine in s:getGlasConfig()
@@ -170,13 +169,14 @@ function! s:addGlasBufs(magiList)
             continue
         endif
 
-        call add(l:glasLines, l:line)
+        call add(l:glasRaw, l:line)
     endfor
 
 
     let l:rootPath = ''
     let l:folderPath = ''
-    for l:line in l:glasLines
+    let l:folderStub = ''
+    for l:line in l:glasRaw
         let l:firstChar = l:line[0]
         let l:content = StripWhitespace(l:line[1:])
 
@@ -184,24 +184,26 @@ function! s:addGlasBufs(magiList)
             let l:parts = split(l:content, ':')
             let l:rootPath = StripWhitespace(l:parts[1])
 
-        elseif l:firstChar == '$' "Comment
+        elseif l:firstChar == '$' "Display this text on mbe
             let l:stub = s:getLeftPadding() . l:content
             call add(a:magiList, l:stub)
 
         elseif l:firstChar == '#' "Folder
-            if l:folderPath != ''
-                call add(a:magiList, '')
-            endif
-                
             let l:parts = split(l:content, ':')
             let l:folderDesc = StripWhitespace(l:parts[0])
             let l:rawFolderPath = StripWhitespace(l:parts[1])
-            let l:folderPath = substitute(l:rawFolderPath, '{root}', l:rootPath, '')
 
-            let l:stub = s:getLeftPadding() . l:folderDesc
-            call add(a:magiList, l:stub)
+            let l:folderPath = substitute(l:rawFolderPath, '{root}', l:rootPath, '')
+            let l:folderStub = s:getLeftPadding() . l:folderDesc
+            let l:addFolder = 1
 
         else "File
+            if l:folderStub != ''
+                call add(a:magiList, '')
+                call add(a:magiList, l:folderStub)
+                let l:folderStub = ''
+            endif
+
             "s:bufUniqNameDict[l:i] "TODO: get unique name?
             let l:path = l:folderPath . '/' . l:line
             let l:stub = s:createStub(l:path, l:line)
