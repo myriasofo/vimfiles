@@ -274,7 +274,8 @@ endfunction
 
 function! s:addBufs(magiList, bufNums)
     for l:i in a:bufNums
-        if !has_key(s:loadedBufs, expand('#'.l:i.':p'))
+        let l:filename = expand('#'.l:i.':p')
+        if !has_key(s:loadedBufs, l:filename)
             call add(a:magiList, s:createStubFromBufNum(l:i))
         endif
     endfor
@@ -283,6 +284,7 @@ endfunction
 
 function! s:createStub(path, fileDesc)
     let l:path = fnamemodify(a:path, ':p')
+    let l:path = substitute(l:path, '//', '/', 'g') "NOTE: If two slashes, combine into one
 
     let l:fileDesc = a:fileDesc
     if has_key(s:mapPaletteFiles, a:fileDesc)
