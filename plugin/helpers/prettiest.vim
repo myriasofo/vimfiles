@@ -257,8 +257,7 @@ fun! CompressLine(modes)
 endfun
 
 
-command! FormatJson call FormatJson(line('.'))
-command! -range FormatJson call FormatJson(<line1>,<line2>)
+command! -range FormatJson call FormatJson(<line1>, <line2>)
 "command! FormatJsonVisual call FormatJson('v')
 command! CompressLine call CompressLine('fold')
 command! CompressLineVisual call CompressLine('v')

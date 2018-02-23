@@ -907,7 +907,3 @@
 
 
 "map ? glMrl
-
-function GlasCommentAll()
-    "look at jsonformat
-endfunction

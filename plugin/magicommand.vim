@@ -391,28 +391,7 @@ function! s:isSpecialBuf(bufNum)
 endfunction
 
 
-" Helpers - to toggle glas
-fun! s:magiToggleGlas()
-    let g:magiLayoutMode = g:magiLayoutMode == 1 ? 2 : 1
-    call s:refreshMbe()
-endfun
-
-fun! s:refreshMbe()
-    if IsMBEOpen() == 0
-        return
-    endif
-
-    " Switch to diff window to trigger refresh
-    let currentWin = bufwinnr('%')
-    let diffWin = currentWin == 1 ? 2 : 1
-    exe diffWin    . ' wincmd w'
-    exe currentWin . ' wincmd w'
-endfun
-
-command! GlasToggle call s:magiToggleGlas()
-command! MbeRefresh call s:refreshMbe()
-
-" External api
+" External API
 function! MagiOpenBuffer(key)
     if has_key(s:hotkeysToBufPaths, a:key)
         let filePath = s:hotkeysToBufPaths[a:key]
@@ -468,3 +447,59 @@ function! IsMBEOpen()
     "for i in winnr('$')
 endfun
 
+
+" External Tools
+function! s:refreshMbe()
+    if IsMBEOpen() == 0
+        return
+    endif
+
+    " Switch to diff window to trigger refresh
+    let currentWin = bufwinnr('%')
+    let diffWin = currentWin == 1 ? 2 : 1
+    exe diffWin    . ' wincmd w'
+    exe currentWin . ' wincmd w'
+endfun
+
+function! s:glasToggle()
+    let g:magiLayoutMode = g:magiLayoutMode == 1 ? 2 : 1
+    call s:refreshMbe()
+endfun
+
+function! s:glasClear(nStart, nEnd)
+    let skip = 0
+    for i in range(a:nStart, a:nEnd)
+        let rawLine = getline(i)
+        let line = StripWhitespace(rawLine)
+        if len(line) == 0
+            continue
+        endif
+        let firstChar = line[0]
+
+
+        if firstChar == '/'
+            let skip = 0
+            continue
+        elseif firstChar == '*'
+            let skip = 1
+        endif
+
+        if skip == 1
+            continue
+        endif
+
+        if firstChar == '(' || firstChar == '@' || firstChar == '#'
+            continue
+        endif
+
+        call tcomment#Comment(i, i)
+    endfor
+
+    write
+    MbeRefresh
+endfunction
+
+
+command! MbeRefresh call s:refreshMbe()
+command! GlasToggle call s:glasToggle()
+command! -range=% GlasClear call s:glasClear(<line1>, <line2>)
