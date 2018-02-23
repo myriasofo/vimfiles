@@ -113,7 +113,7 @@ function! s:divideBufsIntoHiddenAndVisible(bufNums)
     let l:visibleBufs = []
 
     for l:i in a:bufNums
-        if IsBufVisible(l:i)
+        if !IsBufVisible(l:i)
             if !s:isSpecialBuf(l:i)
                 call add(l:hiddenBufs, l:i)
             endif
