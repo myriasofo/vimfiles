@@ -81,7 +81,7 @@ function! s:layoutTwo(bufNums)
     "call s:addBufs(magiList, l:special)
     call s:addGlasBufs(magiList)
 
-    call add(magiList, '    Remaining')
+    call add(magiList, '    # Remaining')
     call s:addSpecialBufs2(magiList)
     call s:addBufs(magiList, l:remaining)
 
@@ -195,7 +195,7 @@ function! s:addGlasBufs(magiList)
             let l:rawFolderPath = StripWhitespace(l:parts[1])
 
             let l:folderPath = substitute(l:rawFolderPath, '{root}', l:rootPath, '')
-            let l:folderStub = s:getLeftPadding() . l:folderDesc
+            let l:folderStub = s:getLeftPadding() . '# ' . l:folderDesc
             let l:addFolder = 1
 
         else "File

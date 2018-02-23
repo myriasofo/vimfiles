@@ -540,11 +540,13 @@ endfunction
 function! <SID>RenderSyntax()
   if has("syntax")
     syn clear
+    syn match Folded "^\s*#.*"
+
     "syn match MBE_Hidden '\v.*'
     "syn match MBE_Active '\v^ *\*.*'
     "syn match MBE_Visible '\v^ *\#.*'
 
-    syn match MBE_Active '\v^\s\s\s\*.*'
+    "syn match MBE_Active '\v^\s\s\s\*.*'
 
     "syn match MBE_Hidden '    temp2.to'
     "syn match MBE_Hidden '    list.to'
