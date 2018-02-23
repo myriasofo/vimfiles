@@ -5,6 +5,7 @@ let g:magiLayoutMode = 2
 let s:leftPadding = 4
 let s:minimumWidth = 7
 let s:ignoredFiles = [
+    \'glas.to',
     \'stable.to',
     \'flux.to',
     \'list.to',
@@ -93,7 +94,7 @@ function! s:divideBufsIntoSpecialAndRemaining(bufNums)
 
     for l:i in a:bufNums
         if s:isSpecialBuf(l:i)
-            if bufwinnr(l:i) != -1
+            if IsBufVisible(l:i)
                 "call add(l:remaining, l:i)
                 continue
             endif
@@ -112,7 +113,7 @@ function! s:divideBufsIntoHiddenAndVisible(bufNums)
     let l:visibleBufs = []
 
     for l:i in a:bufNums
-        if bufwinnr(l:i) == -1
+        if IsBufVisible(l:i)
             if !s:isSpecialBuf(l:i)
                 call add(l:hiddenBufs, l:i)
             endif
@@ -219,7 +220,7 @@ endfunction
 function! s:addSpecialBufs(magiList)
     for l:tail in s:decantFiles
         let l:path = g:dir_palettes . l:tail
-        if bufwinnr(l:path) != -1
+        if IsBufVisible(l:path)
             continue
         endif
 
@@ -246,7 +247,7 @@ function! s:addSpecialBufs2(magiList)
     "for tail in special
     "  let path = fnamemodify(g:dir_palettes . tail, ':p')
     "
-    "  if bufwinnr(path) != -1
+    "  if IsBufVisible(path)
     "    call add(a:magiList, s:createStub(path, tail))
     "  elseif has_key(tempFiles, tail)
     "    let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
@@ -261,7 +262,7 @@ function! s:addSpecialBufs2(magiList)
     let special = ['temp1.to', 'temp2.to']
     for tail in special
         let path = fnamemodify(g:dir_palettes . tail, ':p')
-        if bufwinnr(path) != -1
+        if IsBufVisible(path)
             continue
         endif
 
@@ -332,7 +333,7 @@ function! s:getMbeMarker(path)
             return '***'
         endif
 
-    elseif bufwinnr(a:path) != -1
+    elseif IsBufVisible(a:path)
         if g:magiLayoutMode == 1
             return ''
         else

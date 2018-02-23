@@ -441,3 +441,23 @@ fun! GrepMe(...)
 endfun
 
 
+" Unorgz
+function! IsString(expr)
+    return type(a:expr) == 1
+endfunction
+
+function! IsInteger(expr)
+    return type(a:expr) == 0
+endfunction
+
+function! IsBufVisible(expr)
+    if IsString(a:expr)
+        let regex = '^' . a:expr . '$'
+        return bufwinnr(regex) != -1
+    elseif IsInteger(a:expr)
+        return bufwinnr(a:expr) != -1
+    endif
+
+    echom 'WARNING: Invalid type:' . type(a:expr)
+    return 0
+endfunction
