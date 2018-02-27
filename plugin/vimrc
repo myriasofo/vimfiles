@@ -181,7 +181,7 @@
             endif
 
             " Turn off mouse (no cheating!)
-            "set mouse =
+            set mouse =
             set guicursor+=a:blinkon0
             set autoread "Auto-update file if changed outside of vim
 
@@ -451,12 +451,16 @@
 
             imap <d-a> <nop>
             imap <d-s> <nop>
+            imap <d-d> <nop>
             imap <d-f> <nop>
 
             imap <d-z> <nop>
             imap <d-x> <nop>
             imap <d-c> <nop>
             imap <d-v> <nop>
+            imap <d-b> <nop>
+
+            imap <d-n> <nop>
 
             vmap qo <nop>
 
