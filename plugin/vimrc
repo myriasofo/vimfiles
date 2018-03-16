@@ -1,6 +1,21 @@
 
 
 "| 0. Before everything else
+    " Determine os
+        function! GetOperatingSystem()
+            if has('mac')
+                return 'mac'
+            elseif has('unix')
+                return 'linux'
+            elseif has('win32') || has('win64') || has('win32unix')
+                return 'windows'
+            else
+                return 'unknown'
+            endif
+        endfunction
+
+        let g:os = GetOperatingSystem()
+
     " Define core directory paths
         set shellslash
 
@@ -92,7 +107,7 @@
             let g:loadOnceSyntax = 1
             " cmds 'colorscheme' and 'syntax enable' are fickle, so run only once
                 syntax enable
-                if has('gui_running') || has('nvim')
+                if has('gui_running') || g:os == 'linux'
                     colorscheme flattened_light
                     "colorscheme NeoSolarized
                     "colorscheme solarized
@@ -156,7 +171,7 @@
     " GUI and indents
         " One-liners
             " Self-explanatory
-            if has('macunix')
+            if has('mac')
                 set guifont=Consolas:h12
                 set linespace=1
             elseif has('unix')
@@ -401,6 +416,7 @@
             "Only windows
             inoremap <c-BS> <c-w>
             cnoremap <c-BS> <c-w>
+            noremap! <C-h> <C-w>
 
             "Only mac (linux?)
             inoremap <m-BS> <c-w>
@@ -755,7 +771,7 @@
             set sessionoptions=blank,buffers,curdir,tabpages,winpos
             "set sessionoptions=blank,buffers,curdir,folds,tabpages,winpos
             "set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winpos
-            if has('gui_running')
+            if has('gui_running') || has('nvim')
                 let g:session_autosave = 'yes'
                 let g:session_autoload = 'yes'
             else
@@ -919,3 +935,7 @@
 
 
 "map ? glMrl
+
+if has('nvim')
+    tnoremap <Esc> <C-\><C-n>
+endif
