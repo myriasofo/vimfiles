@@ -35,7 +35,9 @@
 
         " Get plugins from github
             " My faves
-            Plugin 'altercation/vim-colors-solarized'
+            Plugin 'romani/flattened'
+            "Plugin 'altercation/vim-colors-solarized'
+            "Plugin 'icymind/NeoSolarized'
             Plugin 'tpope/vim-sleuth' "Critical to handle varying shiftwidths (eg. 4sp vs 2sp)
             Plugin 'tomtom/tcomment_vim' "Easy commenting
             Plugin 'luochen1990/rainbow' "Differentiate parentheses
@@ -91,7 +93,10 @@
             " cmds 'colorscheme' and 'syntax enable' are fickle, so run only once
                 syntax enable
                 if has("gui_running")
-                    colorscheme solarized
+                    colorscheme flattened_light
+                    "colorscheme NeoSolarized "has PROBLEMATIC AUTOCOMMAND
+                    "colorscheme solarized
+
                     "colorscheme molokai
                     "colorscheme hybrid
                     "colorscheme lucius
@@ -100,7 +105,7 @@
                 endif
 
                 "set background=dark
-                set background=light
+                "set background=light
 
                 "let g:molokai_original =1
                 "let g:solarized_termcolors=256
@@ -122,8 +127,10 @@
                 endif
 
             " Save history of commands (note: commands, not undo)
-                let &viminfo .= ',n' . g:dir_vim . 'viminfo'
-                set history=100
+                if !has('nvim')
+                    let &viminfo .= ',n' . g:dir_vim . 'viminfo'
+                    set history=100
+                endif
 
             " File backups + swaps
                 let &backupdir = g:dir_vim . 'backups'
@@ -238,7 +245,7 @@
             endif
 
         " Highlighting for solarized
-            if g:colors_name == 'solarized'
+            if g:colors_name == 'solarized' || g:colors_name == 'NeoSolarized' || g:colors_name == 'flattened_light'
                 "hi! link Folded Normal gui=bold
                 hi Folded gui=bold guifg=fg guibg=bg
                 "hi Folded gui=bold
