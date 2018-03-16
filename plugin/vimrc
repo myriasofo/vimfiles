@@ -365,7 +365,7 @@
             " Use Ag over Grep
             let ignore_dirs = ['CVS', 'node_modules', '.venv']
 
-            let &grepprg = 'ag -s --nogroup --nocolor'
+            let &grepprg = 'ag -s --nogroup --nocolor --hidden'
             for ignore_dir in ignore_dirs
                 let &grepprg .= ' --ignore-dir ' . ignore_dir
             endfor
