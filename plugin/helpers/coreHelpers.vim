@@ -333,7 +333,6 @@ endfunction
     fun! CloseTempBuffers()
         " Go thru win and close any that are &filetype == 'help'
         let tempBuffers = {
-            \'': 1,
             \'help':1,
             \'gitcommit':1,
             \'minibufexpl': 1,
@@ -342,7 +341,7 @@ endfunction
         
         for i in range(winnr('$'), 1, -1)
             let winFileType = getwinvar(i, '&filetype') 
-            if has_key(tempBuffers, winFileType)
+            if has_key(tempBuffers, winFileType) || winFileType == ''
                 exe i.'quit'
             endif
         endfor

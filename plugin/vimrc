@@ -55,7 +55,7 @@
 
             " Fine, but never use
             "Plugin 'godlygeek/tabular' "Aligns text by char (eg. = or :)
-            Plugin 'kchmck/vim-coffee-script'
+            "Plugin 'kchmck/vim-coffee-script'
 
             " Fine, but I don't want
             "Plugin 'szw/vim-ctrlspace'
@@ -73,9 +73,9 @@
             " To try
             "Plugin 'Valloric/YouCompleteMe'
             "Plugin 'tpope/vim-abolish' "not needed
-            Plugin 'scrooloose/syntastic'
+            "Plugin 'scrooloose/syntastic'
             "Plugin 'mtscout6/syntastic-local-eslint.vim'
-            Plugin 'gilday/syntastic-local-standard.vim'
+            "Plugin 'gilday/syntastic-local-standard.vim'
             "Plugin 'wookiehangover/jshint.vim'
             "Plugin 'tpope/vim-jdaddy' "Does this format json?
             "Plugin 'klen/python-mode'
@@ -150,10 +150,12 @@
     " GUI and indents
         " One-liners
             " Self-explanatory
-            if has('unix')
+            if has('macunix')
                 set guifont=Consolas:h12
                 set linespace=1
-
+            elseif has('unix')
+                set guifont=Consolas\ 12
+                set linespace=1
                 "set guifont=Menlo\ Regular:h13
                 "set linespace=3
             elseif has('win32')
