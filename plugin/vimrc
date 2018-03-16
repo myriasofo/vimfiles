@@ -35,9 +35,7 @@
 
         " Get plugins from github
             " My faves
-            Plugin 'romani/flattened'
-            "Plugin 'altercation/vim-colors-solarized'
-            "Plugin 'icymind/NeoSolarized'
+            Plugin 'romani/flattened' "For solarized colorscheme
             Plugin 'tpope/vim-sleuth' "Critical to handle varying shiftwidths (eg. 4sp vs 2sp)
             Plugin 'tomtom/tcomment_vim' "Easy commenting
             Plugin 'luochen1990/rainbow' "Differentiate parentheses
@@ -71,6 +69,8 @@
             "Plugin 'mhinz/vim-startify' "Startup screen w MRU files and sessions
             "Plugin 'ntpeters/vim-better-whitespace' "For trailing whitespace
             "Plugin 'kien/ctrlp.vim' "Prefer my own plugins, spacework + navkey
+            "Plugin 'altercation/vim-colors-solarized' "Issues w neovim
+            "Plugin 'icymind/NeoSolarized' "Issues stemming from its autocommand
 
             " To try
             "Plugin 'Valloric/YouCompleteMe'
@@ -92,11 +92,10 @@
             let g:loadOnceSyntax = 1
             " cmds 'colorscheme' and 'syntax enable' are fickle, so run only once
                 syntax enable
-                if has("gui_running")
+                if has('gui_running') || has('nvim')
                     colorscheme flattened_light
-                    "colorscheme NeoSolarized "has PROBLEMATIC AUTOCOMMAND
+                    "colorscheme NeoSolarized
                     "colorscheme solarized
-
                     "colorscheme molokai
                     "colorscheme hybrid
                     "colorscheme lucius
@@ -217,7 +216,7 @@
             set titlestring =%{PrintCurrFolder()}
 
         " Dismantle any gui toolbars
-            if has("gui_running")
+            if has('gui_running')
                 set guioptions-=t
                 set guioptions-=T
                 set guioptions-=m
@@ -756,7 +755,7 @@
             set sessionoptions=blank,buffers,curdir,tabpages,winpos
             "set sessionoptions=blank,buffers,curdir,folds,tabpages,winpos
             "set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winpos
-            if has("gui_running")
+            if has('gui_running')
                 let g:session_autosave = 'yes'
                 let g:session_autoload = 'yes'
             else
