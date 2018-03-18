@@ -229,6 +229,7 @@
         " Title string
             "set titlestring=\ 
             set titlestring =%{PrintCurrFolder()}
+            set title
 
         " Dismantle any gui toolbars
             if has('gui_running')
