@@ -171,15 +171,15 @@
     " GUI and indents
         " One-liners
             " Self-explanatory
-            if has('mac')
+            if g:os == 'mac'
                 set guifont=Consolas:h12
                 set linespace=1
-            elseif has('unix')
+            elseif g:os == 'linux'
                 set guifont=Consolas\ 12
                 set linespace=1
                 "set guifont=Menlo\ Regular:h13
                 "set linespace=3
-            elseif has('win32')
+            elseif g:os == 'windows'
                 set guifont=Consolas:h11
                 "set linespace=5
                 "let &guifont = "Source_Code_Pro:h9"
@@ -391,7 +391,7 @@
                 let &grepprg .= ' --ignore-dir ' . ignore_dir
             endfor
 
-        elseif has('win32')
+        elseif g:os == 'windows'
             set grepprg=findstr\ /n\ /s
         "elseif has('unix')
         endif
@@ -723,7 +723,7 @@
                 "endfun
 
             " Maximize window
-                if has('win32')
+                if g:os == 'windows'
                     "set lines=999 columns=999
                     au GUIEnter * simalt ~x
                 else
@@ -771,7 +771,7 @@
             set sessionoptions=blank,buffers,curdir,tabpages,winpos
             "set sessionoptions=blank,buffers,curdir,folds,tabpages,winpos
             "set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winpos
-            if has('gui_running') || has('nvim')
+            if has('gui_running') || g:os == 'linux'
                 let g:session_autosave = 'yes'
                 let g:session_autoload = 'yes'
             else
@@ -857,7 +857,7 @@
 
         command! FileExplorer call OpenExplorer()
         fun! OpenExplorer()
-            if has('win32')
+            if g:os == 'windows'
                 !start explorer .
                 "!start explorer /select,%:p
             elseif has('unix')
@@ -936,6 +936,6 @@
 
 "map ? glMrl
 
-if has('nvim')
+if has('terminal')
     tnoremap <Esc> <C-\><C-n>
 endif
