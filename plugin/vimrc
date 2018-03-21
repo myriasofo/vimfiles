@@ -106,7 +106,12 @@
         if !exists('g:loadOnceSyntax')
             let g:loadOnceSyntax = 1
             " cmds 'colorscheme' and 'syntax enable' are fickle, so run only once
+                if has('nvim') || v:version >= 800
+                    set termguicolors
+                endif
+
                 syntax enable
+
                 if has('gui_running') || g:os == 'linux'
                     colorscheme flattened_light
                     "colorscheme NeoSolarized
@@ -262,7 +267,7 @@
         " Highlighting for solarized
             if g:colors_name == 'solarized' || g:colors_name == 'NeoSolarized' || g:colors_name == 'flattened_light'
                 "hi! link Folded Normal gui=bold
-                hi Folded gui=bold guifg=fg guibg=bg
+                hi Folded gui=bold guifg=fg guibg=bg cterm=bold
                 "hi Folded gui=bold
                 "hi! link Folded Underlined
                 hi ShowCursor guibg=fg guifg=bg
@@ -283,8 +288,8 @@
 
         " Highlight status line and EOF
             "hi! link StatusLine LineNr
-            hi StatusLine guibg=bg gui=bold
-            hi StatusLineNc guibg=bg gui=NONE ctermbg=NONE
+            hi StatusLine guibg=bg gui=bold cterm=bold
+            hi StatusLineNc guibg=bg gui=NONE ctermbg=NONE cterm=bold
             "hi! link StatusLineNc Comment
             "hi StatusLine guibg=grey33 guifg=gold
             "hi StatusLineNC guibg=grey25 guifg=gold
@@ -651,6 +656,11 @@
             "xmap gS  <Plug>VgSurround
 
     " Other
+        " For terminal inside of vim
+            if has('terminal')
+                tnoremap <Esc> <C-\><C-n>
+            endif
+
         " Managing files and views
             noremap hh :update <bar> MbeRefresh<cr>
             noremap hj :wall <bar> MbeRefresh<cr>
@@ -934,9 +944,6 @@
         unlet old_modified
     endfun
 
+    "map ? glMrl
 
-"map ? glMrl
 
-if has('terminal')
-    tnoremap <Esc> <C-\><C-n>
-endif
