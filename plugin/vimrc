@@ -50,7 +50,7 @@
 
         " Get plugins from github
             " My faves
-            Plugin 'romani/flattened' "For solarized colorscheme
+            Plugin 'romainl/flattened' "For solarized colorscheme
             Plugin 'tpope/vim-sleuth' "Critical to handle varying shiftwidths (eg. 4sp vs 2sp)
             Plugin 'tomtom/tcomment_vim' "Easy commenting
             Plugin 'luochen1990/rainbow' "Differentiate parentheses
