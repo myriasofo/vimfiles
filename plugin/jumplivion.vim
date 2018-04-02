@@ -104,7 +104,7 @@ fun! Jumplivion(incr, modes, type)
             if (flag == "sameSection" && indNext != indStart)
                 \ || (flag == "diffSection" && indNext == indStart)
                 \ || (flag == 'headers' && a:incr == -1 && !IsEmptyspace(nNext) && indNext < indStart)
-                \ || (flag == 'headers' && a:incr == 1 && !IsEmptyspace(nNext) && indNext <= indStart)
+                \ || (flag == 'headers' && a:incr == 1 && ((!IsEmptyspace(nNext) && indNext <= indStart) || nNext == line('$')))
                 return Jumplivion_mover(flag, a:modes, a:incr, nNext, nStart, indStart)
             elseif nNext <= 1
                 return Jumplivion_mover("none", a:modes, a:incr, 1, nStart, indStart)
