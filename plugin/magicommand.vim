@@ -502,4 +502,5 @@ endfunction
 
 command! MbeRefresh call s:refreshMbe()
 command! GlasToggle call s:glasToggle()
+command! ToggleGlas call s:glasToggle()
 command! -range=% GlasClear call s:glasClear(<line1>, <line2>)
