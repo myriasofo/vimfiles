@@ -12,6 +12,7 @@ let s:ignoredFiles = [
     \'temp1.to',
     \'temp2.to',
     \
+    \'journal.to',
     \'timeLog.to',
     \'vimrc',
     \]
