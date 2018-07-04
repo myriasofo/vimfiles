@@ -350,7 +350,7 @@ endfunction
     fun! WhenSessionLoad()
         if !exists("g:sessionHasLoaded")
             let g:sessionHasLoaded = 1
-            MagiOpen
+            MBEOpen
         endif
     endfun
 

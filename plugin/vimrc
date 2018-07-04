@@ -662,8 +662,8 @@
             endif
 
         " Managing files and views
-            noremap hh :update <bar> MbeRefresh<cr>
-            noremap hj :wall <bar> MbeRefresh<cr>
+            noremap hh :update <bar> MagiRefresh<cr>
+            noremap hj :wall <bar> MagiRefresh<cr>
             nnoremap qw :xa<cr>
             nnoremap qu :call UnloadCurrentBuffer()<cr>
             nnoremap qy :MBEbd! <cr>

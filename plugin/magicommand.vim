@@ -328,14 +328,14 @@ function! s:getFileLines(path, nLines)
     return bufloaded(a:path) ? getbufline(a:path, 0, a:nLines) : readfile(a:path, 0, a:nLines)
 endfunction
 
-function! s:getMbeHotkey(path)
+function! s:getMagiHotkey(path)
     " char "a" is 97 and "z" is 122
     let letter = nr2char(97 + len(s:hotkeysToBufPaths))
     let s:hotkeysToBufPaths[letter] = fnameescape(a:path)
     return letter
 endfunction
 
-function! s:getMbeMarker(path)
+function! s:getMagiMarker(path)
     if a:path == fnamemodify(bufname('%'), ':p')
         if g:magiLayoutMode == 1
             return '*'
@@ -361,7 +361,7 @@ function! s:getMbeMarker(path)
         return s:getLeftPadding()
 
     else
-        return s:getMbeHotkey(a:path) . ' '
+        return s:getMagiHotkey(a:path) . ' '
     endif
 endfunction
 
@@ -370,7 +370,7 @@ function! s:hasElement(myList, elem)
 endfunction
 
 function! s:getStubMargin(path)
-    let l:marker = s:getMbeMarker(a:path)
+    let l:marker = s:getMagiMarker(a:path)
     let l:padding = s:getLeftPadding(strlen(l:marker) * -1)
     return l:padding . l:marker
 endfunction
@@ -459,7 +459,7 @@ endfun
 
 
 " User Commands
-function! s:refreshMbe()
+function! s:refreshMagi()
     if IsMagiOpen() == 0
         return
     endif
@@ -473,7 +473,7 @@ endfun
 
 function! s:glasToggle()
     let g:magiLayoutMode = g:magiLayoutMode == 1 ? 2 : 1
-    call s:refreshMbe()
+    call s:refreshMagi()
 endfun
 
 function! s:glasClear(nStart, nEnd)
@@ -503,10 +503,10 @@ function! s:glasClear(nStart, nEnd)
     endfor
 
     write
-    MbeRefresh
+    MagiRefresh
 endfunction
 
-command! MbeRefresh call s:refreshMbe()
+command! MagiRefresh call s:refreshMagi()
 command! GlasToggle call s:glasToggle()
 command! ToggleGlas call s:glasToggle()
 command! -range=% GlasClear call s:glasClear(<line1>, <line2>)
