@@ -50,19 +50,19 @@ let s:hotkeysToBufPaths = {}
 
 
 " Helper functions
-function! s:layoutOne(bufNums)
+function! s:layoutVisibleBufs(bufNums)
     let [l:hiddenBufs, l:visibleBufs] = s:divideBufsIntoHiddenAndVisible(a:bufNums)
 
     let magiList = []
 
     call add(magiList, '')
     call s:addBufs(magiList, l:visibleBufs)
+    call add(magiList, '')
 
-    " Usually use have 2 wins. So if only one, then add an extra linebreak
+    " Usually have 2 wins visible. So if only one, then add an extra linebreak
     if len(l:visibleBufs) == 1
         call add(magiList, '')
     endif
-    call add(magiList, '')
 
     "call s:addGlasBufs(magiList)
     call s:addSpecialBufs(magiList)
@@ -71,17 +71,19 @@ function! s:layoutOne(bufNums)
     return magiList
 endfunction
 
-function! s:layoutTwo(bufNums)
+function! s:layoutGlas(bufNums)
     let [l:special, l:remaining] = s:divideBufsIntoSpecialAndRemaining(a:bufNums)
 
     let magiList = []
 
-    "call add(magiList, '')
+    call add(magiList, '')
     "call add(magiList, '    Special')
     "call s:addSpecialBufs2(magiList)
-    "call s:addBufs(magiList, l:special)
     call s:addGlasBufs(magiList)
 
+    if magiList[-1] != ''
+        call add(magiList, '')
+    endif
     call add(magiList, '    # Remaining')
     call s:addSpecialBufs2(magiList)
     call s:addBufs(magiList, l:remaining)
@@ -160,10 +162,10 @@ function! s:addGlasBufs(magiList)
         let l:firstChar = l:line[0]
 
         if l:firstChar == '/'
-            let l:skip = 0
+            let l:skip -= 1
             continue
         elseif l:firstChar == '*'
-            let l:skip = 1
+            let l:skip += 1
             continue
         elseif l:skip
             continue
@@ -174,47 +176,54 @@ function! s:addGlasBufs(magiList)
         call add(l:glasRaw, l:line)
     endfor
 
-
     let l:rootPath = ''
     let l:folderPath = ''
-    let l:folderStub = ''
     for l:line in l:glasRaw
         let l:firstChar = l:line[0]
         let l:content = StripWhitespace(l:line[1:])
 
-        if l:firstChar == '@' "Set root path
-            let l:parts = split(l:content, ':')
-            let l:rootPath = StripWhitespace(l:parts[1])
-
-        elseif l:firstChar == '$' "Display this text on mbe
+        "Display this text (only)
+        if l:firstChar == '$'
             let l:stub = s:getLeftPadding() . l:content
             call add(a:magiList, l:stub)
 
-        elseif l:firstChar == '#' "Folder
+        "Set root path
+        elseif l:firstChar == '@'
+            let l:parts = split(l:content, ':')
+            let l:rootPath = StripWhitespace(l:parts[1])
+
+        "Set folder
+        elseif l:firstChar == '#'
+            if a:magiList[-1] != ''
+                call add(a:magiList, '')
+            endif
+
             let l:parts = split(l:content, ':')
             let l:folderDesc = StripWhitespace(l:parts[0])
             let l:rawFolderPath = StripWhitespace(l:parts[1])
 
-            let l:folderPath = substitute(l:rawFolderPath, '{root}', l:rootPath, '')
+            let l:folderPath = substitute(l:rawFolderPath, '{root}', l:rootPath, '') . '/'
             let l:folderStub = s:getLeftPadding() . '# ' . l:folderDesc
-            let l:addFolder = 1
+            call add(a:magiList, l:folderStub)
 
-        else "File
-            if l:folderStub != ''
-                call add(a:magiList, '')
-                call add(a:magiList, l:folderStub)
-                let l:folderStub = ''
+        "Add file
+        else 
+            if l:firstChar == '~' || l:firstChar == '/'
+                let l:path = l:line
+                let l:line = fnamemodify(l:line, ':t')
+            elseif l:firstChar == '&'
+                let l:line = l:content
+                let l:path = l:folderPath . l:line
+            else
+                let l:path = l:folderPath . l:line
+                let l:line = fnamemodify(l:line, ':t')
             endif
-
             "s:bufUniqNameDict[l:i] "TODO: get unique name?
-            let l:path = l:folderPath . '/' . l:line
+
             let l:stub = s:createStub(l:path, l:line)
             call add(a:magiList, l:stub)
         endif
     endfor
-
-    call add(a:magiList, '')
-
 endfunction
 
 
@@ -423,9 +432,9 @@ function! MagiGetViewerList(bufNums, bufUniqNameDict)
     let s:loadedBufs = {}
 
     if g:magiLayoutMode == 1
-        return s:layoutOne(a:bufNums)
+        return s:layoutVisibleBufs(a:bufNums)
     else
-        return s:layoutTwo(a:bufNums)
+        return s:layoutGlas(a:bufNums)
     endif
 endfunction
 
