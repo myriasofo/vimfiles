@@ -183,8 +183,8 @@ fun! SwapWin_2and3()
     normal! mC
 
     " If MBE, 2 and 3. If no MBE, then 1 and 2
-    let winA = (IsMBEOpen() ? 2 : 1)
-    let winB = (IsMBEOpen() ? 3 : 2)
+    let winA = (IsMagiOpen() ? 2 : 1)
+    let winB = (IsMagiOpen() ? 3 : 2)
 
     " Preserve buf# in win2 and win3
     let buf_fromWinA = winbufnr(winA)

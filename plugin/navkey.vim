@@ -225,14 +225,14 @@ fun! s:extract_bookmarkData(bookmark)
         let displayText = 'cwd (' . displayText . ')'
 
     elseif a:bookmark == 'win1'
-        let bufNum = (IsMBEOpen() ? winbufnr(2) : winbufnr(1))
+        let bufNum = (IsMagiOpen() ? winbufnr(2) : winbufnr(1))
         let dirPath = (bufNum == -1 ? g:rootPath : expand('#'.bufNum.':p:h'))
 
         let displayText = (dirPath == g:rootPath ? dirPath : fnamemodify(dirPath, ':t'))
         let displayText = 'win1 (' . displayText . ')'
 
     elseif a:bookmark == 'win2'
-        let bufNum = (IsMBEOpen() ? winbufnr(3) : winbufnr(2))
+        let bufNum = (IsMagiOpen() ? winbufnr(3) : winbufnr(2))
         let dirPath = (bufNum == -1 ? g:rootPath : expand('#'.bufNum.':p:h'))
 
         let displayText = (dirPath == g:rootPath ? dirPath : fnamemodify(dirPath, ':t'))

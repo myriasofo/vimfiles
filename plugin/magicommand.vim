@@ -450,7 +450,7 @@ function! MagiDetermineViewerWidth(magiList)
     return l:magiWidth
 endfunction
 
-function! IsMBEOpen()
+function! IsMagiOpen()
     return getwinvar(1, '&filetype') == 'minibufexpl'
     "return (bufname(winbufnr(1)) == "-MiniBufExplorer-")
     " alt: could check each win and see if any are
@@ -460,7 +460,7 @@ endfun
 
 " User Commands
 function! s:refreshMbe()
-    if IsMBEOpen() == 0
+    if IsMagiOpen() == 0
         return
     endif
 
