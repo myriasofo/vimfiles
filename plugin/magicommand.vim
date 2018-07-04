@@ -1,4 +1,4 @@
-" TODO: rename mbe to magi
+
 
 " Constants
 let g:magiLayoutMode = 2
@@ -34,22 +34,8 @@ let s:mapPaletteFiles = {
 let s:glasConfigLocation = g:dir_notes . '_configs/glas.to'
 let s:hotkeysToBufPaths = {}
 
-" Settings for MBE
-    let g:miniBufExplStatusLineText = '\ '
-    "let g:miniBufExplStatusLineText = "%{bufnr('$')}"
-    "let g:miniBufExplStatusLineText = "%{fnamemodify(getcwd(),':t')}"
-    "let g:miniBufExplStatusLineText = "%{PrintCurrFolder()}"
 
-    " Put MBE in vert, with colm 20
-    let g:miniBufExplVSplit = 1
-
-    " Put MBE in left
-    let g:miniBufExplBRSplit = 0
-
-    let g:miniBufExplAutoStart = 0
-
-
-" Helper functions
+" Core layouts
 function! s:layoutVisibleBufs(bufNums)
     let [l:hiddenBufs, l:visibleBufs] = s:divideBufsIntoHiddenAndVisible(a:bufNums)
 
@@ -91,6 +77,8 @@ function! s:layoutGlas(bufNums)
     return magiList
 endfunction
 
+
+" Making lists of bufs
 function! s:divideBufsIntoSpecialAndRemaining(bufNums)
     let l:special = []
     let l:remaining = []
@@ -129,26 +117,6 @@ function! s:divideBufsIntoHiddenAndVisible(bufNums)
     call sort(l:hiddenBufs, "s:compareBufName")
 
     return [l:hiddenBufs, l:visibleBufs]
-endfunction
-
-function! s:compareWinNum(bufNum1, bufNum2)
-    let l:win1 = bufwinnr(a:bufNum1)
-    let l:win2 = bufwinnr(a:bufNum2)
-
-    return l:win1 - l:win2
-endfunction
-
-function! s:compareBufName(bufNum1, bufNum2)
-    let l:bufName1 = expand("#".a:bufNum1.":p:t")
-    let l:bufName2 = expand("#".a:bufNum2.":p:t")
-
-    if l:bufName1 < l:bufName2
-        return -1
-    elseif l:bufName1 > l:bufName2
-        return 1
-    else
-        return 0
-    endif
 endfunction
 
 function! s:addGlasBufs(magiList)
@@ -226,7 +194,6 @@ function! s:addGlasBufs(magiList)
     endfor
 endfunction
 
-
 function! s:addSpecialBufs(magiList)
     for l:tail in s:decantFiles
         let l:path = g:dir_palettes . l:tail
@@ -292,7 +259,28 @@ function! s:addBufs(magiList, bufNums)
     endfor
 endfunction
 
+function! s:compareWinNum(bufNum1, bufNum2)
+    let l:win1 = bufwinnr(a:bufNum1)
+    let l:win2 = bufwinnr(a:bufNum2)
 
+    return l:win1 - l:win2
+endfunction
+
+function! s:compareBufName(bufNum1, bufNum2)
+    let l:bufName1 = expand("#".a:bufNum1.":p:t")
+    let l:bufName2 = expand("#".a:bufNum2.":p:t")
+
+    if l:bufName1 < l:bufName2
+        return -1
+    elseif l:bufName1 > l:bufName2
+        return 1
+    else
+        return 0
+    endif
+endfunction
+
+
+" Creating stub (each formatted line in magi)
 function! s:createStub(path, fileDesc)
     let l:path = fnamemodify(a:path, ':p')
     let l:path = substitute(l:path, '//', '/', 'g') "NOTE: If two slashes, combine into one
@@ -458,7 +446,7 @@ function! IsMBEOpen()
 endfun
 
 
-" External Tools
+" User Commands
 function! s:refreshMbe()
     if IsMBEOpen() == 0
         return
@@ -509,8 +497,21 @@ function! s:glasClear(nStart, nEnd)
     MbeRefresh
 endfunction
 
-
 command! MbeRefresh call s:refreshMbe()
 command! GlasToggle call s:glasToggle()
 command! ToggleGlas call s:glasToggle()
 command! -range=% GlasClear call s:glasClear(<line1>, <line2>)
+
+" Settings for MBE (this should be deprecated)
+    let g:miniBufExplStatusLineText = '\ '
+    "let g:miniBufExplStatusLineText = "%{bufnr('$')}"
+    "let g:miniBufExplStatusLineText = "%{fnamemodify(getcwd(),':t')}"
+    "let g:miniBufExplStatusLineText = "%{PrintCurrFolder()}"
+
+    " Put MBE in vert, with colm 20
+    let g:miniBufExplVSplit = 1
+
+    " Put MBE in left
+    let g:miniBufExplBRSplit = 0
+
+    let g:miniBufExplAutoStart = 0
