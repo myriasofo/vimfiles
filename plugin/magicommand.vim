@@ -121,32 +121,12 @@ endfunction
 
 function! s:addGlasBufs(magiList)
     "Add all from current glas palette (global var)
-
-    let l:glasRaw = []
-
-    let l:skip = 0
-    for l:rawLine in s:getGlasConfig()
-        let l:line = substitute(l:rawLine, '^\s\+', '', '')
-        let l:firstChar = l:line[0]
-
-        if l:firstChar == '/'
-            let l:skip -= 1
-            continue
-        elseif l:firstChar == '*'
-            let l:skip += 1
-            continue
-        elseif l:skip
-            continue
-        elseif l:firstChar == '' || l:firstChar == '('
-            continue
-        endif
-
-        call add(l:glasRaw, l:line)
-    endfor
-
+    let l:rawGlasLines = s:getRawGlasLines()
     let l:rootPath = ''
     let l:folderPath = ''
-    for l:line in l:glasRaw
+    let l:folderStub = ''
+
+    for l:line in l:rawGlasLines
         let l:firstChar = l:line[0]
         let l:content = StripWhitespace(l:line[1:])
 
@@ -162,36 +142,68 @@ function! s:addGlasBufs(magiList)
 
         "Set folder
         elseif l:firstChar == '#'
-            if a:magiList[-1] != ''
-                call add(a:magiList, '')
-            endif
-
             let l:parts = split(l:content, ':')
             let l:folderDesc = StripWhitespace(l:parts[0])
             let l:rawFolderPath = StripWhitespace(l:parts[1])
-
             let l:folderPath = substitute(l:rawFolderPath, '{root}', l:rootPath, '') . '/'
             let l:folderStub = s:getLeftPadding() . '# ' . l:folderDesc
-            call add(a:magiList, l:folderStub)
 
         "Add file
         else 
-            if l:firstChar == '~' || l:firstChar == '/'
-                let l:path = l:line
-                let l:line = fnamemodify(l:line, ':t')
-            elseif l:firstChar == '&'
+            if l:folderStub != '' "Only show folder if it has files (!)
+                if a:magiList[-1] != ''
+                    call add(a:magiList, '')
+                endif
+                call add(a:magiList, l:folderStub)
+                let l:folderStub = ''
+            endif
+
+            if l:firstChar == '&'
+                let l:displayed = l:content
+                let l:firstChar = l:content[0]
                 let l:line = l:content
-                let l:path = l:folderPath . l:line
+            else
+                let l:displayed = fnamemodify(l:line, ':t')
+            endif
+
+            if l:firstChar == '~'
+                let l:path = l:line
             else
                 let l:path = l:folderPath . l:line
-                let l:line = fnamemodify(l:line, ':t')
             endif
-            "s:bufUniqNameDict[l:i] "TODO: get unique name?
 
-            let l:stub = s:createStub(l:path, l:line)
+            let l:stub = s:createStub(l:path, l:displayed)
             call add(a:magiList, l:stub)
         endif
     endfor
+endfunction
+
+function! s:getRawGlasLines()
+    let l:rawGlasLines = []
+
+    let l:skip = 0
+    for l:rawLine in s:getGlasConfig()
+        let l:line = StripWhitespace(l:rawLine)
+        let l:firstChar = l:line[0]
+
+        if l:firstChar == '' || l:firstChar == '('
+            continue
+        endif
+
+        if l:firstChar == '*'
+            let l:skip += 1
+            continue
+        elseif l:firstChar == '\'
+            let l:skip = l:skip == 0 ? 0 : l:skip - 1
+            continue
+        elseif l:skip > 0
+            continue
+        endif
+
+        call add(l:rawGlasLines, l:line)
+    endfor
+
+    return l:rawGlasLines
 endfunction
 
 function! s:addSpecialBufs(magiList)
@@ -465,28 +477,25 @@ function! s:glasToggle()
 endfun
 
 function! s:glasClear(nStart, nEnd)
-    let skip = 0
+    " WHAT - comment out all lines that are files
+
+    let skippedChars = [
+        \'\',
+        \'*',
+        \'(',
+        \'@',
+        \'#',
+        \]
+        "\'$',
+
     for i in range(a:nStart, a:nEnd)
         let rawLine = getline(i)
         let line = StripWhitespace(rawLine)
         if len(line) == 0
             continue
         endif
-        let firstChar = line[0]
 
-
-        if firstChar == '/'
-            let skip = 0
-            continue
-        elseif firstChar == '*'
-            let skip = 1
-        endif
-
-        if skip == 1
-            continue
-        endif
-
-        if firstChar == '(' || firstChar == '@' || firstChar == '#'
+        if s:hasElement(skippedChars, line[0])
             continue
         endif
 
