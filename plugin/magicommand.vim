@@ -186,7 +186,7 @@ function! s:getRawGlasLines()
         let l:line = StripWhitespace(l:rawLine)
         let l:firstChar = l:line[0]
 
-        if l:firstChar == '' || l:firstChar == '('
+        if l:firstChar == '' || l:firstChar == '(' || l:firstChar == '|'
             continue
         endif
 
@@ -483,6 +483,7 @@ function! s:glasClear(nStart, nEnd)
         \'\',
         \'*',
         \'(',
+        \'|',
         \'@',
         \'#',
         \]

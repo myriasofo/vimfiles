@@ -947,3 +947,4 @@
     "map ? glMrl
 
 
+set shell=zsh\ -i "Used so .zshrc is loaded
