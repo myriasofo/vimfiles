@@ -83,7 +83,7 @@
             "Plugin 'Shougo/unite.vim'
             "Plugin 'mhinz/vim-startify' "Startup screen w MRU files and sessions
             "Plugin 'ntpeters/vim-better-whitespace' "For trailing whitespace
-            "Plugin 'kien/ctrlp.vim' "Prefer my own plugins, spacework + navkey
+            Plugin 'kien/ctrlp.vim' "Prefer my own plugins, spacework + navkey
             "Plugin 'altercation/vim-colors-solarized' "Issues w neovim
             "Plugin 'icymind/NeoSolarized' "Issues stemming from its autocommand
 
@@ -402,6 +402,21 @@
         "elseif has('unix')
         endif
 
+    " For ctrlp
+        let g:ctrlp_working_path_mode = 0
+        let g:ctrlp_prompt_mappings = {
+            \ 'PrtDeleteWord()':      ['<m-bs>'],
+            \ }
+
+        let g:ctrlp_custom_ignore = {
+            \ 'dir': '\v(
+                \.git
+                \|CVS
+                \)'
+            \ }
+
+        let g:ctrlp_show_hidden = 1
+        let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
     " Other
         "let g:loaded_matchparen = 1
         let g:matchparen_timeout = 10
@@ -947,4 +962,5 @@
     "map ? glMrl
 
 
-set shell=zsh\ -i "Used so .zshrc is loaded
+set shell=zsh\ -i "Used so .zshrc is loaded for vim's internal terminal
+

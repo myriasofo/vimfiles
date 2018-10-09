@@ -157,39 +157,15 @@ finish
         " Do not clear filenames cache, to improve CtrlP startup
         " For ctrlp: don't clear cache (to manually clear, <f5>)
         "let g:ctrlp_clear_cache_on_exit = 0
-        let g:ctrlp_working_path_mode = 0
-        let g:ctrlp_show_hidden = 1
+
         let g:ctrlp_user_command = 'dir %s /-n /b /s /a-d'
         "let g:ctrlp_user_command = 'dir %s /-n /b /ad'
-        let g:ctrlp_custom_ignore = {
-            \ 'dir': '\v(
-                \Dropbox\\Art
-                \|projects\\CMB
-                \|vimfiles\\backup|vimfiles\\undofiles|vimfiles\\session
-                \|Archives\\documentation|reinstallation|Archives\\static|\.git
-                \|CS\\books_algorithms
-                \|CVS
-                \|Tasks\\[discard
-            \)'
-        \ }
-        let g:ctrlp_prompt_mappings = {
-            \ 'PrtDeleteWord()': ['<c-bs>'],
-            \ }
-
         " Set delay to prevent extra search
         "let g:ctrlp_lazy_update = 350
         "let g:ctrlp_use_caching = 0
 
         " Set no file limit, we are building a big project
         let g:ctrlp_max_files = 0
-
-        " Trying to use pymatcher
-            if has('python')
-                let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' }
-            else
-                "echom 'pymatcher requires python'
-            endif
-
 
         " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
         "let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
