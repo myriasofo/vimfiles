@@ -97,6 +97,8 @@
             "Plugin 'tpope/vim-jdaddy' "Does this format json?
             "Plugin 'klen/python-mode'
             "Plugin 'hdima/python-syntax'
+            Plugin 'tpope/vim-rails'
+            Plugin 'vim-ruby/vim-ruby'
 
         " Vundle end
             call vundle#end()

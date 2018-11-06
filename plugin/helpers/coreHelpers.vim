@@ -85,6 +85,11 @@
                     return text[-1:] == '}' || text[-1:] == ')' || text[-1:] == ']'  || text[-2:] == '*/'
                 endif
                 return 0
+
+            elseif &filetype == 'ruby'
+                let text = substitute(getline(a:lnum), '^\s*', '', '')
+                return (text[0:2] == 'end')
+
             endif
         endif
     endfun

@@ -19,6 +19,9 @@ function! ExecuteCurrentFile()
     elseif &filetype == 'vim'
         call s:executeVimscript()
 
+    elseif &filetype == 'ruby'
+        call s:executeRuby()
+
     else
         echom 'ScoutKey: Filetype not supported for RunCode()'
     endif
@@ -93,6 +96,10 @@ function! s:executePython()
     catch
         call ExecuteInShell('python2 %', 'right')
     endtry
+endfunction
+
+function! s:executeRuby()
+    call ExecuteInShell('ruby %', 'right')
 endfunction
 
 function! s:executeStata()
