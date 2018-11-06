@@ -302,13 +302,13 @@
 
 "| 2. Plugin options
     " For tcomment
-        let g:tcommentMaps = 0 "Don't need tcomment's key maps
-        let g:tcommentOptions = {'whitespace': 'no'}
+        let g:tcomment_maps = 0 "Don't need tcomment's key maps
+        let g:tcomment#options = {'whitespace': 'no'}
         try
-            call tcomment#DefineType('javascript','// %s')
-            call tcomment#DefineType('cpp','// %s')
-            call tcomment#DefineType('java','// %s')
-            call tcomment#DefineType('todo','( %s')
+            call tcomment#type#Define('javascript','// %s')
+            call tcomment#type#Define('cpp','// %s')
+            call tcomment#type#Define('java','// %s')
+            call tcomment#type#Define('todo','( %s')
         catch
             echom "NOTE: tcomment is not loaded"
         endtry
