@@ -83,7 +83,7 @@
             "Plugin 'Shougo/unite.vim'
             "Plugin 'mhinz/vim-startify' "Startup screen w MRU files and sessions
             "Plugin 'ntpeters/vim-better-whitespace' "For trailing whitespace
-            Plugin 'kien/ctrlp.vim' "Prefer my own plugins, spacework + navkey
+            Plugin 'ctrlpvim/ctrlp.vim' "Prefer my own plugins, spacework + navkey
             "Plugin 'altercation/vim-colors-solarized' "Issues w neovim
             "Plugin 'icymind/NeoSolarized' "Issues stemming from its autocommand
 
@@ -419,6 +419,8 @@
 
         let g:ctrlp_show_hidden = 1
         let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
+        let g:ctrlp_by_filename = 1
+
     " Other
         "let g:loaded_matchparen = 1
         let g:matchparen_timeout = 10
