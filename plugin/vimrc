@@ -99,6 +99,9 @@
             "Plugin 'hdima/python-syntax'
             Plugin 'tpope/vim-rails'
             Plugin 'vim-ruby/vim-ruby'
+            Plugin 'neoclide/vim-jsx-improve'
+            Plugin 'mxw/vim-jsx'
+            "Plugin 'pangloss/vim-javascript'
 
         " Vundle end
             call vundle#end()

@@ -71,7 +71,7 @@
                 let text = substitute(getline(a:lnum), '^\s*', '', '')
                 return (text[0:2] == 'end')
 
-            elseif &filetype == 'javascript'
+            elseif &filetype == 'javascript' || &filetype == 'javascript.jsx' 
                 " WHY - cover if/else or chained fctns, plus commenting
                 let text = substitute(getline(a:lnum), '^\s*', '', '')
                 if text[0:1] == '//' || text[0:1] == '/*'
@@ -233,6 +233,7 @@ endfunction
     endfun
 
     fun! JsSyntaxHl()
+        return
         "syn clear "TODO: just make my own syntax file
 
         " Literals : Including strings and booleans
