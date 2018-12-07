@@ -447,11 +447,13 @@
             "Only windows
             inoremap <c-BS> <c-w>
             cnoremap <c-BS> <c-w>
+            tnoremap <c-BS> <c-w>
             noremap! <C-h> <C-w>
 
             "Only mac (linux?)
             inoremap <m-BS> <c-w>
             cnoremap <m-BS> <c-w>
+            tnoremap <m-BS> <c-w>
 
         " Undo
             noremap U <c-r>
@@ -924,7 +926,13 @@
             \'#93a0a1',
             \'#fdf6e3',
         \]
-        set termwinsize=0*250
+        "set termwinsize=0*250
+        
+        " Below needed to map <c-w> for delete word
+        set termwinkey=<C-L>
+
+        " Move out of term to another win
+        tnoremap <c-d> <c-l><c-w>
 
 
     fun! FindNextIndentError()
