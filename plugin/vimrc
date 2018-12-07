@@ -295,6 +295,9 @@
             "hi! link StatusLine LineNr
             hi StatusLine guibg=bg gui=bold cterm=bold
             hi StatusLineNc guibg=bg gui=NONE ctermbg=NONE cterm=bold
+            hi! link StatusLineTerm StatusLine
+            hi! link StatusLineTermNC StatusLineNc
+
             "hi! link StatusLineNc Comment
             "hi StatusLine guibg=grey33 guifg=gold
             "hi StatusLineNC guibg=grey25 guifg=gold
@@ -801,7 +804,7 @@
             "   open vim > noname > session load > open mbe
             "   start close > close mbe > session save > exit
 
-            set sessionoptions=blank,buffers,curdir,tabpages,winpos
+            set sessionoptions=blank,buffers,curdir,tabpages,winpos,terminal
             "set sessionoptions=blank,buffers,curdir,folds,tabpages,winpos
             "set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winpos
             if has('gui_running') || g:os == 'linux'
@@ -901,6 +904,28 @@
     " TODO: figure out why I had this
         "set viewoptions =folds
 
+    " For terminal inside of vim
+        " Use solarized colors for the terminal!
+        let g:terminal_ansi_colors = [
+            \'#003440',
+            \'#dc312e',
+            \'#859901',
+            \'#b58900',
+            \'#268ad2',
+            \'#d33582',
+            \'#2aa197',
+            \'#eee8d5',
+            \'#002833',
+            \'#cb4a16',
+            \'#586d74',
+            \'#657b82',
+            \'#839495',
+            \'#6c6ec6',
+            \'#93a0a1',
+            \'#fdf6e3',
+        \]
+        set termwinsize=0*250
+
 
     fun! FindNextIndentError()
         " Todo - Doesn't handle folding. Not worth it
@@ -969,5 +994,4 @@
     "map ? glMrl
 
 
-set shell=zsh\ -i "Used so .zshrc is loaded for vim's internal terminal
 

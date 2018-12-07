@@ -271,7 +271,11 @@ fun! ClearOutHiddenBuffers()
     wall
     for i in range(1, bufnr('$'))
         if IsBufHidden(i)
-            exe 'bd ' . i
+            if getbufvar(i, "&buftype") == "terminal"
+                exe 'bd! ' . i
+            else
+                exe 'bd ' . i
+            endif
         endif
     endfor
 endfun

@@ -313,6 +313,17 @@ endfunction
 
 function! s:createStubFromBufNum(bufNum)
     let l:fileDesc = s:bufUniqNameDict[a:bufNum]
+
+    " for terminals
+    let FILE_NO_NAME = '--NO NAME--'
+    let lenNoName = len(FILE_NO_NAME) - 1
+    if l:fileDesc[:lenNoName] == FILE_NO_NAME
+        if getbufvar(a:bufNum, "&buftype") == 'terminal'
+            let shell_name = fnamemodify(&shell, ':t')
+            let l:fileDesc = shell_name . '-'
+        endif
+    endif
+
     let l:path = expand('#' . a:bufNum . ':p')
     return s:createStub(l:path, l:fileDesc)
 endfunction
@@ -376,6 +387,11 @@ function! s:getStubMargin(path)
 endfunction
 
 function! s:isBufModified(path)
+    let shell_name = fnamemodify(&shell, ':t')
+    if fnamemodify(a:path, ':t')[:len(shell_name)-1] == shell_name
+        return 0
+    end
+
     return bufloaded(a:path) && getbufvar(bufnr(a:path), '&modified')
 endfunction
 
