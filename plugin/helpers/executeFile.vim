@@ -7,7 +7,7 @@ function! ExecuteCurrentFile()
     if &filetype == 'haskell'
         call s:executeHaskell()
 
-    elseif &filetype == 'javascript'
+    elseif &filetype == 'javascript' || &filetype == 'javascript.jsx'
         call s:executeJavascript()
 
     elseif &filetype == 'python'
