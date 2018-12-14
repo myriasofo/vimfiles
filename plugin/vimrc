@@ -392,23 +392,11 @@
         endfun
 
     " For grep and search
-        command! -nargs=? Indexer call GrepMe(<f-args>)
         let g:ag_apply_qmappings = 0
-
-        " Use ag
-        if executable('ag')
-            " Use Ag over Grep
-            let ignore_dirs = ['CVS', 'node_modules', '.venv']
-
-            let &grepprg = 'ag -s --nogroup --nocolor --hidden'
-            for ignore_dir in ignore_dirs
-                let &grepprg .= ' --ignore-dir ' . ignore_dir
-            endfor
-
-        elseif g:os == 'windows'
-            set grepprg=findstr\ /n\ /s
-        "elseif has('unix')
-        endif
+        let g:my_grep_ignored_core = ['CVS', 'node_modules', '.venv', '.git']
+        let g:my_grep_ignored_dirs = {
+            \'~/custora/custora': ['tmp', 'opt', 'log', 'cache']
+        \}
 
     " For ctrlp
         let g:ctrlp_working_path_mode = 0
@@ -1000,6 +988,5 @@
     endfun
 
     "map ? glMrl
-
 
 

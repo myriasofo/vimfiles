@@ -411,39 +411,81 @@ endfunction
         endif
     endfun
 
-fun! GrepMe(...)
-    " Format query
-    " TODO: grep is fine with single quotes ('), but doesn't acknowledge double quotes (")
-    if a:0 == 0 "if no args
-        let searchQuery = getreg('/')
-        let searchQuery = (searchQuery[0:1] == '\<' && searchQuery[-2:-1] == '\>' ? searchQuery[2:-3] : searchQuery)
-    else
-        let searchQuery = a:1
-        let @/ = a:1
-    endif
+" For Grep
+    function! RunGrep(...)
+        let searchQuery = s:formatSearchQuery(a:000)
 
-    " Execute grep
-    try
-        exe 'silent grep' '"'.searchQuery.'" *'
-    catch
-        echom "invalid input"
-        return
-    endtry
+        call s:executeGrep(searchQuery)
 
-    " Format result
-    set hlsearch
-    set foldlevel=99
-    redraw!
+        call s:setupGrepWindow(searchQuery)
+    endfunction
 
-    " Prep quickfix window
-    copen
-    if &filetype == "qf"
-        call setwinvar(0, "&statusline", '  Found '.len(getqflist())." for [".searchQuery."]")
-        "set ffs=dos
-        "silent g/\\\$/s///
+    function! s:formatSearchQuery(arguments)
+        let hasQuery = len(a:arguments) > 0
+
+        if hasQuery
+            let searchQuery = a:arguments[0]
+            let @/ = searchQuery
+        else "get query from register
+            let searchQuery = getreg('/')
+            if searchQuery[0:1] == '\<' && searchQuery[-2:-1] == '\>' 
+                let searchQuery = searchQuery[2:-3]
+            endif
+        endif
+
+        " Escape any double-quotes (not needed for single quotes)
+        let searchQuery = substitute(searchQuery, '"', '\\"', 'g')
+
+        return searchQuery
+    endfunction
+
+    function! s:executeGrep(searchQuery)
+        call s:configureGrepCommand()
+
+        try
+            exe 'silent grep' '"'.a:searchQuery.'" *'
+        catch
+            echom "invalid input"
+            return
+        endtry
+
+    endfunction
+
+    function! s:configureGrepCommand()
+        if executable('ag')
+            let &grepprg = 'ag -s --nogroup --nocolor --hidden'
+
+            let ignored_dirs = g:my_grep_ignored_core
+            let current_dir = fnamemodify(getcwd(), ':~')
+            if has_key(g:my_grep_ignored_dirs, current_dir)
+                let ignored_dirs += g:my_grep_ignored_dirs[current_dir]
+            endif
+
+            for ignore_dir in ignored_dirs
+                let &grepprg .= ' --ignore-dir ' . ignore_dir
+            endfor
+        elseif g:os == 'windows'
+            let &grepprg = 'findstr /n /s'
+        endif
+    endfunction
+
+    function! s:setupGrepWindow(searchQuery)
+        " Format result
+        set hlsearch
+        set foldlevel=99
         redraw!
-    endif
-endfun
+
+        " Prep quickfix window
+        copen
+        if &filetype == "qf"
+            call setwinvar(0, "&statusline", '  Found '.len(getqflist())." for [".a:searchQuery."]")
+            "set ffs=dos
+            "silent g/\\\$/s///
+            redraw!
+        endif
+    endfunction
+
+    command! -nargs=? Indexer call RunGrep(<f-args>)
 
 
 " Unorgz
