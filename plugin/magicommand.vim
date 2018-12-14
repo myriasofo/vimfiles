@@ -145,8 +145,13 @@ function! s:addGlasBufs(magiList)
             let l:parts = split(l:content, ':')
             let l:folderDesc = StripWhitespace(l:parts[0])
             let l:rawFolderPath = StripWhitespace(l:parts[1])
-            let l:folderPath = substitute(l:rawFolderPath, '{root}', l:rootPath, '') . '/'
             let l:folderStub = s:getLeftPadding() . '# ' . l:folderDesc
+
+            if l:rawFolderPath == '/'
+                let l:folderPath = ''
+            else
+                let l:folderPath = substitute(l:rawFolderPath, '{root}', l:rootPath, '') . '/'
+            endif            
 
         "Add file
         else 
@@ -167,6 +172,8 @@ function! s:addGlasBufs(magiList)
             endif
 
             if l:firstChar == '~'
+                let l:path = l:line
+            elseif l:firstChar == '/'
                 let l:path = l:line
             else
                 let l:path = l:folderPath . l:line
@@ -321,6 +328,8 @@ function! s:createStubFromBufNum(bufNum)
         if getbufvar(a:bufNum, "&buftype") == 'terminal'
             let shell_name = fnamemodify(&shell, ':t')
             let l:fileDesc = shell_name . '-'
+        elseif getbufvar(a:bufNum, "&buftype") == 'quickfix'
+            let l:fileDesc = '(quickfix)'
         endif
     endif
 
@@ -403,6 +412,14 @@ function! s:getGlasConfig()
     endtry
 endfunction
 
+function! s:saveGlasConfig(config)
+    if buflisted(s:glasConfigLocation) 
+        exe "MBEbun " s:glasConfigLocation
+    endif
+
+    call writefile(a:config, s:glasConfigLocation)
+endfunction
+
 function! s:isSpecialBuf(bufNum)
     if type(a:bufNum) == 0
         let a:path = expand('#'.a:bufNum.':p')
@@ -415,6 +432,7 @@ function! s:isSpecialBuf(bufNum)
         \|| isdirectory(bufname(a:bufNum))
     \)
 endfunction
+
 
 
 " External API
@@ -523,8 +541,22 @@ function! s:glasClear(nStart, nEnd)
     MagiRefresh
 endfunction
 
+
+function! s:glasAddFile()
+    let config = s:getGlasConfig()
+    let currentFilePath = expand('%:~')
+
+    call add(config, currentFilePath)
+
+    call s:saveGlasConfig(config)
+
+    call s:refreshMagi()
+endfunction
+
+
 command! MagiRefresh call s:refreshMagi()
 command! GlasToggle call s:glasToggle()
+command! GlasAddFile call s:glasAddFile()
 command! ToggleGlas call s:glasToggle()
 command! -range=% GlasClear call s:glasClear(<line1>, <line2>)
 
