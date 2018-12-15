@@ -415,40 +415,53 @@ endfunction
     function! RunGrep(...)
         let searchQuery = s:formatSearchQuery(a:000)
 
-        call s:executeGrep(searchQuery)
+        call s:configureGrepCommand()
 
-        call s:setupGrepWindow(searchQuery)
+        let executed = s:executeGrep(searchQuery)
+
+        if executed
+            call s:setupGrepWindow(searchQuery)
+        endi
     endfunction
 
     function! s:formatSearchQuery(arguments)
+        let searchOptions = ''
         let hasQuery = len(a:arguments) > 0
 
         if hasQuery
             let searchQuery = a:arguments[0]
             let @/ = searchQuery
+
+            " TODO: check for -i => change @/ to have \c => sep out query
+            " TODO: check for -w => change @/ to have \< and \>
+
         else "get query from register
             let searchQuery = getreg('/')
+
             if searchQuery[0:1] == '\<' && searchQuery[-2:-1] == '\>' 
                 let searchQuery = searchQuery[2:-3]
+                let searchOptions .= ' -w'
+            endif
+
+            if searchQuery[0:1] == '\c'
+                let searchQuery = searchQuery[2:]
+                let searchOptions .= ' -i'
             endif
         endif
 
-        " Escape any double-quotes (not needed for single quotes)
-        let searchQuery = substitute(searchQuery, '"', '\\"', 'g')
+        " TODO: check if 2 or more words and NO quotes. then add quotes
 
-        return searchQuery
+        return searchQuery . searchOptions
     endfunction
 
     function! s:executeGrep(searchQuery)
-        call s:configureGrepCommand()
-
         try
-            exe 'silent grep' '"'.a:searchQuery.'" *'
+            exe 'silent grep '.a:searchQuery.' *'
+            return 1
         catch
-            echom "invalid input"
-            return
+            echom "Invalid query: ".a:searchQuery
+            return 0
         endtry
-
     endfunction
 
     function! s:configureGrepCommand()
