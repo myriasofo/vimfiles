@@ -413,53 +413,101 @@ endfunction
 
 " For Grep
     function! RunGrep(...)
-        let searchQuery = s:formatSearchQuery(a:000)
+        let query = s:formatQuery(a:000)
 
         call s:configureGrepCommand()
 
-        let executed = s:executeGrep(searchQuery)
+        let executed = s:executeGrep(query)
 
         if executed
-            call s:setupGrepWindow(searchQuery)
+            call s:setupGrepWindow(query)
         endi
     endfunction
 
-    function! s:formatSearchQuery(arguments)
-        let searchOptions = ''
-        let hasQuery = len(a:arguments) > 0
+    function! s:formatQuery(arguments)
+        let [query, queryParams] = len(a:arguments) == 1 ?
+            \s:extractQuery(a:arguments[0]) :
+            \s:getQueryFromLastSearch()
 
-        if hasQuery
-            let searchQuery = a:arguments[0]
-            let @/ = searchQuery
+        let query = s:confirmQueryHasQuotes(query)
 
-            " TODO: check for -i => change @/ to have \c => sep out query
-            " TODO: check for -w => change @/ to have \< and \>
-
-        else "get query from register
-            let searchQuery = getreg('/')
-
-            if searchQuery[0:1] == '\<' && searchQuery[-2:-1] == '\>' 
-                let searchQuery = searchQuery[2:-3]
-                let searchOptions .= ' -w'
-            endif
-
-            if searchQuery[0:1] == '\c'
-                let searchQuery = searchQuery[2:]
-                let searchOptions .= ' -i'
-            endif
-        endif
-
-        " TODO: check if 2 or more words and NO quotes. then add quotes
-
-        return searchQuery . searchOptions
+        return query . queryParams
     endfunction
 
-    function! s:executeGrep(searchQuery)
+    function! s:extractQuery(input)
+        let query = a:input
+        let queryParams = ''
+
+        for param in ['-i', '-w']
+            let index = s:findParam(query, param)
+            if index != -1
+                let query = strpart(query, 0, index) . strpart(query, index+len(param)+1)
+                let queryParams .= ' '.param
+            endif
+        endfor
+
+        let query = StripWhitespace(query)
+        call s:setHighlight(query)
+
+        return [query, queryParams]
+    endfunction
+
+    function! s:getQueryFromLastSearch()
+        let query = getreg('/')
+        let queryParams = ''
+
+        if query[0:1] == '\<' && query[-2:-1] == '\>' 
+            let query = query[2:-3]
+            let queryParams .= ' -w'
+        endif
+
+        if query[0:1] == '\c'
+            let query = query[2:]
+            let queryParams .= ' -i'
+        endif
+
+        return [query, queryParams]
+    endfunction
+
+    function! s:confirmQueryHasQuotes(query)
+        let query = a:query
+
+        if query[0] != '"' && query[0] != "'"
+            let query = '"' . query
+        endif
+
+        if query[-1:] != '"' && query[-1:] != "'"
+            let query .= '"'
+        endif
+
+        return query
+    endfunction
+
+    function! s:findParam(str, param)
+        if a:str[:2] == a:param.' ' 
+            return 0
+        endif
+
+        return match(a:str, ' '.a:param)
+    endfunction
+
+    function! s:setHighlight(query)
+        let query = a:query
+        if (query[0] == '"' && query[-1:] == '"') || (query[0] == "'" && query[-1:] == "'") 
+            let query = query[1:-2]
+        endif
+
+        let @/ = query
+    endfunction
+
+    function! s:executeGrep(query)
         try
-            exe 'silent grep '.a:searchQuery.' *'
+            let command = 'silent grep '.a:query.' *'
+            echom command
+            exe command
             return 1
         catch
-            echom "Invalid query: ".a:searchQuery
+            echom "Invalid query: ".a:query
             return 0
         endtry
     endfunction
@@ -482,7 +530,7 @@ endfunction
         endif
     endfunction
 
-    function! s:setupGrepWindow(searchQuery)
+    function! s:setupGrepWindow(query)
         " Format result
         set hlsearch
         set foldlevel=99
@@ -491,7 +539,7 @@ endfunction
         " Prep quickfix window
         copen
         if &filetype == "qf"
-            call setwinvar(0, "&statusline", '  Found '.len(getqflist())." for [".a:searchQuery."]")
+            call setwinvar(0, "&statusline", '  Found '.len(getqflist())." for [".a:query."]")
             "set ffs=dos
             "silent g/\\\$/s///
             redraw!
