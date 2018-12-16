@@ -1,4 +1,5 @@
 
+" Main
 function! RunGrep(...)
     let query = s:formatQuery(a:000)
 
@@ -11,6 +12,8 @@ function! RunGrep(...)
     endi
 endfunction
 
+
+" Process query
 function! s:formatQuery(arguments)
     let [query, queryParams] = len(a:arguments) == 1 ?
         \s:extractQuery(a:arguments[0]) :
@@ -18,42 +21,60 @@ function! s:formatQuery(arguments)
 
     let query = s:confirmQueryHasQuotes(query)
 
-    return query . queryParams
+    return query . ' ' . join(queryParams, ' ')
 endfunction
 
 function! s:extractQuery(input)
     let query = a:input
-    let queryParams = ''
+    let queryParams = []
 
-    for param in ['-i', '-w']
+    for param in ['-s', '-w', '-Q']
         let index = s:findParam(query, param)
         if index != -1
             let query = strpart(query, 0, index) . strpart(query, index+len(param)+1)
-            let queryParams .= ' '.param
+            call add(queryParams, param)
         endif
     endfor
 
     let query = StripWhitespace(query)
-    call s:setHighlight(query)
+    call s:setHighlight(query, queryParams)
 
     return [query, queryParams]
 endfunction
 
 function! s:getQueryFromLastSearch()
     let query = getreg('/')
-    let queryParams = ''
 
     if query[0:1] == '\<' && query[-2:-1] == '\>' 
-        let query = query[2:-3]
-        let queryParams .= ' -w'
+        return [query[2:-3], ['-w', '-s']]
+
+    elseif query[0:1] == '\c'
+        return [query[2:], ['-i']]
+
+    else
+        return [query, ['-s']]
+    endif
+endfunction
+
+function! s:findParam(str, param)
+    if a:str[:2] == a:param.' ' 
+        return 0
     endif
 
-    if query[0:1] == '\c'
-        let query = query[2:]
-        let queryParams .= ' -i'
+    return match(a:str, ' '.a:param)
+endfunction
+
+function! s:setHighlight(query, queryParams)
+    let query = a:query
+    if (query[0] == '"' && query[-1:] == '"') || (query[0] == "'" && query[-1:] == "'") 
+        let query = query[1:-2]
     endif
 
-    return [query, queryParams]
+    if index(a:queryParams, '-s') == -1
+        let @/ = '\c'.query
+    else
+        let @/ = query
+    end
 endfunction
 
 function! s:confirmQueryHasQuotes(query)
@@ -70,38 +91,11 @@ function! s:confirmQueryHasQuotes(query)
     return query
 endfunction
 
-function! s:findParam(str, param)
-    if a:str[:2] == a:param.' ' 
-        return 0
-    endif
 
-    return match(a:str, ' '.a:param)
-endfunction
-
-function! s:setHighlight(query)
-    let query = a:query
-    if (query[0] == '"' && query[-1:] == '"') || (query[0] == "'" && query[-1:] == "'") 
-        let query = query[1:-2]
-    endif
-
-    let @/ = query
-endfunction
-
-function! s:executeGrep(query)
-    try
-        let command = 'silent grep '.a:query.' *'
-        echom command
-        exe command
-        return 1
-    catch
-        echom "Invalid query: ".a:query
-        return 0
-    endtry
-endfunction
-
+" Execute query and display
 function! s:configureGrepCommand()
     if executable('ag')
-        let &grepprg = 'ag -s --nogroup --nocolor --hidden'
+        let &grepprg = 'ag -i --nogroup --nocolor --hidden'
 
         let ignored_dirs = g:my_grep_ignored_core
         let current_dir = fnamemodify(getcwd(), ':~')
@@ -115,6 +109,18 @@ function! s:configureGrepCommand()
     elseif g:os == 'windows'
         let &grepprg = 'findstr /n /s'
     endif
+endfunction
+
+function! s:executeGrep(query)
+    try
+        let command = 'silent grep '.a:query.' *'
+        echom 'GREP: '.command
+        exe command
+        return 1
+    catch
+        echom "Invalid query: ".a:query
+        return 0
+    endtry
 endfunction
 
 function! s:setupGrepWindow(query)
