@@ -95,27 +95,33 @@ endfunction
 " Execute query and display
 function! s:configureGrepCommand()
     if executable('ag')
-        let &grepprg = 'ag -i --nogroup --nocolor --hidden'
-
-        let ignored_dirs = g:my_grep_ignored_core
-        let current_dir = fnamemodify(getcwd(), ':~')
-        if has_key(g:my_grep_ignored_dirs, current_dir)
-            let ignored_dirs += g:my_grep_ignored_dirs[current_dir]
-        endif
-
-        for ignore_dir in ignored_dirs
-            let &grepprg .= ' --ignore-dir ' . ignore_dir
-        endfor
+        let &grepprg = 'ag -i --nogroup --nocolor --hidden' . s:getIgnoredDirs()
     elseif g:os == 'windows'
         let &grepprg = 'findstr /n /s'
     endif
 endfunction
 
+function! s:getIgnoredDirs()
+    let ignored_dirs = g:my_grep_ignored_core
+
+    let current_dir = fnamemodify(getcwd(), ':~')
+    if has_key(g:my_grep_ignored_dirs, current_dir)
+        let ignored_dirs += g:my_grep_ignored_dirs[current_dir]
+    endif
+
+    let ignore_dirs_string = ''
+    for ignore_dir in ignored_dirs
+        let ignore_dirs_string .= ' --ignore-dir ' . ignore_dir
+    endfor
+    return ignore_dirs_string
+endfunction
+
 function! s:executeGrep(query)
     try
-        let command = 'silent grep '.a:query.' *'
-        echom 'GREP: '.command
-        exe command
+        let cmd = 'silent grep '.a:query.' *'
+        echom 'GREP PRG: '.&grepprg
+        echom 'GREP: '.cmd
+        exe cmd
         return 1
     catch
         echom "Invalid query: ".a:query

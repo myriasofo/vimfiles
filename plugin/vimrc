@@ -393,9 +393,14 @@
 
     " For grep and search
         let g:ag_apply_qmappings = 0
-        let g:my_grep_ignored_core = ['CVS', 'node_modules', '.venv', '.git']
+
+        " GREP ignored dirs
+        " auto ignores version control files, eg. .git and CVS
+        " Not sure why grep doesnt need the below
+        "\'~/custora/custora': ['tmp', 'opt', 'log', 'cache']
+        let g:my_grep_ignored_core = ['node_modules', '.venv']
         let g:my_grep_ignored_dirs = {
-            \'~/custora/custora': ['tmp', 'opt', 'log', 'cache']
+            \'~/custora/custora': ['opt']
         \}
 
     " For ctrlp
