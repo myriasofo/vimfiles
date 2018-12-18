@@ -27,13 +27,11 @@ function! s:getQueryFromLastSearch()
     let query = getreg('/')
 
     if query[0:1] == '\<' && query[-2:-1] == '\>' 
-        return [query[2:-3], ['-w', '-s']]
-
+        return query[2:-3] . ' -w -s'
     elseif query[0:1] == '\c'
-        return [query[2:], ['-i']]
-
+        return query[2:] . ' -i'
     else
-        return [query, ['-s']]
+        return query . ' -s'
     endif
 endfunction
 
