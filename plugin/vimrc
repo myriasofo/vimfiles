@@ -400,13 +400,13 @@
             let &grepprg = 'findstr /n /s'
         endif
 
-        "let g:ag_apply_qmappings = 0
+        let &errorformat .= ',%f'
 
-        "let g:ackprg = "ag --vimgrep"
-        "let g:ackprg = 'ag'
-        "let g:ack_autofold_results = 1 "annoying
+        let g:ackprg = &grepprg
         let g:ack_qhandler = 'copen'
         let g:ackhighlight = 1
+        "let g:ack_autofold_results = 1 "annoying
+        let g:ag_apply_qmappings = 0
 
         " ag does this automatically
         "let g:my_grep_ignored_core = ['node_modules', '.venv']
