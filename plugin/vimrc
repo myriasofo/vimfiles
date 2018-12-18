@@ -55,7 +55,7 @@
             Plugin 'tomtom/tcomment_vim' "Easy commenting
             Plugin 'luochen1990/rainbow' "Differentiate parentheses
             Plugin 'tpope/vim-surround' "Operations with surround chars, surprisingly useful
-            Plugin 'rking/ag.vim' "Faster grep, ie. searching thru text of files
+            "Plugin 'rking/ag.vim' "Faster grep, ie. searching thru text of files
 
             " Could make my own version of
             Plugin 'xolox/vim-session'
@@ -83,7 +83,7 @@
             "Plugin 'Shougo/unite.vim'
             "Plugin 'mhinz/vim-startify' "Startup screen w MRU files and sessions
             "Plugin 'ntpeters/vim-better-whitespace' "For trailing whitespace
-            Plugin 'ctrlpvim/ctrlp.vim' "Prefer my own plugins, spacework + navkey
+            "Plugin 'ctrlpvim/ctrlp.vim' "Prefer my own plugins, spacework + navkey
             "Plugin 'altercation/vim-colors-solarized' "Issues w neovim
             "Plugin 'icymind/NeoSolarized' "Issues stemming from its autocommand
 
@@ -102,6 +102,7 @@
             Plugin 'neoclide/vim-jsx-improve'
             Plugin 'mxw/vim-jsx'
             "Plugin 'pangloss/vim-javascript'
+            "Plugin 'mileszs/ack.vim'
 
         " Vundle end
             call vundle#end()
@@ -392,16 +393,26 @@
         endfun
 
     " For grep and search
-        let g:ag_apply_qmappings = 0
+        if executable('ag')
+            let &grepprg = 'ag'
+            "let &grepprg = 'ag --hidden'
+        elseif g:os == 'windows'
+            let &grepprg = 'findstr /n /s'
+        endif
 
-        " GREP ignored dirs
-        " auto ignores version control files, eg. .git and CVS
-        " Not sure why grep doesnt need the below
-        "\'~/custora/custora': ['tmp', 'opt', 'log', 'cache']
-        let g:my_grep_ignored_core = ['node_modules', '.venv']
-        let g:my_grep_ignored_dirs = {
-            \'~/custora/custora': ['opt']
-        \}
+        "let g:ag_apply_qmappings = 0
+
+        "let g:ackprg = "ag --vimgrep"
+        "let g:ackprg = 'ag'
+        "let g:ack_autofold_results = 1 "annoying
+        let g:ack_qhandler = 'copen'
+        let g:ackhighlight = 1
+
+        " ag does this automatically
+        "let g:my_grep_ignored_core = ['node_modules', '.venv']
+        "let g:my_grep_ignored_dirs = {
+        "    \'~/custora/custora': ['opt']
+        "\}
 
     " For ctrlp
         let g:ctrlp_working_path_mode = 0
@@ -681,18 +692,38 @@
                 tnoremap <Esc> <C-\><C-n>
             endif
 
+            function! OpenTerminal()
+                " Purpose: To refresh name in mbe, away from 'NO-NAME'
+
+                let prevWin = win_getid()
+                terminal
+                let termWin = win_getid()
+
+                call win_gotoid(prevWin)
+                call win_gotoid(termWin)
+            endfunction
+            command! Terminal call OpenTerminal()
+
         " Managing files and views
             noremap hh :update <bar> MagiRefresh<cr>
             noremap hj :wall <bar> MagiRefresh<cr>
             nnoremap qw :xa<cr>
             nnoremap qu :call UnloadCurrentBuffer()<cr>
             nnoremap qy :MBEbd! <cr>
-            nnoremap <silent> qi :q<cr>
+            nnoremap <silent> qi :call QuitBuffer()<cr>
 
-            fun! UnloadCurrentBuffer()
+            function! UnloadCurrentBuffer()
                 update
                 MBEbd
-            endfun
+            endfunction
+
+            function! QuitBuffer()
+                quit
+                if &filetype == 'minibufexpl'
+                    exe "normal! \<c-w>l"
+                    echom "ERROR: Avoid navigating to mbe (bc of fugitive and Gstatus/Gcommit)"
+                endif
+            endfunction
 
             " NOTE: For below, didn't add <cr> on purpose, as a check to make sure
             nnoremap qh :call DeleteSession()

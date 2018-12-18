@@ -1,7 +1,6 @@
 
 function! ExecuteCurrentFile()
-    " Save prev win
-    let winPrev = winnr()
+    let winPrev = win_getid()
     update
     
     if &filetype == 'haskell'
@@ -32,8 +31,7 @@ function! ExecuteCurrentFile()
     "elseif &filetype == 'java'
     "elseif &filetype == 'cpp'
 
-    " Return to prev win
-    exe winPrev.' wincmd w'
+    call win_gotoid(winPrev)
 endfunction
 
 function! ExecuteInShell(cmd, direction)

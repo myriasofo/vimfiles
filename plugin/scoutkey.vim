@@ -45,6 +45,10 @@ fun! ScoutKey()
         redraw!
     elseif char == 'k'
         exe "normal! \<c-w>k"
+        if &filetype == 'minibufexpl'
+            exe "normal! \<c-w>l"
+            echom "ERROR: Avoid navigating to mbe (bc of fugitive and Gstatus/Gcommit)"
+        endif
         redraw!
     elseif char == 'l'
         exe "normal! \<c-w>j"
