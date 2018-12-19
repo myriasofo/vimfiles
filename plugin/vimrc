@@ -49,47 +49,27 @@
             Plugin 'gmarik/Vundle.vim' "Vundle is required to manage itself
 
         " Get plugins from github
-            " My faves
-            Plugin 'romainl/flattened' "For solarized colorscheme
-            Plugin 'tpope/vim-sleuth' "Critical to handle varying shiftwidths (eg. 4sp vs 2sp)
-            Plugin 'tomtom/tcomment_vim' "Easy commenting
+            " Core (very useful)
             Plugin 'luochen1990/rainbow' "Differentiate parentheses
+            Plugin 'romainl/flattened' "For solarized colorscheme
+            Plugin 'tomtom/tcomment_vim' "Easy commenting
+            Plugin 'tpope/vim-sleuth' "Critical to handle varying shiftwidths (eg. 4sp vs 2sp)
             Plugin 'tpope/vim-surround' "Operations with surround chars, surprisingly useful
-            "Plugin 'rking/ag.vim' "Faster grep, ie. searching thru text of files
-
-            " Could make my own version of
-            Plugin 'xolox/vim-session'
-            Plugin 'xolox/vim-misc'
-
-            " Using my own custom version of below
-            "Plugin 'Lokaltog/vim-easymotion'
-            "Plugin 'techlivezheng/vim-plugin-minibufexpl'
-            "Plugin 'henrik/vim-indexed-search'
-            "Plugin 'Yggdroot/indentLine'
-
-
-            " Fine, but never use
-            "Plugin 'godlygeek/tabular' "Aligns text by char (eg. = or :)
-            "Plugin 'kchmck/vim-coffee-script'
-
-            " Fine, but I don't want
-            "Plugin 'szw/vim-ctrlspace'
-            "Plugin 'severin-lemaignan/vim-minimap' "Not useful
-            "Plugin 'nathanaelkane/vim-indent-guides' "Noisy-looking
-            "Plugin 'raimondi/delimitmate' "Auto add matching parens (so don't forget to)
-            "Plugin 'jeetsukumaran/vim-buffersaurus'
             Plugin 'tpope/vim-fugitive' "I prefer commandline
-            "Plugin 'airblade/vim-gitgutter' "I prefer meld
-            "Plugin 'Shougo/unite.vim'
-            "Plugin 'mhinz/vim-startify' "Startup screen w MRU files and sessions
-            "Plugin 'ntpeters/vim-better-whitespace' "For trailing whitespace
-            "Plugin 'ctrlpvim/ctrlp.vim' "Prefer my own plugins, spacework + navkey
-            "Plugin 'altercation/vim-colors-solarized' "Issues w neovim
-            "Plugin 'icymind/NeoSolarized' "Issues stemming from its autocommand
+
+            " Language-specific
+            Plugin 'tpope/vim-rails'
+            Plugin 'vim-ruby/vim-ruby'
+            Plugin 'mxw/vim-jsx'
+            Plugin 'pangloss/vim-javascript'
+            "Plugin 'kchmck/vim-coffee-script'
+            "Plugin 'neoclide/vim-jsx-improve' "messes up w flowtype
+
+            " Replaceable (want to make my own version of)
+            Plugin 'xolox/vim-misc'
+            Plugin 'xolox/vim-session'
 
             " To try
-            "Plugin 'Valloric/YouCompleteMe'
-            "Plugin 'tpope/vim-abolish' "not needed
             "Plugin 'scrooloose/syntastic'
             "Plugin 'mtscout6/syntastic-local-eslint.vim'
             "Plugin 'gilday/syntastic-local-standard.vim'
@@ -97,12 +77,32 @@
             "Plugin 'tpope/vim-jdaddy' "Does this format json?
             "Plugin 'klen/python-mode'
             "Plugin 'hdima/python-syntax'
-            Plugin 'tpope/vim-rails'
-            Plugin 'vim-ruby/vim-ruby'
-            Plugin 'neoclide/vim-jsx-improve'
-            Plugin 'mxw/vim-jsx'
-            "Plugin 'pangloss/vim-javascript'
-            "Plugin 'mileszs/ack.vim'
+            "Plugin 'Valloric/YouCompleteMe'
+
+            " Meh
+            " Using my own custom version of below
+                "Plugin 'Lokaltog/vim-easymotion'
+                "Plugin 'techlivezheng/vim-plugin-minibufexpl'
+                "Plugin 'henrik/vim-indexed-search'
+                "Plugin 'Yggdroot/indentLine'
+                "Plugin 'mileszs/ack.vim' "For grep
+                "Plugin 'rking/ag.vim' "For grep, unmaintained compared to ack
+
+            " Fine, but not for me
+                "Plugin 'godlygeek/tabular' "Aligns text by char (eg. = or :)
+                "Plugin 'szw/vim-ctrlspace'
+                "Plugin 'ctrlpvim/ctrlp.vim' "Prefer my own plugins, spacework + navkey
+                "Plugin 'severin-lemaignan/vim-minimap' "Not useful
+                "Plugin 'nathanaelkane/vim-indent-guides' "Noisy-looking
+                "Plugin 'raimondi/delimitmate' "Auto add matching parens (so don't forget to)
+                "Plugin 'jeetsukumaran/vim-buffersaurus'
+                "Plugin 'airblade/vim-gitgutter' "I prefer meld
+                "Plugin 'Shougo/unite.vim'
+                "Plugin 'mhinz/vim-startify' "Startup screen w MRU files and sessions
+                "Plugin 'ntpeters/vim-better-whitespace' "For trailing whitespace
+                "Plugin 'altercation/vim-colors-solarized' "Issues w neovim, so use 'flattened' instead
+                "Plugin 'icymind/NeoSolarized' "Issues stemming from its autocommand
+                "Plugin 'tpope/vim-abolish' "not needed
 
         " Vundle end
             call vundle#end()
@@ -254,7 +254,7 @@
 
         " Formatting of indents/tabs
             set expandtab
-            set shiftwidth=2 "overwritten by .py (4) and .to (4)
+            set shiftwidth=2 "overwritten by sleuth
             "set tabstop=4 "Never used
             "set softtabstop=4 "Never used
 
