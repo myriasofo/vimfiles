@@ -689,17 +689,23 @@
 
     " Other
         " For terminal inside of vim
-            function! OpenTerminal()
-                " Purpose: To refresh name in mbe, away from 'NO-NAME'
+            function! OpenTerminal(...)
+                " Choose directory
+                if a:0 == 1
+                  let dirTerminal = a:1 == '%' ? expand('%:p:h') : a:1
+                  execute 'cd '.dirTerminal
+                endif
 
-                let prevWin = win_getid()
                 terminal
-                let termWin = win_getid()
 
-                call win_gotoid(prevWin)
-                call win_gotoid(termWin)
+                if a:0 == 1
+                  cd -
+                endif
+
+                " For mbe to show 'zsh' instead of 'no-name'
+                MagiRefresh
             endfunction
-            command! Terminal call OpenTerminal()
+            command! -nargs=? -complete=dir Terminal call OpenTerminal(<f-args>)
 
             " Use solarized colors for the terminal!
             let g:terminal_ansi_colors = [
