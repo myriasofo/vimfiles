@@ -692,7 +692,7 @@
             function! OpenTerminal(...)
                 " Choose directory
                 if a:0 == 1
-                  let dirTerminal = a:1 == '%' ? expand('%:p:h') : a:1
+                  let dirTerminal = a:1 != expand('%') ? a:1 : expand('%:p:h')
                   execute 'cd '.dirTerminal
                 endif
 

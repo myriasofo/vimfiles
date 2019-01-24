@@ -10,7 +10,7 @@
             return
         endif
 
-        exe "find " . l:filename
+        exe "edit " . l:filename
     endfunction
 
     function! StripWhitespace(string)
