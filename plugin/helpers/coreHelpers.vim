@@ -71,7 +71,7 @@
                 let text = substitute(getline(a:lnum), '^\s*', '', '')
                 return (text[0:2] == 'end')
 
-            elseif &filetype == 'javascript' || &filetype == 'javascript.jsx' 
+            elseif &filetype == 'javascript' || &filetype == 'javascript.jsx'  || &filetype == 'scala'
                 " WHY - cover if/else or chained fctns, plus commenting
                 let text = substitute(getline(a:lnum), '^\s*', '', '')
                 if text[0:1] == '//' || text[0:1] == '/*'
