@@ -422,13 +422,13 @@ endfunction
 
 function! s:isSpecialBuf(bufNum)
     if type(a:bufNum) == 0
-        let a:path = expand('#'.a:bufNum.':p')
+        let path = expand('#'.a:bufNum.':p')
     else
-        let a:path = a:bufNum
+        let path = a:bufNum
     endif
 
     return (
-        \s:hasElement(s:ignoredFiles, fnamemodify(a:path, ':t'))
+        \s:hasElement(s:ignoredFiles, fnamemodify(path, ':t'))
         \|| isdirectory(bufname(a:bufNum))
     \)
 endfunction
