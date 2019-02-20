@@ -215,7 +215,7 @@
             endif
 
             " Turn off mouse (no cheating!)
-            "set mouse =
+            set mouse =
             set guicursor+=a:blinkon0
             set autoread "Auto-update file if changed outside of vim
 
