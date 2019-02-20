@@ -18,6 +18,7 @@ let s:ignoredFiles = [
     \]
 
 let s:decantFiles = [
+    \'list.to',
     \'temp1.to',
     \'temp2.to',
     \]
@@ -25,7 +26,7 @@ let s:decantFiles = [
 let s:mapPaletteFiles = {
     \'stable.to':  'A',
     \'flux.to':    'B',
-    \'list.to':    'C',
+    \'list.to':    '0',
     \'temp1.to':   '1',
     \'temp2.to':   '2',
     \'timeLog.to': 'L',
@@ -255,8 +256,7 @@ function! s:addSpecialBufs2(magiList)
 
     " version 3
     " Minimal. Might be all I need
-    let special = ['temp1.to', 'temp2.to']
-    for tail in special
+    for tail in s:decantFiles
         let path = fnamemodify(g:dir_palettes . tail, ':p')
         if IsBufVisible(path)
             continue
