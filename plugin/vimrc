@@ -158,19 +158,21 @@
                 endif
 
             " File backups + swaps
-                let &backupdir = g:dir_vim . 'backups'
-                if !isdirectory(&backupdir)
-                    call mkdir(&backupdir, "p")
-                endif
-
                 let &directory = g:dir_vim . 'swaps'
                 if !isdirectory(&directory)
                     call mkdir(&directory, "p")
                 endif
 
-                set backupskip=/tmp/*,/private/tmp/*
-                set backup
-                set writebackup
+                set nobackup
+                set nowritebackup
+                "let &backupdir = g:dir_vim . 'backups'
+                "if !isdirectory(&backupdir)
+                "    call mkdir(&backupdir, "p")
+                "endif
+
+                "set backupskip=/tmp/*,/private/tmp/*
+                "set backup
+                "set writebackup
 
         " Disable modeline bc of security reasons
             set nomodeline
