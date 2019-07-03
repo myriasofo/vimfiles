@@ -241,8 +241,8 @@
 
         " Title string
             "set titlestring=\ 
-            set titlestring =%{PrintCurrFolder()}
-            set title
+            "set titlestring =%{PrintCurrFolder()}
+            set notitle
 
         " Dismantle any gui toolbars
             if has('gui_running')
