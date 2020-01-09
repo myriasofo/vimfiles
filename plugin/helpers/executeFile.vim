@@ -90,9 +90,9 @@ endfunction
 
 function! s:executePython()
     try
-        call ExecuteInShell('python3 %', 'right')
+        call ExecuteInShell('python3 -B %', 'right')
     catch
-        call ExecuteInShell('python2 %', 'right')
+        call ExecuteInShell('python2 -B %', 'right')
     endtry
 endfunction
 
@@ -117,3 +117,4 @@ endfunction
 
 "command! -complete=shellcmd -nargs=+ Shell call ExecuteInShell(<q-args>)
 
+  
