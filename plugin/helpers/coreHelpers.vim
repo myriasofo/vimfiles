@@ -216,7 +216,7 @@ endfunction
 
         "syn keyword Type i
         "syn keyword Conditional i
-        syn keyword Function i j
+        syn keyword Function i j k
         "syn keyword Function self
 
     endfun
