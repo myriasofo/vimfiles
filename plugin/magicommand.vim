@@ -348,7 +348,7 @@ function! s:getFileLines(path, nLines)
     if bufloaded(a:path)
         return getbufline(a:path, 0, a:nLines)
     else
-        silent let lines = readfile(a:path, 0, a:nLines)
+        silent! let lines = readfile(a:path, 0, a:nLines)
         return lines
     endif
 endfunction
