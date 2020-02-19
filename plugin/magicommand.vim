@@ -345,7 +345,12 @@ function! s:getLeftPadding(...)
 endfunction
 
 function! s:getFileLines(path, nLines)
-    return bufloaded(a:path) ? getbufline(a:path, 0, a:nLines) : readfile(a:path, 0, a:nLines)
+    if bufloaded(a:path)
+        return getbufline(a:path, 0, a:nLines)
+    else
+        silent let lines = readfile(a:path, 0, a:nLines)
+        return lines
+    endif
 endfunction
 
 function! s:getMagiHotkey(path)
