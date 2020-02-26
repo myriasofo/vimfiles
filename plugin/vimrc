@@ -19,8 +19,11 @@
     " Define core directory paths
         set shellslash
 
+        if !exists('g:dir_notes')
+            let g:dir_notes = expand('~/GoogleDrive/Notes/')
+        endif
+
         let g:dir_vim = expand('~/.vim/')
-        let g:dir_notes = expand('~/GoogleDrive/Notes/')
         let g:dir_palettes = g:dir_notes . '_palettes/'
         let g:dir_dev = expand('~/my/')
         let g:dir_myPlugins = g:dir_dev . 'vimfiles/'
