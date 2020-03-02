@@ -211,8 +211,8 @@
             set wildmenu
             set wildmode=longest:list "To list all options
             set linebreak "Useful for wrapping by words
-            set list
-            set listchars=tab:=-
+            "set list
+            "set listchars=tab:=-
             "set ttyfast
             "set ruler
             if exists("&breakindent") "Only in version >= 8
@@ -261,7 +261,7 @@
         " Formatting of indents/tabs
             set expandtab
             set shiftwidth=2 "overwritten by sleuth
-            "set tabstop=4 "Never used
+            set tabstop=4
             "set softtabstop=4 "Never used
 
             " autoindent is *exactly* what I want: when <CR> in insert mode, matches ind of above
