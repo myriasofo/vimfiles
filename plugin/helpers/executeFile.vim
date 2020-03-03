@@ -21,6 +21,10 @@ function! ExecuteCurrentFile()
     elseif &filetype == 'ruby'
         call s:executeRuby()
 
+    elseif &filetype == 'go'
+        call s:executeGolang()
+
+
     else
         echom 'ScoutKey: Filetype not supported for RunCode()'
     endif
@@ -112,6 +116,10 @@ endfunction
 
 function! s:executeVimscript()
     source %
+endfunction
+
+function! s:executeGolang()
+    call ExecuteInShell('go run %', 'right')
 endfunction
 
 
