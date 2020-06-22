@@ -20,7 +20,8 @@
         set shellslash
 
         if !exists('g:dir_notes')
-            let g:dir_notes = expand('~/Dropbox/Notes/')
+            echom 'NOTE: Please set "g:dir_notes" to valid folder'
+            finish
         endif
 
         let g:dir_vim = expand('~/.vim/')
