@@ -20,7 +20,7 @@
         set shellslash
 
         if !exists('g:dir_notes')
-            let g:dir_notes = expand('~/GoogleDrive/Notes/')
+            let g:dir_notes = expand('~/Dropbox/Notes/')
         endif
 
         let g:dir_vim = expand('~/.vim/')
