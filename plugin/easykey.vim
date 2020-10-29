@@ -88,7 +88,8 @@ fun! EasyKey(modes, nJumpKeys)
         elseif a:modes == 'n'
             " no special behavior for normal mode
         endif
-        call cursor(jumpLine, jumpCol)
+
+        call s:moveCursor(jumpLine, jumpCol)
     endif
 endfun
 
@@ -244,6 +245,17 @@ fun! s:getNextJumpKey()
     return (s:indexJumpKey >= len(s:jumpKeys) ? "" : s:jumpKeys[s:indexJumpKey])
 endfun
 
+fun! s:moveCursor(line, colm)
+    " Needed bc `cursor()` doesnt handle ascii chars properly
+
+    call cursor(a:line, 1)
+
+    if a:colm == 1
+        return
+    endif
+
+    execute "normal! ".(a:colm-1)."l"
+endfun
 
 " Settings
     " Letters for jumpKeys
