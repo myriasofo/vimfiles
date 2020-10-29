@@ -23,7 +23,6 @@ fun! EasyKey(modes, nJumpKeys)
     let firstChange = 0
     let jumpHighlights = []
     call add(jumpHighlights, matchadd("Blackout", '\m\%>0l'))
-    "call add(jumpHighlights, matchadd("Blackout", '\m\%>'.nTop.'l.\%<'.nBot.'l'))
     
     " Insert jumpKeys here
     for lnum in s:getVisibleLines()
@@ -136,8 +135,8 @@ fun! s:insertJumpKeys(moveTo, lnum, charArr, ind, matchDct, jumpHighlights)
             if len(jumpKey) == 1
                 call add(a:jumpHighlights, matchadd("JumpKey_single", '\m\%'.a:lnum.'l\%'.colm.'c'))
             elseif len(jumpKey) == 2
-                call add(a:jumpHighlights, matchadd("JumpKey_double1", '\m\%'.a:lnum.'l\%'.colm.'c'))
-                call add(a:jumpHighlights, matchadd("JumpKey_double2", '\m\%'.a:lnum.'l\%'.(colm+1).'c'))
+                call add(a:jumpHighlights, matchaddpos("JumpKey_double1", [[a:lnum, colm]]))
+                call add(a:jumpHighlights, matchaddpos("JumpKey_double2", [[a:lnum, colm+1]]))
                 let skip = 1
             endif
 
