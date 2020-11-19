@@ -6,6 +6,8 @@ let s:leftPadding = 4
 let s:minimumWidth = 7
 let s:ignoredFiles = [
     \'glas.to',
+    \'spacework.to',
+    \'navkey.to',
     \'stable.to',
     \'flux.to',
     \'list.to',
