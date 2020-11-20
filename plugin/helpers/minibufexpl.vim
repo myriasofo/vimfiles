@@ -1622,13 +1622,11 @@ function! <SID>UpdateBufferNameDict(bufNum,deleted)
 
     " Remove a deleted buffer from the buffer name dictionary
     if a:deleted
-        if has_key(s:bufNameDict, l:bufName)
-            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
-            let l:bufnrs = s:bufNameDict[l:bufName]
+        for key in keys(s:bufNameDict)
+            let l:bufnrs = s:bufNameDict[key]
             call filter(l:bufnrs, 'v:val != '.l:bufNum)
-            let s:bufNameDict[l:bufName] = l:bufnrs
-            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
-        endif
+            let s:bufNameDict[key] = l:bufnrs
+        endfor
         call <SID>DEBUG('Leaving UpdateBufferNameDict()',10)
         return
     endif
