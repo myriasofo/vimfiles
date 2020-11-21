@@ -82,6 +82,9 @@
             "Plugin 'klen/python-mode'
             "Plugin 'hdima/python-syntax'
             "Plugin 'Valloric/YouCompleteMe'
+            Plugin 'jmcantrell/vim-virtualenv'
+            Plugin 'tyru/open-browser-github.vim'
+            Plugin 'tyru/open-browser.vim'
 
             " Meh
             " Using my own custom version of below
@@ -1039,5 +1042,24 @@
     endfun
 
     "map ? glMrl
+
+
+" For py virtual env
+    let g:virtualenv_auto_activate = 0
+
+    function! ActivatePythonVirtualEnv()
+        let g:virtualenv_directory = getcwd()
+        VirtualEnvActivate .venv
+    endfunction
+
+    command! VENV call ActivatePythonVirtualEnv()
+
+" For open file in github
+    let g:openbrowser_github_always_used_branch = 'master'
+    let g:openbrowser_github_select_current_line = 1
+
+
+" allows me to get py libraries in my shell
+"set shellcmdflag=-ic
 
 
