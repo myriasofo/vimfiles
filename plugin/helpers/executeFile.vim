@@ -119,34 +119,47 @@ endfunction
   
 let s:output_bufname = 'abe_shell'
 let s:start_time = 0
+let g:async_jobs = []
 
 function! s:runInShell(cmd)
+    write
     let s:start_time = localtime()
-
     let l:arguments = [&shell, &shellcmdflag, a:cmd]
-    call job_start(l:arguments, s:getShellOptions())
 
+    let l:job = job_start(l:arguments, s:getShellOptions())
+
+    call add(g:async_jobs, l:job)
     call s:setBufferForShellOutput()
 endfunction
 
 function! s:getShellOptions()
     let opts = {}
     let opts.close_cb = function('s:shellCloseHandler')
-    "let opts.callback = function('s:messageHandler')
     let opts.callback = {channel, msg -> appendbufline(s:output_bufname, '$', msg) }
-    ""let opts.term_kill = 'term'
+    "let opts.term_kill = 'term'
     "let opts.vertical = 'belowright'
-    ""let opts.norestore = 1
-    ""let opts.term_finish = 'open'
-    "call term_start(c, opts)
-    "let l:options['in_mode'] = 'nl'
+    "let opts.norestore = 1
+    "let opts.term_finish = 'open'
+    "let opts.in_mode = 'nl'
     return opts
 endfunction
 
 function! s:shellCloseHandler(channel)
-    let duration = localtime() - s:start_time
+    let l:duration = localtime() - s:start_time
+    let l:interval = 'seconds'
+    if l:duration > 60
+        let l:duration /= 60.0
+        let l:duration = round(l:duration * 100) / 100
+        let l:interval = 'minute(s)'
+        !python3 ~/my/dotfiles/utils/slackit.py 'vim py'
+    endif
     call appendbufline(s:output_bufname, '$', '')
-    call appendbufline(s:output_bufname, '$', '[[Finished in '.l:duration.' seconds]]')
+    call appendbufline(s:output_bufname, '$', '[[Finished in '.string(l:duration).' '.l:interval.']]')
+
+    if len(g:async_jobs) == 0
+        call appendbufline(s:output_bufname, '$', '[[Note: job was killed]]')
+    endif
+    let g:async_jobs = []
 endfunction!
 
 function! s:setBufferForShellOutput()
@@ -190,4 +203,17 @@ endfunction
 function! s:executePython()
     call s:runInShell(s:getPythonCommand())
 endfunction
+
+
+function! StopJob()
+    for l:job in g:async_jobs
+        echom 'Stopping job: '.l:job
+        call job_stop(l:job)
+    endfor
+
+    let g:async_jobs = []
+endfunction
+
+command! StopJob call StopJob()
+
 
