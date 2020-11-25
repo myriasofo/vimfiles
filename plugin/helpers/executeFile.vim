@@ -176,13 +176,13 @@ function! s:getPythonCommand()
     " Source venv, if possible
     let l:venv_file = getcwd().'/.venv/bin/activate'
     if filereadable(l:venv_file)
-        let l:cmd .= 'source '.l:venv_file
+        let l:cmd .= 'source '.l:venv_file.' && '
     endif
 
     " Add current file
     let l:current_filename = expand('%:p')
     let l:cmd_to_run_python = 'python3 -B '.l:current_filename
-    let l:cmd .= ' && '.l:cmd_to_run_python
+    let l:cmd .= l:cmd_to_run_python
 
     return l:cmd
 endfunction
