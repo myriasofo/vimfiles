@@ -82,7 +82,7 @@
             "Plugin 'klen/python-mode'
             "Plugin 'hdima/python-syntax'
             "Plugin 'Valloric/YouCompleteMe'
-            Plugin 'jmcantrell/vim-virtualenv'
+            "Plugin 'jmcantrell/vim-virtualenv'
             Plugin 'tyru/open-browser-github.vim'
             Plugin 'tyru/open-browser.vim'
 
@@ -441,6 +441,10 @@
         let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
         let g:ctrlp_by_filename = 1
 
+    " For opening files in github
+        let g:openbrowser_github_always_used_branch = 'master'
+        let g:openbrowser_github_select_current_line = 1
+
     " Other
         "let g:loaded_matchparen = 1
         let g:matchparen_timeout = 10
@@ -798,6 +802,10 @@
             vnoremap sf; $
             vnoremap sfj ^
 
+        " To hide gvim's menu (to remove keyboard shortcuts that overlap w my custom hotkeys)
+            aunmenu *
+            tlunmenu *
+
 "| 4. Setup auto-commands
     if !exists("g:loadOnce_onFirstSource")
         let g:loadOnce_onFirstSource = 1
@@ -919,155 +927,5 @@
     endif
 
 
-" Stuff I'm trying out
-    " Keys for navigating marks
-        "noremap hs mH
-        "noremap hd `H
-        noremap hs :call SetMark()<cr>
-        noremap hd :call JumpToMark()<cr>
-        noremap ha <c-o>
-        noremap hf <c-i>
-        "noremap hg :call JumpReset()<cr>
-        "fun! JumpReset()
-        "    normal! <C-I>
-        "endfun
-        "TODO - simply press <c-i> 10 times (hackish = close enough)
-        fun! SetMark()
-            normal! mH
-            echom "Custom mark was set"
-        endfun
-        fun! JumpToMark()
-            normal! `H
-            echom "Jumped to mark"
-        endfun
+" Inbox
 
-    " Jump to fold?
-        "map p :call JumpToFold(1)<cr>
-        "map P :call JumpToFold(-1)<cr>
-        fun! JumpToFold(direction)
-            let nCurr = GetFoldBounds('.', a:direction)
-            let nBound = (a:direction == 1 ? line('$') : 1)
-            if nCurr == nBound
-                return
-            endif
-
-            let i = nCurr + a:direction
-            while !IsFolded(i) && i != nBound
-                let i += a:direction
-            endwhile
-            call cursor(i, 0)
-        endfun
-
-    " Tab is never used in normal mode (!!!)
-        noremap <tab> v
-
-    " Open terminal in vim? open mac explorer?
-        "!open -a Terminal.app .
-        "NOTE - Don't need to open terminal bc can do all bash in vim!
-
-        command! FileExplorer call OpenExplorer()
-        fun! OpenExplorer()
-            if g:os == 'windows'
-                !start explorer .
-                "!start explorer /select,%:p
-            elseif has('unix')
-                !open .
-            endif
-        endfun
-
-    " TODO: figure out why I had this
-        "set viewoptions =folds
-
-    fun! FindNextIndentError()
-        " Todo - Doesn't handle folding. Not worth it
-
-        let nStart = line('.')
-        let EOF = line('$')
-        let firstFound = 0
-        let numFound = 0
-
-        if nStart == EOF
-            return
-        endif
-
-        for i in range(nStart+1, EOF-1)
-            if IsBlank(i)
-                continue
-            endif
-
-            " Grab data on this line
-            let nCurr = i
-            let nNext = nextnonblank(i+1)
-            if nNext == 0
-                break
-            endif
-            let indCurr = indent(i)
-            let indNext = indent(nNext)
-            let indDiff = indNext - indCurr
-
-            if (indCurr % &shiftwidth != 0)
-                let firstFound = (!firstFound ? nCurr : firstFound)
-                let numFound += 1
-
-            elseif indDiff > &shiftwidth
-                let firstFound = (!firstFound ? nNext : firstFound)
-                let numFound += 1
-
-            elseif indDiff < -&shiftwidth
-                let nPrev = prevnonblank(i-1)
-                let textPrev = getline(nPrev)
-                if match(textPrev, '^\s\+\(if\|else\|for\|} else\)') == -1 || textPrev[-1:] == '{'
-                    if textPrev[-1:] != ':'
-                        let firstFound = (!firstFound ? nNext : firstFound)
-                        let numFound += 1
-                    endif
-                endif
-            endif
-        endfor
-
-        call cursor(firstFound, 0)
-        echom "Ind errors remaining: " . numFound
-    endfun
-
-    fun! ClearAllUndoHistory()
-        let old_undolevels = &undolevels
-        let old_modified = &modified
-
-        set undolevels=-1
-        call setline(line('.'), getline('.'))
-
-        let &undolevels = old_undolevels
-        let &modified = old_modified
-        unlet old_undolevels
-        unlet old_modified
-    endfun
-
-    "map ? glMrl
-
-
-" For py virtual env
-    let g:virtualenv_auto_activate = 0
-
-    function! ActivatePythonVirtualEnv()
-        let g:virtualenv_directory = getcwd()
-        VirtualEnvActivate .venv
-    endfunction
-
-    command! VENV call ActivatePythonVirtualEnv()
-
-" For open file in github
-    let g:openbrowser_github_always_used_branch = 'master'
-    let g:openbrowser_github_select_current_line = 1
-
-
-" allows me to get py libraries in my shell
-"set shellcmdflag=-ic
-
-
-" Completely hide menu for gvim (gets rid of keyboard shortcuts that overlap w my custom hotkeys)
-function DelayedSetVariables(timer)
-    aunmenu *
-    tlunmenu *
-endfunction
-call timer_start(1000,'DelayedSetVariables')
-call timer_start(3000,'DelayedSetVariables')

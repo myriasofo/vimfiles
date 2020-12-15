@@ -152,6 +152,120 @@ finish
                 endfun
         endif
 
+    " TODO: figure out why I had this
+        "set viewoptions =folds
+    " For py virtual env
+        let g:virtualenv_auto_activate = 0
+
+        function! ActivatePythonVirtualEnv()
+            let g:virtualenv_directory = getcwd()
+            VirtualEnvActivate .venv
+        endfunction
+
+        command! VENV call ActivatePythonVirtualEnv()
+
+    " Jump to fold?
+        "map p :call JumpToFold(1)<cr>
+        "map P :call JumpToFold(-1)<cr>
+        fun! JumpToFold(direction)
+            let nCurr = GetFoldBounds('.', a:direction)
+            let nBound = (a:direction == 1 ? line('$') : 1)
+            if nCurr == nBound
+                return
+            endif
+
+            let i = nCurr + a:direction
+            while !IsFolded(i) && i != nBound
+                let i += a:direction
+            endwhile
+            call cursor(i, 0)
+        endfun
+
+    " Keys for navigating marks
+        "noremap hs mH
+        "noremap hd `H
+        noremap hs :call SetMark()<cr>
+        noremap hd :call JumpToMark()<cr>
+        noremap ha <c-o>
+        noremap hf <c-i>
+        "noremap hg :call JumpReset()<cr>
+        "fun! JumpReset()
+        "    normal! <C-I>
+        "endfun
+        "TODO - simply press <c-i> 10 times (hackish = close enough)
+        fun! SetMark()
+            normal! mH
+            echom "Custom mark was set"
+        endfun
+        fun! JumpToMark()
+            normal! `H
+            echom "Jumped to mark"
+        endfun
+
+    fun! FindNextIndentError()
+        " Todo - Doesn't handle folding. Not worth it
+
+        let nStart = line('.')
+        let EOF = line('$')
+        let firstFound = 0
+        let numFound = 0
+
+        if nStart == EOF
+            return
+        endif
+
+        for i in range(nStart+1, EOF-1)
+            if IsBlank(i)
+                continue
+            endif
+
+            " Grab data on this line
+            let nCurr = i
+            let nNext = nextnonblank(i+1)
+            if nNext == 0
+                break
+            endif
+            let indCurr = indent(i)
+            let indNext = indent(nNext)
+            let indDiff = indNext - indCurr
+
+            if (indCurr % &shiftwidth != 0)
+                let firstFound = (!firstFound ? nCurr : firstFound)
+                let numFound += 1
+
+            elseif indDiff > &shiftwidth
+                let firstFound = (!firstFound ? nNext : firstFound)
+                let numFound += 1
+
+            elseif indDiff < -&shiftwidth
+                let nPrev = prevnonblank(i-1)
+                let textPrev = getline(nPrev)
+                if match(textPrev, '^\s\+\(if\|else\|for\|} else\)') == -1 || textPrev[-1:] == '{'
+                    if textPrev[-1:] != ':'
+                        let firstFound = (!firstFound ? nNext : firstFound)
+                        let numFound += 1
+                    endif
+                endif
+            endif
+        endfor
+
+        call cursor(firstFound, 0)
+        echom "Ind errors remaining: " . numFound
+    endfun
+
+    fun! ClearAllUndoHistory()
+        let old_undolevels = &undolevels
+        let old_modified = &modified
+
+        set undolevels=-1
+        call setline(line('.'), getline('.'))
+
+        let &undolevels = old_undolevels
+        let &modified = old_modified
+        unlet old_undolevels
+        unlet old_modified
+    endfun
+
 " Totally useless
     " Figuring out ctrlp options
         " Do not clear filenames cache, to improve CtrlP startup
