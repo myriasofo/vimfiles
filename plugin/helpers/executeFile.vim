@@ -119,7 +119,7 @@ endfunction
   
 let s:output_bufname = 'abe_shell'
 let s:start_time = 0
-let g:async_jobs = []
+let s:async_jobs = []
 
 " For async shell: Main
 function! s:runInShell(cmd)
@@ -136,7 +136,7 @@ function! s:runInShell(cmd)
     let s:start_time = localtime()
     let l:arguments = [&shell, &shellcmdflag, a:cmd]
     let l:job = job_start(l:arguments, s:getShellOptions())
-    call add(g:async_jobs, l:job)
+    call add(s:async_jobs, l:job)
 endfunction
 
 function! s:getShellOptions()
@@ -176,7 +176,7 @@ function! s:shellCloseHandler(channel)
         call appendbufline(s:output_bufname, '$', '[[Note: job was killed]]')
     endif
 
-    let g:async_jobs = []
+    let s:async_jobs = []
 
     if l:at_eof
         call s:scrollShellToBottom()
@@ -259,7 +259,7 @@ endfunction
 
 # For async shell: Helper functions
 function! s:isAsyncJobRunning()
-    return len(g:async_jobs) != 0
+    return len(s:async_jobs) != 0
 endfunction
 
 function! s:isShellVisible()
@@ -307,12 +307,12 @@ endfunction
 
 
 function! StopJob()
-    for l:job in g:async_jobs
+    for l:job in s:async_jobs
         echom 'Stopping job: '.l:job
         call job_stop(l:job)
     endfor
 
-    let g:async_jobs = []
+    let s:async_jobs = []
 endfunction
 
 command! StopJob call StopJob()
