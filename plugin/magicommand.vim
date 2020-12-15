@@ -461,7 +461,7 @@ endfun
 function! MagiRemoveBuffer(key)
     if has_key(s:hotkeysToBufPaths, a:key)
         let filePath = s:hotkeysToBufPaths[a:key]
-        exe 'bd ' . filePath
+        exe 'bwipeout ' . filePath
         return
     endif
 
