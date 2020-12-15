@@ -123,23 +123,23 @@ let g:async_jobs = []
 
 " For all async shell commands
 function! s:runInShell(cmd)
-    "If another job is running, but shell's not visible, show shell (but dont run another job)
-    if len(g:async_jobs) != 0
-        if bufwinid(s:output_bufname) == -1
-            call s:setBufferForShellOutput()
+    " Error if another async job is running
+    if s:isAsyncJobRunning()
+        if !s:isShellVisible()
+            call s:showShellOutput()
         end
         echom "ERROR: Another job is already running"
         return
     endif
-    call s:setBufferForShellOutput()
-    
 
+    " Show shell
+    call s:showShellOutput()
+
+    " Start async job
     write
     let s:start_time = localtime()
     let l:arguments = [&shell, &shellcmdflag, a:cmd]
-
     let l:job = job_start(l:arguments, s:getShellOptions())
-
     call add(g:async_jobs, l:job)
 endfunction
 
@@ -156,7 +156,7 @@ function! s:getShellOptions()
 endfunction
 
 function! s:shellMessageHandler(channel, msg)
-    if bufnr(s:output_bufname) == -1
+    if !s:isShellBufferExists()
         return
     endif
     
@@ -201,10 +201,10 @@ function! s:shellCloseHandler(channel)
     end
 endfunction!
 
-function! s:setBufferForShellOutput()
+function! s:showShellOutput()
     let l:currWinId = win_getid()
 
-    if bufwinid(s:output_bufname) == -1
+    if !s:isShellVisible()
         silent exe 'vertical botright new '.s:output_bufname
         call setbufvar(s:output_bufname, '&foldenable', 0)
         call setbufvar(s:output_bufname, '&buftype', 'nofile')
@@ -225,6 +225,18 @@ function! s:setBufferForShellOutput()
     endif
 
     call win_gotoid(l:currWinId)
+endfunction
+
+function! s:isAsyncJobRunning()
+    return len(g:async_jobs) != 0
+endfunction
+
+function! s:isShellVisible()
+    return bufwinid(s:output_bufname) != -1
+endfunction
+
+function! s:isShellBufferExists()
+    return bufnr(s:output_bufname) != -1
 endfunction
 
 

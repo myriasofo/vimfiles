@@ -17,6 +17,7 @@ let s:ignoredFiles = [
     \'journal.to',
     \'timeLog.to',
     \'vimrc',
+    \'abe_shell',
     \]
 
 let s:decantFiles = [
