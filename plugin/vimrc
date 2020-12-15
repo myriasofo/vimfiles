@@ -1064,3 +1064,10 @@
 "set shellcmdflag=-ic
 
 
+" Completely hide menu for gvim (gets rid of keyboard shortcuts that overlap w my custom hotkeys)
+function DelayedSetVariables(timer)
+    aunmenu *
+    tlunmenu *
+endfunction
+call timer_start(1000,'DelayedSetVariables')
+call timer_start(3000,'DelayedSetVariables')
