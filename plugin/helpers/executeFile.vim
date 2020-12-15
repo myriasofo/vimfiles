@@ -122,6 +122,17 @@ let s:start_time = 0
 let g:async_jobs = []
 
 function! s:runInShell(cmd)
+    "If another job is running, but shell's not visible, show shell (but dont run another job)
+    if len(g:async_jobs) != 0
+        if bufwinid(s:output_bufname) == -1
+            call s:setBufferForShellOutput()
+        end
+        echom "ERROR: Another job is already running"
+        return
+    endif
+    call s:setBufferForShellOutput()
+    
+
     write
     let s:start_time = localtime()
     let l:arguments = [&shell, &shellcmdflag, a:cmd]
@@ -129,19 +140,26 @@ function! s:runInShell(cmd)
     let l:job = job_start(l:arguments, s:getShellOptions())
 
     call add(g:async_jobs, l:job)
-    call s:setBufferForShellOutput()
 endfunction
 
 function! s:getShellOptions()
     let opts = {}
     let opts.close_cb = function('s:shellCloseHandler')
-    let opts.callback = {channel, msg -> appendbufline(s:output_bufname, '$', msg) }
+    let opts.callback = function('s:shellMessageHandler')
     "let opts.term_kill = 'term'
     "let opts.vertical = 'belowright'
     "let opts.norestore = 1
     "let opts.term_finish = 'open'
     "let opts.in_mode = 'nl'
     return opts
+endfunction
+
+function! s:shellMessageHandler(channel, msg)
+    if bufnr(s:output_bufname) == -1
+        return
+    endif
+    
+    call appendbufline(s:output_bufname, '$', a:msg)
 endfunction
 
 function! s:shellCloseHandler(channel)
@@ -165,19 +183,23 @@ endfunction!
 function! s:setBufferForShellOutput()
     let l:currWinId = win_getid()
 
-    if bufnr(s:output_bufname) == -1
-        exe 'vertical botright new '.s:output_bufname
+    if bufwinid(s:output_bufname) == -1
+        silent exe 'vertical botright new '.s:output_bufname
         call setbufvar(s:output_bufname, '&foldenable', 0)
         call setbufvar(s:output_bufname, '&buftype', 'nofile')
         call setbufvar(s:output_bufname, '&swapfile', 0)
-        call setbufvar(s:output_bufname, '&buflisted', 0)
-        call setbufvar(s:output_bufname, '&bufhidden', 'wipe')
-        "call setbufvar(s:output_bufname, '&relativenumber', 0)
+        "call setbufvar(s:output_bufname, '&buflisted', 0)
+        "call setbufvar(s:output_bufname, '&bufhidden', 'wipe')
+        call setbufvar(s:output_bufname, '&bufhidden', 'hide')
     end
 
-    call deletebufline(s:output_bufname, 1, '$')
-    call appendbufline(s:output_bufname, '$', '[[Initiated]]')
-    call appendbufline(s:output_bufname, '$', '')
+    if len(g:async_jobs) == 0
+        call deletebufline(s:output_bufname, 1, '$')
+
+        call appendbufline(s:output_bufname, '$', '[[Initiated]]')
+        call appendbufline(s:output_bufname, '$', '')
+        call cursor('$', 0)
+    endif
 
     call win_gotoid(l:currWinId)
 endfunction
