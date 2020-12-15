@@ -121,6 +121,7 @@ let s:output_bufname = 'abe_shell'
 let s:start_time = 0
 let g:async_jobs = []
 
+" For all async shell commands
 function! s:runInShell(cmd)
     "If another job is running, but shell's not visible, show shell (but dont run another job)
     if len(g:async_jobs) != 0
@@ -159,10 +160,24 @@ function! s:shellMessageHandler(channel, msg)
         return
     endif
     
+    " for scroll later
+    let l:win_id = bufwinid(s:output_bufname)
+    let l:at_eof = line('$', l:win_id) == line('.', l:win_id)
+
     call appendbufline(s:output_bufname, '$', a:msg)
+
+    " scroll to bottom
+    if l:at_eof
+        call win_execute(l:win_id, 'call cursor("$", 0) | redraw')
+    end
 endfunction
 
 function! s:shellCloseHandler(channel)
+    " for scroll later
+    let l:win_id = bufwinid(s:output_bufname)
+    let l:at_eof = (line('$', l:win_id) == line('.', l:win_id))
+
+    " timer
     let l:duration = localtime() - s:start_time
     let l:interval = 'seconds'
     if l:duration > 60
@@ -174,10 +189,16 @@ function! s:shellCloseHandler(channel)
     call appendbufline(s:output_bufname, '$', '')
     call appendbufline(s:output_bufname, '$', '[[Finished in '.string(l:duration).' '.l:interval.']]')
 
+    " job was killed
     if len(g:async_jobs) == 0
         call appendbufline(s:output_bufname, '$', '[[Note: job was killed]]')
     endif
     let g:async_jobs = []
+
+    " scroll to bottom
+    if l:at_eof
+        call win_execute(l:win_id, 'call cursor("$", 0) | redraw')
+    end
 endfunction!
 
 function! s:setBufferForShellOutput()
@@ -205,6 +226,7 @@ function! s:setBufferForShellOutput()
 endfunction
 
 
+" For specificallly running python in shell
 function! s:getPythonCommand()
     let l:cmd = ''
 
