@@ -121,19 +121,15 @@ let s:output_bufname = 'abe_shell'
 let s:start_time = 0
 let g:async_jobs = []
 
-" For all async shell commands
+" For async shell: Main
 function! s:runInShell(cmd)
+    call s:manageShellOutput()
+
     " Error if another async job is running
     if s:isAsyncJobRunning()
-        if !s:isShellVisible()
-            call s:showShellOutput()
-        end
         echom "ERROR: Another job is already running"
         return
     endif
-
-    " Show shell
-    call s:showShellOutput()
 
     " Start async job
     write
@@ -160,83 +156,130 @@ function! s:shellMessageHandler(channel, msg)
         return
     endif
     
-    " for scroll later
-    let l:win_id = bufwinid(s:output_bufname)
-    let l:at_eof = line('$', l:win_id) == line('.', l:win_id)
+    " for whether to scroll
+    let l:at_eof = s:isShellScrollAtEof()
 
     call appendbufline(s:output_bufname, '$', a:msg)
 
-    " scroll to bottom
     if l:at_eof
-        call win_execute(l:win_id, 'call cursor("$", 0) | redraw')
+        call s:scrollShellToBottom()
     end
 endfunction
 
 function! s:shellCloseHandler(channel)
-    " for scroll later
-    let l:win_id = bufwinid(s:output_bufname)
-    let l:at_eof = (line('$', l:win_id) == line('.', l:win_id))
+    " for whether to scroll
+    let l:at_eof = s:isShellScrollAtEof()
 
-    " timer
+    call s:reportTiming()
+
+    if !s:isAsyncJobRunning()
+        call appendbufline(s:output_bufname, '$', '[[Note: job was killed]]')
+    endif
+
+    let g:async_jobs = []
+
+    if l:at_eof
+        call s:scrollShellToBottom()
+    end
+endfunction!
+
+function! s:reportTiming()
     let l:duration = localtime() - s:start_time
     let l:interval = 'seconds'
+
     if l:duration > 60
         let l:duration /= 60.0
         let l:duration = round(l:duration * 100) / 100
         let l:interval = 'minute(s)'
+    endif
+
+    if l:duration > 60 || !s:isShellVisible()
         !python3 ~/my/dotfiles/utils/slackit.py 'vim py'
     endif
+
     call appendbufline(s:output_bufname, '$', '')
     call appendbufline(s:output_bufname, '$', '[[Finished in '.string(l:duration).' '.l:interval.']]')
-
-    " job was killed
-    if len(g:async_jobs) == 0
-        call appendbufline(s:output_bufname, '$', '[[Note: job was killed]]')
-    endif
-    let g:async_jobs = []
-
-    " scroll to bottom
-    if l:at_eof
-        call win_execute(l:win_id, 'call cursor("$", 0) | redraw')
-    end
-endfunction!
-
-function! s:showShellOutput()
-    let l:currWinId = win_getid()
-
-    if !s:isShellVisible()
-        silent exe 'vertical botright new '.s:output_bufname
-        call setbufvar(s:output_bufname, '&foldenable', 0)
-        call setbufvar(s:output_bufname, '&buftype', 'nofile')
-        call setbufvar(s:output_bufname, '&swapfile', 0)
-        "call setbufvar(s:output_bufname, '&buflisted', 0)
-        "call setbufvar(s:output_bufname, '&bufhidden', 'wipe')
-        call setbufvar(s:output_bufname, '&bufhidden', 'hide')
-    end
-
-    if len(g:async_jobs) == 0
-        call deletebufline(s:output_bufname, 1, '$')
-
-        call appendbufline(s:output_bufname, '$', '[[Initiated]]')
-        call appendbufline(s:output_bufname, '$', '')
-
-        let l:win_id = bufwinid(s:output_bufname)
-        call win_execute(l:win_id, 'call cursor("$", 0) | redraw')
-    endif
-
-    call win_gotoid(l:currWinId)
 endfunction
 
+function! s:manageShellOutput()
+    " 1 if shell is not visible
+        " 1A if no job => show shell + clean output
+        " 1B if job is running => show shell
+    " 2 if shell is visible (assume buffer exists)
+        " 2A if no job => clean output
+        " 2B if job is running => do nothing
+
+    " For 1A + 1B
+    call s:showShellOutput()
+
+    " For 1A + 2A
+    call s:cleanShellOutput()
+endfunction
+
+function! s:showShellOutput()
+    if s:isShellVisible()
+        return
+    endif
+
+    " Create buf
+    if !s:isShellBufferExists()
+        call bufadd(s:output_bufname)
+        call bufload(s:output_bufname)
+    endif
+
+    " Load buf into win
+    let l:currWinId = win_getid()
+    silent exe 'vertical botright sbuffer '.s:output_bufname
+    call win_gotoid(l:currWinId)
+
+    " Settings for this special buffer
+    call setbufvar(s:output_bufname, '&buftype', 'nofile')
+    call setbufvar(s:output_bufname, '&swapfile', 0)
+    call setbufvar(s:output_bufname, '&foldlevel', 99)
+    "call setbufvar(s:output_bufname, '&foldenable', 0)
+    "call setbufvar(s:output_bufname, '&foldlevel', 99)
+    "call setbufvar(s:output_bufname, '&buflisted', 0)
+    "call setbufvar(s:output_bufname, '&bufhidden', 'wipe')
+    "call setbufvar(s:output_bufname, '&bufhidden', 'hide')
+endfunction
+
+function! s:cleanShellOutput()
+    if s:isAsyncJobRunning()
+        return
+    endif
+
+    call deletebufline(s:output_bufname, 1, '$')
+
+    call appendbufline(s:output_bufname, '$', '[[Initiated]]')
+    call appendbufline(s:output_bufname, '$', '')
+
+    call s:scrollShellToBottom()
+endfunction
+
+
+# For async shell: Helper functions
 function! s:isAsyncJobRunning()
     return len(g:async_jobs) != 0
 endfunction
 
 function! s:isShellVisible()
-    return bufwinid(s:output_bufname) != -1
+    return s:getShellWinId() != -1
 endfunction
 
 function! s:isShellBufferExists()
     return bufnr(s:output_bufname) != -1
+endfunction
+
+function! s:getShellWinId()
+    return bufwinid(s:output_bufname)
+endfunction
+
+function! s:scrollShellToBottom()
+    call win_execute(s:getShellWinId(), 'call cursor("$", 0) | redraw')
+endfunction
+
+function! s:isShellScrollAtEof()
+    return (line('.', s:getShellWinId()) == line('$', s:getShellWinId()))
 endfunction
 
 
@@ -273,5 +316,4 @@ function! StopJob()
 endfunction
 
 command! StopJob call StopJob()
-
 
