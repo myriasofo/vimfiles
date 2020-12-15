@@ -756,12 +756,13 @@
             noremap hj :wall <bar> MagiRefresh<cr>
             nnoremap qw :xa<cr>
             nnoremap qu :call UnloadCurrentBuffer()<cr>
-            nnoremap qy :MBEbd! <cr>
+            nnoremap qy :bd! <cr>
             nnoremap <silent> qi :call QuitBuffer()<cr>
 
             function! UnloadCurrentBuffer()
                 update
-                MBEbd
+                "MBEbd #doesnt work anymore?
+                bd
             endfunction
 
             function! QuitBuffer()
