@@ -219,7 +219,9 @@ function! s:setBufferForShellOutput()
 
         call appendbufline(s:output_bufname, '$', '[[Initiated]]')
         call appendbufline(s:output_bufname, '$', '')
-        call cursor('$', 0)
+
+        let l:win_id = bufwinid(s:output_bufname)
+        call win_execute(l:win_id, 'call cursor("$", 0) | redraw')
     endif
 
     call win_gotoid(l:currWinId)
