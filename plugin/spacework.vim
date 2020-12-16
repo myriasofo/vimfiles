@@ -259,7 +259,7 @@ endfun
     fun! s:setConfig(config)
         "Should unload config *before* writing to it
         if buflisted(g:Spacework_configLocation) 
-            exe "MBEbun " g:Spacework_configLocation
+            exe "bunload " g:Spacework_configLocation
         endif
 
         call writefile(a:config, g:Spacework_configLocation)

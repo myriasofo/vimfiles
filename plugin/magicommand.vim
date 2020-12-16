@@ -422,7 +422,7 @@ endfunction
 
 function! s:saveGlasConfig(config)
     if buflisted(s:glasConfigLocation) 
-        exe "MBEbun " s:glasConfigLocation
+        exe "bunload " s:glasConfigLocation
     endif
 
     call writefile(a:config, s:glasConfigLocation)
