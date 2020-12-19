@@ -253,18 +253,6 @@ finish
         echom "Ind errors remaining: " . numFound
     endfun
 
-    fun! ClearAllUndoHistory()
-        let old_undolevels = &undolevels
-        let old_modified = &modified
-
-        set undolevels=-1
-        call setline(line('.'), getline('.'))
-
-        let &undolevels = old_undolevels
-        let &modified = old_modified
-        unlet old_undolevels
-        unlet old_modified
-    endfun
 
 " Totally useless
     " Figuring out ctrlp options
