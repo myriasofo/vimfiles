@@ -34,8 +34,8 @@ fun! ScoutKey()
         "CtrlPBookmarkDir
 
 
-    elseif char == 'h'
-        call LoadFile(g:dir_palettes . 'stable.to')
+    "elseif char == 'h'
+    "    call LoadFile(g:dir_palettes . 'A.to')
     elseif char == 'j'
         exe "normal! \<c-w>h"
         if &filetype == 'minibufexpl'
@@ -61,16 +61,14 @@ fun! ScoutKey()
 
 
     elseif char == 'n'
-        "call SetupWorkspace(g:dir_palettes.'list.to', g:dir_palettes.'temp1.to')
-        call LoadFile(g:dir_palettes . 'flux.to')
+        call LoadFile(g:dir_palettes . 'A.to')
     elseif char == 'm'
-        call LoadFile(g:dir_palettes . 'list.to')
+        call LoadFile(g:dir_palettes . '0.to')
     elseif char == ','
-        call LoadFile(g:dir_palettes . 'temp1.to')
+        call LoadFile(g:dir_palettes . '1.to')
     elseif char == '.'
-        call LoadFile(g:dir_palettes . 'temp2.to')
+        call LoadFile(g:dir_palettes . '2.to')
     elseif char == '/'
-        "call SetupWorkspace(g:dir_palettes.'temp1.to', g:dir_palettes.'temp2.to')
         call LoadFile(g:dir_notes . '_specials/timeLog.to')
 
 

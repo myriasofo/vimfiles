@@ -8,11 +8,10 @@ let s:ignoredFiles = [
     \'glas.to',
     \'spacework.to',
     \'navkey.to',
-    \'stable.to',
-    \'flux.to',
-    \'list.to',
-    \'temp1.to',
-    \'temp2.to',
+    \'A.to',
+    \'0.to',
+    \'1.to',
+    \'2.to',
     \
     \'journal.to',
     \'timeLog.to',
@@ -21,17 +20,15 @@ let s:ignoredFiles = [
     \]
 
 let s:decantFiles = [
-    \'list.to',
-    \'temp1.to',
-    \'temp2.to',
+    \'1.to',
+    \'2.to',
     \]
 
 let s:mapPaletteFiles = {
-    \'stable.to':  'A',
-    \'flux.to':    'B',
-    \'list.to':    '0',
-    \'temp1.to':   '1',
-    \'temp2.to':   '2',
+    \'A.to':       'A',
+    \'0.to':       '0',
+    \'1.to':       '1',
+    \'2.to':       '2',
     \'timeLog.to': 'L',
     \}
 
@@ -233,7 +230,6 @@ endfunction
 
 function! s:addSpecialBufs2(magiList)
     " version 1
-    "let special = ['flux.to', 'list.to', 'temp1.to', 'temp2.to']
     "for tail in special
     "  let path = fnamemodify(g:dir_palettes . tail, ':p')
     "  call add(a:magiList, s:createStub(path, tail))
@@ -242,8 +238,6 @@ function! s:addSpecialBufs2(magiList)
 
     " version 2
     " Hard to tell what's going on
-    "let special = ['temp1.to', 'temp2.to', 'flux.to', 'list.to']
-    "let tempFiles = {'temp1.to': 1, 'temp2.to': 2}
     "for tail in special
     "  let path = fnamemodify(g:dir_palettes . tail, ':p')
     "

@@ -548,10 +548,7 @@ function! <SID>RenderSyntax()
 
     "syn match MBE_Active '\v^\s\s\s\*.*'
 
-    "syn match MBE_Hidden '    temp2.to'
-    "syn match MBE_Hidden '    list.to'
     "syn match MBE_Hidden '\v^\s+\d+.*'
-    "syn match MBE_Hidden '    temp1.to'
     "syn match MBE_Active '\v^\s\*\*\s.*'
     "syn match MBE_Visible '\v^\s\s\*\s.*'
     " Set colors in vimrc
