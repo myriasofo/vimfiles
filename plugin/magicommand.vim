@@ -54,6 +54,7 @@ function! s:layoutVisibleBufs(bufNums)
     "call s:addGlasBufs(magiList)
     call s:addSpecialBufs(magiList)
     call s:addBufs(magiList, l:hiddenBufs)
+    call s:addConflictsFromDropbox(magiList)
 
     return magiList
 endfunction
@@ -74,6 +75,7 @@ function! s:layoutGlas(bufNums)
     call add(magiList, '    # Remaining')
     call s:addSpecialBufs2(magiList)
     call s:addBufs(magiList, l:remaining)
+    call s:addConflictsFromDropbox(magiList)
 
     return magiList
 endfunction
@@ -271,6 +273,18 @@ function! s:addBufs(magiList, bufNums)
         let l:filename = expand('#'.l:i.':p')
         if !has_key(s:loadedBufs, l:filename)
             call add(a:magiList, s:createStubFromBufNum(l:i))
+        endif
+    endfor
+endfunction
+
+function! s:addConflictsFromDropbox(magiList)
+    let l:note_files = split(globpath(g:dir_notes, '**'), '\n')
+
+    for l:file in l:note_files
+        if match(l:file, 'conflicted copy') >= 0
+            let l:displayed = fnamemodify(l:file, ':t')
+            let l:stub = s:createStub(l:file, l:displayed)
+            call add(a:magiList, l:stub)
         endif
     endfor
 endfunction
