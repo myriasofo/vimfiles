@@ -287,14 +287,20 @@ endfunction
 function! s:getPythonCommand()
     let l:cmd = ''
 
+    " Switch dir if sketch.py
+    let l:venv_dir = getcwd()
+    let l:current_filename = expand('%:p')
+    if l:current_filename == g:sketch_filename
+        let l:venv_dir = g:dir_dotfiles . 'utils'
+    endif
+
     " Source venv, if possible
-    let l:venv_file = getcwd().'/.venv/bin/activate'
+    let l:venv_file = l:venv_dir.'/.venv/bin/activate'
     if filereadable(l:venv_file)
         let l:cmd .= 'source '.l:venv_file.' && '
     endif
 
     " Add current file
-    let l:current_filename = expand('%:p')
     let l:cmd_to_run_python = 'python3 -B '.l:current_filename
     let l:cmd .= l:cmd_to_run_python
 

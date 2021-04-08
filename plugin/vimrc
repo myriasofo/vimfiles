@@ -28,6 +28,8 @@
         let g:dir_palettes = g:dir_notes . '_palettes/'
         let g:dir_dev = expand('~/my/')
         let g:dir_myPlugins = g:dir_dev . 'vimfiles/'
+        let g:dir_dotfiles = g:dir_dev . 'dotfiles/'
+        let g:sketch_filename = g:dir_dotfiles . 'utils/_sketch.py'
 
         if !isdirectory(g:dir_myPlugins)
             echom 'NOTE: Please set "g:dir_myPlugins" to valid folder'
