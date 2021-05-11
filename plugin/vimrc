@@ -878,7 +878,7 @@
                 endfun
 
             " Stop folding for large files (1mb or bigger)
-                let g:FileSizeMax = 1024 * 1000 "1mb
+                let g:FileSizeMax = 1024 * 3000 "3mb
                 autocmd BufReadPre * call HandleLargeFile('pre')
                 autocmd BufReadPost * call HandleLargeFile('post')
                 "autocmd FileType javascript call LargeFile('filetype')
