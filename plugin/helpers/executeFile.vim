@@ -257,7 +257,7 @@ function! s:cleanShellOutput()
 endfunction
 
 
-# For async shell: Helper functions
+" For async shell: Helper functions
 function! s:isAsyncJobRunning()
     return len(s:async_jobs) != 0
 endfunction
