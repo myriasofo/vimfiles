@@ -102,7 +102,7 @@ function! s:executeStata()
 endfunction
 
 function! s:executeTimeLog()
-    call ExecuteInShell('python ' . g:dir_dev . 'analyzeTimeLog/analyzeLog.py', 'right')
+    call ExecuteInShell('python ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py', 'right')
 endfunction
 
 function! s:executeVimscript()
