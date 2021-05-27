@@ -10,10 +10,10 @@ function! ExecuteCurrentFile()
         call s:executePython()
 
     elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
-        call s:executeTimeLog()
+        call ExecuteInShell('python3 ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py -fromtimelog', 'right')
 
     elseif &filetype == 'vim'
-        call s:executeVimscript()
+        source %
 
     elseif &filetype == 'ruby'
         call s:executeRuby()
@@ -99,14 +99,6 @@ function! s:executeStata()
     ""silent! !start /min "C:\Users\Abe\Dropbox\Archives\static\stata-nppp\rundo.exe" "%:p"
     "let dir_runStata = 'C:\Users\Abe\Dropbox\Archives\static\stata-nppp\'
     "silent! exe '!start /min "'.dir_runStata.'rundo.exe" "%:p"'
-endfunction
-
-function! s:executeTimeLog()
-    call ExecuteInShell('python ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py', 'right')
-endfunction
-
-function! s:executeVimscript()
-    source %
 endfunction
 
 function! s:executeGolang()
@@ -303,6 +295,7 @@ function! s:getPythonCommand()
     " Add current file
     let l:cmd_to_run_python = 'python3 -B '.l:current_filename
     let l:cmd .= l:cmd_to_run_python
+    let l:cmd .= ' -fromvim'
 
     return l:cmd
 endfunction
