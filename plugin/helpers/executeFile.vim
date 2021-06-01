@@ -10,7 +10,12 @@ function! ExecuteCurrentFile()
         call s:executePython()
 
     elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
-        call ExecuteInShell('python3 ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py -fromtimelog', 'right')
+        "call s:runInShell(cmd) #For async
+
+        write
+        let cmd = 'source ' . g:dir_dotfiles . 'utils/.venv/bin/activate'
+        let cmd .= ' && python3 ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py -fromtimelog'
+        exe '!'.cmd
 
     elseif &filetype == 'vim'
         source %
@@ -185,9 +190,9 @@ function! s:reportTiming()
         let l:interval = 'minute(s)'
     endif
 
-    if l:duration > 60 || !s:isShellVisible()
-        !python3 ~/my/dotfiles/utils/slackit.py 'vim py'
-    endif
+    "if l:duration > 60 || !s:isShellVisible()
+    "    !alertmac 'vim: async py finished'
+    "endif
 
     call appendbufline(s:output_bufname, '$', '')
     call appendbufline(s:output_bufname, '$', '[[Finished in '.string(l:duration).' '.l:interval.']]')
@@ -295,7 +300,6 @@ function! s:getPythonCommand()
     " Add current file
     let l:cmd_to_run_python = 'python3 -B '.l:current_filename
     let l:cmd .= l:cmd_to_run_python
-    let l:cmd .= ' -fromvim'
 
     return l:cmd
 endfunction
