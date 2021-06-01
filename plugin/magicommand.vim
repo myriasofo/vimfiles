@@ -17,6 +17,8 @@ let s:ignoredFiles = [
     \'timeLog.to',
     \'vimrc',
     \'abe_shell',
+    \'_sketch.py',
+    \'analyzeTimeLog.py',
     \]
 
 let s:decantFiles = [
