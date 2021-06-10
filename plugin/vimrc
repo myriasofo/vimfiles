@@ -539,8 +539,6 @@
 
             imap <d-n> <nop>
 
-            vmap qo <nop>
-
     " Getting around
         " Reassign hjkl
             noremap j h
@@ -791,7 +789,7 @@
             nnoremap qp q:
 
             " Searches (in a sep win)
-            noremap q[ q/
+            nnoremap q[ q/
 
         " Follow links in help
             nnoremap q' <c-]>
@@ -805,8 +803,11 @@
             vnoremap sfj ^
 
         " To hide gvim's menu (to remove keyboard shortcuts that overlap w my custom hotkeys)
-            aunmenu *
-            tlunmenu *
+            function! HideGvimMenu(unused)
+                aunmenu *
+                tlunmenu *
+            endfunction
+            call timer_start(200, 'HideGvimMenu')
 
 "| 4. Setup auto-commands
     if !exists("g:loadOnce_onFirstSource")
