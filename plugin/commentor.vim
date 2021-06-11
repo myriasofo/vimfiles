@@ -12,7 +12,11 @@ function! Commentor(type = '') abort
     " Deciding to comment/uncomment => can uncomment only if all lines are commented. Else, must comment
     let l:allCommented = s:isAllCommented(l:start, l:end, l:l, l:r)
     
-    for i in range(l:start, l:end)
+    for l:i in range(l:start, l:end)
+        if s:isLastLineInFoldAndBlank(l:i, l:end)
+            continue
+        endif
+
         if l:allCommented
             call s:uncommentLine(l:i, l:l, l:r)
         else
@@ -23,6 +27,10 @@ endfunction
 
 function! s:isAllCommented(start, end, l, r)
     for l:i in range(a:start, a:end)
+        if s:isLastLineInFoldAndBlank(l:i, a:end)
+            continue
+        endif
+
         let l:firstChars = trim(getline(l:i))[:len(a:l)-1]
         let l:lastChars = len(a:r) == 0 ? '' : trim(getline(l:i))[-len(a:r):]
         echom len(a:r) ',' trim(getline(l:i)) ',' l:lastChars
@@ -33,6 +41,10 @@ function! s:isAllCommented(start, end, l, r)
     endfor
 
     return 1
+endfunction
+
+function! s:isLastLineInFoldAndBlank(i, end)
+    return a:i == a:end && IsFolded(a:i) && len(getline(a:i)) == 0
 endfunction
 
 function! s:commentLine(i, l, r) abort

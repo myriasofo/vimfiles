@@ -924,6 +924,6 @@ endfun
 
 " Commenting
     noremap <expr> q Commentor()
-    nmap qq q$    
+    nmap qq q$
     autocmd FileType todo setlocal commentstring=(%s
 
