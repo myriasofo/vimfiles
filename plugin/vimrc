@@ -58,7 +58,6 @@
             " Core (very useful)
             Plugin 'luochen1990/rainbow' "Differentiate parentheses
             Plugin 'romainl/flattened' "For solarized colorscheme
-            Plugin 'tomtom/tcomment_vim' "Easy commenting
             Plugin 'tpope/vim-sleuth' "Critical to handle varying shiftwidths (eg. 4sp vs 2sp)
             Plugin 'tpope/vim-surround' "Operations with surround chars, surprisingly useful
             Plugin 'tpope/vim-fugitive' "I prefer commandline
@@ -96,6 +95,7 @@
                 "Plugin 'Yggdroot/indentLine'
                 "Plugin 'mileszs/ack.vim' "For grep
                 "Plugin 'rking/ag.vim' "For grep, unmaintained compared to ack
+                "Plugin 'tpope/vim-commentary' "Made edits to it
 
             " Fine, but not for me
                 "Plugin 'godlygeek/tabular' "Aligns text by char (eg. = or :)
@@ -112,6 +112,7 @@
                 "Plugin 'altercation/vim-colors-solarized' "Issues w neovim, so use 'flattened' instead
                 "Plugin 'icymind/NeoSolarized' "Issues stemming from its autocommand
                 "Plugin 'tpope/vim-abolish' "not needed
+                "Plugin 'tomtom/tcomment_vim' "Had weird issue w registers
 
         " Vundle end
             call vundle#end()
@@ -322,18 +323,6 @@
         endif
 
 "| 2. Plugin options
-    " For tcomment
-        let g:tcomment_maps = 0 "Don't need tcomment's key maps
-        let g:tcomment#options = {'whitespace': 'no'}
-        try
-            call tcomment#type#Define('javascript','// %s')
-            call tcomment#type#Define('cpp','// %s')
-            call tcomment#type#Define('java','// %s')
-            call tcomment#type#Define('todo','( %s')
-        catch
-            echom "NOTE: tcomment is not loaded"
-        endtry
-
     " For gitgutter
         let g:gitgutter_sign_removed = '-'
         let g:gitgutter_sign_removed_first_line = '--'
@@ -669,17 +658,6 @@
             nnoremap zsfk "_cgg
             nnoremap zsfl "_cG
 
-        " Comments
-            let commentKey = 'q'
-            nmap q <plug>TComment_gc
-            nmap qq <Plug>TComment_gcc
-            nmap q; <Plug>TComment_Comment
-            nmap qj <Plug>TComment_Uncomment
-
-            vmap qq :TComment<cr>
-            vmap q; <Plug>TComment_Comment
-            vmap qj <Plug>TComment_Uncomment
-
         " For vim-surround
             let g:surround_no_mappings = 1
             nmap ds <Plug>Dsurround
@@ -943,3 +921,9 @@ fun! ClearAllUndoHistory()
     unlet old_undolevels
     unlet old_modified
 endfun
+
+" Commenting
+    noremap <expr> q Commentor()
+    nmap qq q$    
+    autocmd FileType todo setlocal commentstring=(%s
+
