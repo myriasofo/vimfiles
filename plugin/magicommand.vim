@@ -197,16 +197,19 @@ function! s:getRawGlasLines()
     for l:rawLine in s:getGlasConfig()
         let l:line = StripWhitespace(l:rawLine)
         let l:firstChar = l:line[0]
+        let l:firstTwoChars = l:line[:1]
 
-        if l:firstChar == '' || l:firstChar == '(' || l:firstChar == '|'
+        if l:firstChar == '' || l:firstChar == '('
             continue
         endif
 
-        if l:firstChar == '*'
+        if l:firstTwoChars == '/*'
             let l:skip += 1
             continue
-        elseif l:firstChar == '\'
-            let l:skip = l:skip == 0 ? 0 : l:skip - 1
+        elseif l:firstTwoChars == '*/'
+            let l:skip = l:skip == 0 ? 0 : l:skip - 1 "Handling nested comment blocks
+            continue
+        elseif l:firstChar == '*' "Allow `*` to start title of section for convenience
             continue
         elseif l:skip > 0
             continue
