@@ -30,6 +30,7 @@
         let g:dir_myPlugins = g:dir_dev . 'vimfiles/'
         let g:dir_dotfiles = g:dir_dev . 'dotfiles/'
         let g:sketch_filename = g:dir_dotfiles . 'utils/_sketch.py'
+        let g:analyzeTimeLog_filename = g:dir_dotfiles . 'utils/analyzeTimeLog.py'
 
         if !isdirectory(g:dir_myPlugins)
             echom 'NOTE: Please set "g:dir_myPlugins" to valid folder'
@@ -926,4 +927,6 @@ endfun
     noremap <expr> q Commentor()
     nmap qq q$
     autocmd FileType todo setlocal commentstring=(%s
+    autocmd FileType sbt setlocal commentstring=//%s
+
 

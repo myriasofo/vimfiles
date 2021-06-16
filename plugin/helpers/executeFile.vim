@@ -287,7 +287,7 @@ function! s:getPythonCommand()
     " Switch dir if sketch.py
     let l:venv_dir = getcwd()
     let l:current_filename = expand('%:p')
-    if l:current_filename == g:sketch_filename
+    if index([g:sketch_filename, g:analyzeTimeLog_filename], l:current_filename) != -1
         let l:venv_dir = g:dir_dotfiles . 'utils'
     endif
 
