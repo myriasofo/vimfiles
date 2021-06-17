@@ -528,6 +528,8 @@
             imap <d-b> <nop>
 
             imap <d-n> <nop>
+            nmap <d-h> <nop>
+            "For hide command
 
     " Getting around
         " Reassign hjkl
