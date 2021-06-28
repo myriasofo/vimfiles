@@ -233,22 +233,8 @@
             set autoread "Auto-update file if changed outside of vim
 
         " Status line
-            set laststatus =2
-            "set statusline =\ \ 
-            set statusline =\ \ 
-            set statusline +=%{Scroller()}
-            "set statusline +=\|
-            set statusline +=%5l
-            set statusline +=/
-            set statusline +=%L
-
-            "set statusline +=%02{&foldlevel}
-            "set statusline +=\|
-            "set statusline +=%P
-            "set statusline +=\|
-
-            ":set statusline=%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
-            "hi User1 guibg=red guifg=blue
+            set laststatus=2 "Always have statusline
+            set statusline =%{Scroller()}
 
         " Title string
             "set titlestring=\ 
@@ -583,24 +569,29 @@
             let g:indexed_search_mappings = 0
             set shortmess+=s
 
-            noremap<silent> * *:set hlsearch<cr>zv
-            noremap<silent> & #:set hlsearch<cr>zv
-            noremap<silent> n n:set hlsearch<cr>zv
-            noremap<silent> N N:set hlsearch<cr>zv
-
-            "noremap ' :set hlsearch<cr>/
-            "noremap ' :set hlsearch<bar>ShowSearchIndex<cr>/
-            "noremap ' :set hlsearch<bar>call Refresher()<bar>ShowSearchIndex<cr>/
+            "noremap<silent> & #:set hlsearch<cr>zv "never used
+            noremap * *:call WrapperForSearch()<cr>zv
+            noremap n n:set hlsearch<cr>zv
+            noremap N N:set hlsearch<cr>zv
             noremap ' :call WrapperForSearch()<cr>/
-            noremap <silent> / :call Scroller_refreshSearchResults()<cr>
-            fun! WrapperForSearch()
+            noremap / :call ScrollerMatchLines()<cr>
+
+            function! WrapperForSearch()
                 set hlsearch
-                if exists("b:Scroller_searchPlacement")
-                    unlet b:Scroller_searchPlacement
+                call ScrollerMatchLines()
+            endfunction
+
+            function! WrapperForTimer(timer)
+                call WrapperForSearch()
+                normal! zv
+            endfunction
+
+            function! RunAfterSearch()
+                if getcmdtype() =~ "[/?]"
+                    call timer_start(0, 'WrapperForTimer') "Use timer to make async
                 endif
-                "call Scroller_triggerRefresh()
-                "normal! /
-            endfun
+            endfunction
+            cnoremap <CR> <cmd>call RunAfterSearch()<CR><CR>
 
     " All operators
         " Operator by itself

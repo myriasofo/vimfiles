@@ -1,170 +1,108 @@
-" This provides a scroll bar in the status bar
 
-fun! Scroller()
-    let scrollerLen = Scroller_getLength()
+let s:LEFT_PADDING = '  '
+let s:RIGHT_PADDING = ' '
+let s:MATCH_PADDING = ' '
 
-    " Don't show scrollbar for small files
+function! Scroller() abort
+    return s:LEFT_PADDING
+        \. s:createScroller()
+        \. s:createLineNumberBlock()
+endfunction
+
+function! ScrollerMatchLines()
+    let matchingLines = range(1, line('$'))
+        \->filter('getline(v:val) =~ @/')
+    let b:Scroller_nMatches = len(matchingLines)
+
+    let b:Scroller_indicesOfMatches = {}
+    let b:Scroller_lineNumsOfMatches = {}
+    for lineNum in matchingLines
+        let iMatch = s:getScrollerPosition(lineNum)
+        let b:Scroller_indicesOfMatches[iMatch] = 1
+        let b:Scroller_lineNumsOfMatches[lineNum] = 1
+    endfor
+endfunction
+
+
+function! s:createScroller()
+    let scrollerLen = s:getScrollerBodyLength()
+
+    " Hide scrollbar for files w/o many lines (ie smaller than window height)
     if line('$') < winheight(0)
-        return repeat(' ', scrollerLen + 5)
+        return repeat(' ', scrollerLen + 2)
     endif
 
-    " Get basic data
-    let currLine = line('.')
-    let totalLine = line('$')
-    " Note - be *very* careful with floats. Essentially, always do division last
-    let perc = 1.0 * currLine / totalLine
 
-    if scrollerLen <= 0
-        echom "scrollerLen: ".scrollerLen." winWidth: ".winwidth(0)
-        return ''
-    endif
-
-    " Index to place position and char to show
-    if currLine == 1
-        let cursorIndex = 0
-        let positionChar = 'T'
-    elseif currLine == totalLine
-        let cursorIndex = -1
-        let positionChar = 'B'
-    else
-        let cursorIndex = float2nr(perc * scrollerLen)
-        let positionChar = float2nr(10.0 * perc)
-    endif
-
-    " Constructing scrollbar
-    let scrollArr = split(repeat(' ', scrollerLen), '\zs')
-    "let scrollerQuarter = scrollerLen/4
-    "let scrollArr[scrollerQuarter] = ' '
-    "let scrollArr[scrollerQuarter*2] = '|'
-    "let scrollArr[scrollerQuarter*3] = ' '
-
-    " Marks search results (orgasmic!)
-    let searchNum = ''
-    if &hlsearch && exists("b:Scroller_searchPlacement")
-        if exists("b:Scroller_searchNum")
-            let searchNum = ' ' . b:Scroller_searchNum
-        endif
-
-        for placement in b:Scroller_searchPlacement
-            if placement < scrollerLen
-                let scrollArr[placement] = '_'
-                "try
-                "    let scrollArr[placement] = '_'
-                "catch
-                "    echom "ERROR: scroller with len: ".scrollerLen." and placement:".placement
-                "endtry
+    " Mark matches for search
+    let scrollArr = ListFill(scrollerLen, ' ')
+    if exists("b:Scroller_indicesOfMatches")
+        for iMatch in keys(b:Scroller_indicesOfMatches)
+            if iMatch >= len(scrollArr)
+                let iMatch = len(scrollArr) - 1
             endif
+
+            let scrollArr[iMatch] = '_'
         endfor
     endif
 
-    let scrollArr[cursorIndex] = (scrollArr[cursorIndex] == ' ') ? positionChar : '|'
-    "try
-    "    let scrollArr[cursorIndex] = (scrollArr[cursorIndex] == ' ') ? positionChar : '|'
-    "catch
-    "    echom "ERROR: scroller w len: ".scrollerLen." and cursorIndex: ".cursorIndex
-    "endtry
-    return '(' . join(scrollArr,'') . ')' . searchNum
-endfun
+    let [cursorIndex, cursorChar] = s:getScrollerCursor()
+    let scrollArr[cursorIndex] = cursorChar
 
-fun! Scroller_getLength()
-    if &hlsearch && exists("b:Scroller_searchNum") 
-        if b:Scroller_searchNum == 0
-            let STATUSLINE_SIZE = 16 + 2
-        else
-            let STATUSLINE_SIZE = 16 + float2nr(log10(b:Scroller_searchNum)) + 2
-        endif
-    else
-        let STATUSLINE_SIZE = 16
-    end
-    let SCROLLER_MAX = 80 - STATUSLINE_SIZE 
+    return '(' . join(scrollArr,'') . ')' . s:getMatchCount()
+endfunction
 
-    "let scrollerLen = 10
-    let scrollerLen = winwidth(0) - STATUSLINE_SIZE
-    if scrollerLen > SCROLLER_MAX
-        let scrollerLen = SCROLLER_MAX
+function! s:createLineNumberBlock()
+    let currLine = AddThousandSeparator(line('.'))
+    let totalLine = AddThousandSeparator(line('$'))
+    let padding = repeat(' ', len(totalLine) - len(currLine))
+    return s:RIGHT_PADDING
+        \. padding 
+        \. currLine . '/' . totalLine
+endfunction
+
+function! s:getScrollerBodyLength()
+    let scrollerLen = winwidth(0)
+        \ - len(s:LEFT_PADDING)
+        \ - len(s:getMatchCount())
+        \ - len(s:createLineNumberBlock())
+        \ - 2 "For two parens
+    
+    if scrollerLen < 0
+        let scrolerLen = 0
     endif
+
     return scrollerLen
-endfun
-
-fun! Scroller_refreshSearchResults()
-    let totalLine = line('$')
-    let lineNums = filter(range(1, totalLine), 'getline(v:val) =~ @/')
-    let b:Scroller_searchNum = len(lineNums)
-    let scrollerLen = Scroller_getLength()
-
-    let placementDct = {}
-    for lineNum in lineNums
-        if lineNum == 1
-            let placementDct[0] = 1
-        elseif lineNum == totalLine
-            let placementDct[-1] = 1
-        else
-            let placementDct[float2nr(1.0 * lineNum / totalLine * scrollerLen)] = 1
-        endif
-    endfor
-
-    let placements = keys(placementDct)
-    for i in range(len(placements))
-        let placements[i] = str2nr(placements[i])
-    endfor
-    let b:Scroller_searchPlacement = sort(placements)
-endfun
-
-fun! Scroller_triggerRefresh()
-    "" useful bc triggers a fctn *after*
-    let g:updatetime_prev = &updatetime
-    let &updatetime = 200
-    "augroup Scroller
-        autocmd CursorHold *
-            \ call Scroller_refreshSearchResults()
-            \ | let &updatetime = g:updatetime_prev
-            \ | autocmd! CursorHold
-            "\ | augroup! Scroller
-    "augroup END
-endfun
-
-" NOTE - These cause errors if they don't exist
-"call add(g:session_persist_globals, 'b:Scroller_searchPlacement')
-"call add(g:session_persist_globals, 'b:Scroller_searchNum')
-
-let s:MAX_WIDTH = 80
-
-" WORK IN PROGRESS
-function! s:getWindowWidth()
-    return (winwidth(0) - 2)
 endfunction
 
-function! s:getScrollerWidth()
-    let windowWidth = s:getWindowWidth()
-    let scrollerWidth = windowWidth
-    if scrollerWidth > s:MAX_WIDTH
-        return s:MAX_WIDTH
+function! s:getScrollerCursor()
+    if line('.') == 1
+        let cursorIndex = 0
+        let cursorChar = 'T'
+    elseif line('.') == line('$')
+        let cursorIndex = -1
+        let cursorChar = 'B'
+    else
+        let percPosition = 1.0 * line('.') / line('$') "Be careful of ints vs floats
+        let cursorIndex = s:getScrollerPosition(line('.'))
+        let cursorChar = float2nr(10.0 * percPosition)
     endif
-    return scrollerWidth
 
-    "if &hlsearch && exists("b:Scroller_searchNum") 
-    "    float2nr(log10(b:Scroller_searchNum))
-    "endif
-endfunction
-
-function! s:getLineNumberSection()
-    let currentLine = line('.')
-    let nLines = line('$')
-
-    let spacerWidth = strlen(nLines) - strlen(currentLine)
-    let spacer = repeat(' ', spacerWidth)
-
-    if currentLine == nLines
-        return 'BOT'
+    if exists("b:Scroller_lineNumsOfMatches") && has_key(b:Scroller_lineNumsOfMatches, line('.'))
+        let cursorChar = '|'
     endif
-    return spacer . currentLine . '/' . nLines
+
+    return [cursorIndex, cursorChar]
 endfunction
 
-function! s:test()
-    let scrollerLen = s:getScrollerWidth()
-
-    let lineNumberPosition = s:getLineNumberSection()
-    return '|' . lineNumberPosition
-
-    let scrollerLen -= strlen(lineNumberPosition)
+function! s:getScrollerPosition(lineNum)
+    return (1.0 * a:lineNum / line('$') * s:getScrollerBodyLength())
+        \-> float2nr()
 endfunction
+
+function! s:getMatchCount()
+    if exists("b:Scroller_nMatches")
+        return s:MATCH_PADDING . b:Scroller_nMatches
+    endif
+    return ''
+endfunction
+

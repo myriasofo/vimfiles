@@ -432,3 +432,22 @@ function! IsBufVisible(expr)
     echom 'WARNING: Invalid type:' . type(a:expr)
     return 0
 endfunction
+
+function! ListFill(size, char)
+    return range(a:size)
+        \-> map({_ -> a:char})
+endfunction
+
+function! AddThousandSeparator(numeric)
+    if a:numeric < 1000
+        return a:numeric
+    endif
+
+    return a:numeric
+        \-> split('\zs')
+        \-> reverse() 
+        \-> map({i, char -> i != 0 && i % 3 == 0 ? char.',' : char})
+        \-> reverse()
+        \-> join('')
+endfunction
+
