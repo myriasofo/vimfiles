@@ -52,8 +52,8 @@ function! s:createScroller()
 endfunction
 
 function! s:createLineNumberBlock()
-    let currLine = AddThousandSeparator(line('.'))
-    let totalLine = AddThousandSeparator(line('$'))
+    let currLine = line('.') <= 9999 ? line('.') : AddThousandSeparator(line('.'))
+    let totalLine = line('$') <= 9999 ? line('$') : AddThousandSeparator(line('$'))
     let padding = repeat(' ', len(totalLine) - len(currLine))
     return s:RIGHT_PADDING
         \. padding 
