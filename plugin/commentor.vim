@@ -64,7 +64,7 @@ function! s:commentLine(i, l, r) abort
 endfunction
 
 function! s:uncommentLine(i, l, r) abort
-    let l:l = substitute(a:l, '*', '\\*', '') # for .proto
+    let l:l = substitute(a:l, '*', '\\*', '') "for .proto
 
     let l:replacement = substitute(getline(a:i),  l:l, '', '')
     let l:replacement = substitute(trim(l:replacement, ' ', 2),  a:r.'$', '', '')
