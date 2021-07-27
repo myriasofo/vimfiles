@@ -19,6 +19,8 @@ let s:ignoredFiles = [
     \'abe_shell',
     \'_sketch.py',
     \'analyzeTimeLog.py',
+    \'spotify.to',
+    \'howTo.to',
     \]
 
 let s:decantFiles = [
