@@ -8,8 +8,9 @@ function! Commentor(type = '') abort
     
     let [l:start, l:end] = [line("'["), line("']")]
     let [l:l, l:r] = map(split(&commentstring, '%s', 1), {_,value -> trim(value)})
-    let [l:l, l:r] = &commentstring -> split('%s', 1)
-        \-> map({_, value -> trim(value)})
+    let [l:l, l:r] = &commentstring
+        \->split('%s', 1)
+        \->map({_, value -> trim(value)})
     
     " Deciding to comment/uncomment => can uncomment only if all lines are commented. Else, must comment
     let l:allCommented = s:isAllCommented(l:start, l:end, l:l, l:r)

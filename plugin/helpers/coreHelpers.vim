@@ -435,7 +435,7 @@ endfunction
 
 function! ListFill(size, char)
     return range(a:size)
-        \-> map({_ -> a:char})
+        \->map({_ -> a:char})
 endfunction
 
 function! AddThousandSeparator(numeric)
@@ -444,10 +444,10 @@ function! AddThousandSeparator(numeric)
     endif
 
     return a:numeric
-        \-> split('\zs')
-        \-> reverse() 
-        \-> map({i, char -> i != 0 && i % 3 == 0 ? char.',' : char})
-        \-> reverse()
-        \-> join('')
+        \->split('\zs')
+        \->reverse()
+        \->map({i, char -> i != 0 && i % 3 == 0 ? char.',' : char})
+        \->reverse()
+        \->join('')
 endfunction
 

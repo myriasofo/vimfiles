@@ -96,7 +96,7 @@ endfunction
 
 function! s:getScrollerPosition(lineNum)
     return (1.0 * a:lineNum / line('$') * s:getScrollerBodyLength())
-        \-> float2nr()
+        \->float2nr()
 endfunction
 
 function! s:getMatchCount()
