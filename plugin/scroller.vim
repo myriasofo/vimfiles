@@ -27,11 +27,14 @@ endfunction
 function! s:createScroller()
     let scrollerLen = s:getScrollerBodyLength()
 
+    if scrollerLen <= 0
+        return ''
+    endif
+    
     " Hide scrollbar for files w/o many lines (ie smaller than window height)
     if line('$') < winheight(0)
         return repeat(' ', scrollerLen + 2)
     endif
-
 
     " Mark matches for search
     let scrollArr = ListFill(scrollerLen, ' ')
