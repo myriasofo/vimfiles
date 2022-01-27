@@ -34,8 +34,8 @@ fun! ScoutKey()
         "CtrlPBookmarkDir
 
 
-    "elseif char == 'h'
-    "    call LoadFile(g:dir_palettes . 'A.to')
+    elseif char == 'h'
+        call LoadFile(g:dir_palettes . 'AA.to')
     elseif char == 'j'
         exe "normal! \<c-w>h"
         if &filetype == 'minibufexpl'

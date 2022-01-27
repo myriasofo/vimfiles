@@ -8,6 +8,7 @@ let s:ignoredFiles = [
     \'glas.to',
     \'spacework.to',
     \'navkey.to',
+    \'AA.to',
     \'A.to',
     \'0.to',
     \'1.to',
@@ -24,6 +25,7 @@ let s:ignoredFiles = [
     \]
 
 let s:decantFiles = [
+    \'0.to',
     \'1.to',
     \'2.to',
     \]
