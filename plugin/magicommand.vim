@@ -25,7 +25,6 @@ let s:ignoredFiles = [
     \]
 
 let s:decantFiles = [
-    \'0.to',
     \'1.to',
     \'2.to',
     \]
