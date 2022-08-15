@@ -4,32 +4,15 @@
 let g:magiLayoutMode = 2
 let s:leftPadding = 4
 let s:minimumWidth = 7
-let s:ignoredFiles = [
-    \'glas.to',
-    \'spacework.to',
-    \'navkey.to',
-    \'AA.to',
-    \'A.to',
-    \'0.to',
-    \'1.to',
-    \'2.to',
-    \
-    \'journal.to',
-    \'timeLog.to',
-    \'vimrc',
-    \'abe_shell',
-    \'_sketch.py',
-    \'analyzeTimeLog.py',
-    \'spotify.to',
-    \'howTo.to',
-    \]
-
+let s:glasConfigLocation = g:dir_notes . '_configs/glas.to'
+let s:hotkeysToBufPaths = {}
 let s:decantFiles = [
     \'1.to',
     \'2.to',
     \]
 
 let s:mapPaletteFiles = {
+    \'B.to':       'B',
     \'A.to':       'A',
     \'0.to':       '0',
     \'1.to':       '1',
@@ -37,9 +20,10 @@ let s:mapPaletteFiles = {
     \'timeLog.to': 'L',
     \}
 
-let s:glasConfigLocation = g:dir_notes . '_configs/glas.to'
-let s:hotkeysToBufPaths = {}
-
+let s:ignoredFiles = [
+    \'vimrc',
+    \'abe_shell',
+\]
 
 " Core layouts
 function! s:layoutVisibleBufs(bufNums)
@@ -317,6 +301,18 @@ function! s:compareBufName(bufNum1, bufNum2)
     endif
 endfunction
 
+function! s:populateIgnoredFiles()
+    for l:fileTail in keys(s:mapPaletteFiles)
+        call add(s:ignoredFiles, l:fileTail)
+    endfor
+
+    for l:fileDict in g:Spacework#ExtractConfig()['files']
+        let l:filePath = l:fileDict['filePath']
+        let l:fileTail = fnamemodify(l:filePath, ':t')
+        call add(s:ignoredFiles, l:fileTail)
+    endfor
+endfunction
+
 
 " Creating stub (each formatted line in magi)
 function! s:createStub(path, fileDesc)
@@ -458,7 +454,6 @@ function! s:isSpecialBuf(bufNum)
 endfunction
 
 
-
 " External API
 function! MagiOpenBuffer(key)
     if has_key(s:hotkeysToBufPaths, a:key)
@@ -488,6 +483,11 @@ function! MagiGetViewerList(bufNums, bufUniqNameDict)
     let s:bufUniqNameDict = a:bufUniqNameDict
     let s:hotkeysToBufPaths = {}
     let s:loadedBufs = {}
+
+    if !exists('s:populatedIgnoredFiles')
+        let s:populatedIgnoredFiles = 1
+        call s:populateIgnoredFiles()
+    endif
 
     if g:magiLayoutMode == 1
         return s:layoutVisibleBufs(a:bufNums)
@@ -564,7 +564,6 @@ function! s:glasClear(nStart, nEnd)
     write
     MagiRefresh
 endfunction
-
 
 function! s:glasAddFile()
     let config = s:getGlasConfig()

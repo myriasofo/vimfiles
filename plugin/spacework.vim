@@ -1,17 +1,46 @@
 
 " Expected format for file
-    " '$ text to display' 
-    " '@ command to execute'
-    " '# name of workspace' 
-    " === : marks end of workspace
+    " $ text to display
+    " % file : tail
+    " @ command to execute
+    " # name of workspace 
+    " ( comment
+    " === end of workspace
 
 " Core
-    fun! Spacework_Dialog()
-        let [arr_displayText, hash_wsFiles] = g:ProcessConfig()
+    let s:FILE_CHAR = '%'
+    let s:SPLIT_CHAR = ':'
+
+    fun! g:Spacework_Dialog()
+        let [arr_displayText, hash_wsFiles] = s:processConfig()
         call s:print_dialog(arr_displayText, hash_wsFiles)
     endfun
 
-    fun! g:ProcessConfig()
+    fun! g:Spacework#ExtractConfig()
+        " TODO: Refactor everything to use this
+        let [l:arr, l:unused] = s:processConfig()
+
+        let l:fileDicts = []
+        for l:rawLine in l:arr
+            let l:line = StripWhitespace(l:rawLine)
+            let l:firstChar = l:line[0]
+            if l:firstChar == s:FILE_CHAR
+                let l:splitLine = split(l:line[1:], s:SPLIT_CHAR)
+
+                let l:displayText = StripWhitespace(l:splitLine[0])
+                let l:filePath = StripWhitespace(l:splitLine[1])
+
+                let l:fileDict = {'displayText': l:displayText, 'filePath': l:filePath}
+                call add(l:fileDicts, l:fileDict)
+            endif
+        endfor
+
+        return {
+            \'files': l:fileDicts,
+        \}
+    endfun
+
+    fun! s:processConfig()
         let config = s:getConfig()
         let i = 0
         let hash_wsFiles = {}
