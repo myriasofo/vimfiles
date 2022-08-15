@@ -35,7 +35,7 @@ fun! ScoutKey()
 
 
     elseif char == 'h'
-        call LoadFile(g:dir_palettes . 'AA.to')
+        call LoadFile(g:dir_palettes . 'B.to')
     elseif char == 'j'
         exe "normal! \<c-w>h"
         if &filetype == 'minibufexpl'
