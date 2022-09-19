@@ -4,7 +4,7 @@
     " ( comment
     " % file link (eg. 'linkName: filePath')
     " : use to split linkName vs filePath
-    " & for filePath, use a vim varaible for path (eg. &g:dirNotes/dilig.to)
+    " { for filePath, use a vim varaible for path (eg. {g:dir_notes}/dilig.to)
     " @ command to execute
 
     let s:CHAR_DISPLAY_TEXT = '$'
