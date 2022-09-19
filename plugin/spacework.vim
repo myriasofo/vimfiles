@@ -1,15 +1,28 @@
 
 " Expected format for file
     " $ text to display
-    " % file : tail
-    " @ command to execute
-    " # name of workspace 
     " ( comment
-    " === end of workspace
+
+    " % file link (eg. 'linkName: filePath')
+    " : use to split linkName vs filePath
+    " & for filePath, use a vim varaible for path (eg. &g:dirNotes/dilig.to)
+
+    " # name of workspace 
+    " = end of workspace
+    " @ command to execute
 
 " Core
-    let s:FILE_CHAR = '%'
-    let s:SPLIT_CHAR = ':'
+    let s:CHAR_DISPLAY_TEXT = '$'
+    let s:CHAR_COMMENT = '('
+
+    let s:CHAR_FILELINK = '%'
+    let s:CHAR_FILELINK_SPLIT = ':'
+    let s:CHAR_FILELINK_VAR = '&'
+
+    let s:CHAR_WORKSPACE = '#'
+    let s:CHAR_WORKSPACE_END = '='
+    let s:CHAR_COMMAND = '@'
+
 
     fun! g:Spacework_Dialog()
         let [arr_displayText, hash_wsFiles] = s:processConfig()
@@ -24,8 +37,8 @@
         for l:rawLine in l:arr
             let l:line = StripWhitespace(l:rawLine)
             let l:firstChar = l:line[0]
-            if l:firstChar == s:FILE_CHAR
-                let l:splitLine = split(l:line[1:], s:SPLIT_CHAR)
+            if l:firstChar == s:CHAR_FILELINK
+                let l:splitLine = SplitOnce(l:line[1:], s:CHAR_FILELINK_SPLIT)
 
                 let l:displayText = StripWhitespace(l:splitLine[0])
                 let l:filePath = StripWhitespace(l:splitLine[1])
@@ -50,15 +63,14 @@
             let lineTrimmed = s:trimLine(config[i])
             let firstChar = lineTrimmed[0]
 
-            if firstChar == '#'
+            if firstChar == s:CHAR_WORKSPACE
                 let wsName = lineTrimmed
                 call add(arr_displayText, wsName)
 
-                " grab all until '==='
+                " grab all until '='
                 let hash_wsFiles[wsName] = []
                 let i = s:process_workspace(config, i+1, hash_wsFiles[wsName])
-            "elseif firstChar == '' || firstChar == '@' || firstChar == "$" || firstChar == "%"
-            elseif firstChar != '(' && firstChar != '='
+            elseif firstChar != s:CHAR_COMMENT && firstChar != s:CHAR_WORKSPACE_END
                 call add(arr_displayText, lineTrimmed)
             endif
 
@@ -73,9 +85,9 @@
         while i < len(a:config)
             let lineTrimmed = s:trimLine(a:config[i])
 
-            if lineTrimmed[0:2] == '==='
+            if lineTrimmed[0] == s:CHAR_WORKSPACE_END
                 return i - 1
-            elseif lineTrimmed[0] != '('
+            elseif lineTrimmed[0] != s:CHAR_COMMENT
                 call add(a:wsList, lineTrimmed)
             endif
 
@@ -110,20 +122,20 @@
             "echo line
             let line = StripWhitespace(l:line)
             let firstChar = line[0]
-            if firstChar == "$"
+            if firstChar == s:CHAR_DISPLAY_TEXT
                 let printLine = line[2:] . "\n"
-            elseif firstChar == "@" || firstChar == "#" || firstChar == "%"
+            elseif firstChar == s:CHAR_COMMAND || firstChar == s:CHAR_WORKSPACE || firstChar == s:CHAR_FILELINK
                 " TODO: could turn below into a sep fctn. Returns what to echo
                 let jumpKey = s:getNext_jumpKey()
                 let jumpList[jumpKey] = line
 
-                if firstChar == "@"
+                if firstChar == s:CHAR_COMMAND
                     let printLine = jumpKey . ': ' . line[2:]
-                elseif firstChar == "#"
+                elseif firstChar == s:CHAR_WORKSPACE
                     let wsSize = s:getWsSize(a:hash_wsFiles[line])
                     let filler = repeat(' ', maxStr - strlen(line[2:]))
                     let printLine = jumpKey . ': ' . line[2:] . filler. ' ('.wsSize.')'
-                elseif firstChar == "%"
+                elseif firstChar == s:CHAR_FILELINK
                     "TODO: print properly
                     let splitLine = split(line, ': ')
                     let printLine = jumpKey . ': ' . splitLine[0][2:]
@@ -144,19 +156,19 @@
             if has_key(a:jumpList, char)
                 let cmd = a:jumpList[char]
                 let firstChar = cmd[0]
-                if firstChar == "@"
-                    if cmd == "@ openConfig"
+                if firstChar == s:CHAR_COMMAND
+                    if cmd == s:CHAR_COMMAND . " openConfig"
                         call OpenFile(g:Spacework_configLocation)
-                    elseif cmd == "@ addFile"
-                        call s:addCurrentFileToConfig('# [palette')
+                    elseif cmd == s:CHAR_COMMAND . " addFile"
+                        call s:addCurrentFileToConfig(s:CHAR_WORKSPACE . ' [palette')
                     endif
                     return 0
-                elseif firstChar == "#"
+                elseif firstChar == s:CHAR_WORKSPACE
                     "echo '  ' . char
                     return s:pick_wsFile(a:hash_wsFiles[cmd])
-                elseif firstChar == "%"
+                elseif firstChar == s:CHAR_FILELINK
                     "echo 'time to open file'
-                    let splitLine = split(cmd, ': ')
+                    let splitLine = split(cmd, s:CHAR_FILELINK_SPLIT)
                     let l:filename = StripWhitespace(splitLine[1])
                     call OpenFile(l:filename)
                     return 0
@@ -232,8 +244,8 @@
     fun! s:findEnd_ofWs(config, iStart)
         let i = a:iStart
         while i < len(a:config)
-            if a:config[i][0:2] == "==="
-                if a:config[i-1][0] == "("
+            if a:config[i][0:2] == s:CHAR_WORKSPACE_END
+                if a:config[i-1][0] == s:CHAR_COMMENT
                     let i -= 1
                 endif
                 break
