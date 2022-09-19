@@ -122,6 +122,14 @@
         return (match(a:str, "\n") > 0)
     endfun
 
+    fun! SplitOnce(str, splitChar)
+        let l:firstInstance = stridx(a:str, a:splitChar)
+        let l:left = strpart(a:str, 0, l:firstInstance)
+        let l:right = strpart(a:str, l:firstInstance + 1)
+
+        return [l:left, l:right]
+    endfun
+
 " Take '.' but does NOT spit it out
     fun! IsEmptyspace(lnum) "Strange - means blank or whitespace only
         "return (getline(a:lnum) =~ '^\s*$')

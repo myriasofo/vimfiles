@@ -7,6 +7,7 @@ let s:minimumWidth = 7
 let s:glasConfigLocation = g:dir_notes . '_configs/glas.to'
 let s:hotkeysToBufPaths = {}
 let s:decantFiles = [
+    \'0.to',
     \'1.to',
     \'2.to',
     \]

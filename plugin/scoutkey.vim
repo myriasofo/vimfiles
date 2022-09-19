@@ -67,7 +67,8 @@ fun! ScoutKey()
     elseif char == ','
         call LoadFile(g:dir_palettes . '1.to')
     elseif char == '.'
-        call LoadFile(g:dir_palettes . '2.to')
+        "call LoadFile(g:dir_palettes . '2.to')
+        echom "ERROR: Trying to not use 2.to"
     elseif char == '/'
         call LoadFile(g:dir_notes . '_specials/timeLog.to')
 
