@@ -11,13 +11,13 @@
     let s:CHAR_COMMENT = '('
     let s:CHAR_FILELINK = '%'
     let s:CHAR_FILELINK_SPLIT = ':'
-    let s:CHAR_FILELINK_VAR = '&'
+    let s:CHAR_FILELINK_VAR_LEFT = '{'
+    let s:CHAR_FILELINK_VAR_RIGHT = '}'
     let s:PADDING_LEFT = '  '
 
     " Settings
     let g:Spacework#configLocation = g:dir_notes . '_configs/spacework.to'
     let s:jumpKeysAvailable = 'abcdefghijmnopqrstuvwxyz123'
-
 
 fun! Spacework()
     let [l:toPrint, l:mapKeyToFile] = Spacework#ExtractConfig()
@@ -46,24 +46,10 @@ fun! Spacework#ExtractConfig()
             call add(toPrint, line[2:])
 
         elseif firstChar == s:CHAR_FILELINK
-            let [fileDisplayText, filePath] = SplitOnce(line[1:], ':')
-
-            let filePath = StripWhitespace(filePath)
-            if filePath[0] == '{'
-                let [varName, remainingPath] = SplitOnce(filePath[1:], '}')
-                let filePath = eval(varName) . remainingPath
-            endif
-
-            if fileDisplayText[0] == ' '
-                let jumpKey = s:getNextJumpKey(jumpKeys)
-            else
-                let jumpKey = fileDisplayText[0]
-                let fileDisplayText = fileDisplayText[1:]
-                call s:removeJumpKey(jumpKeys, jumpKey)
-            endif
+            let [filePath, fileDisplayText, jumpKey] = s:extractFileDetails(line, jumpKeys)
             let l:mapKeyToFile[jumpKey] = filePath
-
             call add(toPrint, jumpKey . ': ' . StripWhitespace(fileDisplayText))
+
         else
             call add(toPrint, 'ERROR: Bad line - ' . line)
         endif
@@ -78,6 +64,26 @@ fun! s:readConfig()
     catch
         return []
     endtry
+endfun
+
+fun! s:extractFileDetails(line, jumpKeys)
+    let [fileDisplayText, filePath] = SplitOnce(a:line[1:], s:CHAR_FILELINK_SPLIT)
+
+    let filePath = StripWhitespace(filePath)
+    if filePath[0] == s:CHAR_FILELINK_VAR_LEFT
+        let [varName, remainingPath] = SplitOnce(filePath[1:], s:CHAR_FILELINK_VAR_RIGHT)
+        let filePath = eval(varName) . remainingPath
+    endif
+
+    if fileDisplayText[0] == ' '
+        let jumpKey = s:getNextJumpKey(a:jumpKeys)
+    else
+        let jumpKey = fileDisplayText[0]
+        let fileDisplayText = fileDisplayText[1:]
+        call s:removeJumpKey(a:jumpKeys, jumpKey)
+    endif
+
+    return [filePath, fileDisplayText, jumpKey]
 endfun
 
 fun! s:removeJumpKey(jumpKeys, jumpKey)
