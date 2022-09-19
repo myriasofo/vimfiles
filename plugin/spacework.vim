@@ -48,6 +48,12 @@ fun! Spacework#ExtractConfig()
         elseif firstChar == s:CHAR_FILELINK
             let [fileDisplayText, filePath] = SplitOnce(line[1:], ':')
 
+            let filePath = StripWhitespace(filePath)
+            if filePath[0] == '{'
+                let [varName, remainingPath] = SplitOnce(filePath[1:], '}')
+                let filePath = eval(varName) . remainingPath
+            endif
+
             if fileDisplayText[0] == ' '
                 let jumpKey = s:getNextJumpKey(jumpKeys)
             else
