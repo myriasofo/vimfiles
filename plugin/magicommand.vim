@@ -307,7 +307,7 @@ function! s:populateIgnoredFiles()
         call add(s:ignoredFiles, l:fileTail)
     endfor
 
-    for l:filePath in values(Spacework#ExtractConfig(0))
+    for l:filePath in values(Spacework#ExtractConfig()[1])
         let l:fileTail = fnamemodify(l:filePath, ':t')
         call add(s:ignoredFiles, l:fileTail)
     endfor

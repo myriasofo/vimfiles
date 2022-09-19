@@ -21,16 +21,17 @@
 
 
 fun! Spacework()
-    let l:mapKeyToFile = Spacework#ExtractConfig()
+    let [l:toPrint, l:mapKeyToFile] = Spacework#ExtractConfig()
+    call s:printDialog(l:toPrint)
     call s:getInput(l:mapKeyToFile)
-    redraw "Stops 'Press ENTER or...'
+    redraw "To stop 'Press ENTER or...'
 endfun
 
-fun! Spacework#ExtractConfig(shouldPrint=1)
+fun! Spacework#ExtractConfig()
+    let l:toPrint = []
     let l:mapKeyToFile = {}
     call s:resetJumpKeys() "TODO: easier method?
 
-    let printLine = ''
     for l:line in s:readConfig()
         let line = StripWhitespace(l:line)
         let firstChar = line[0]
@@ -39,29 +40,24 @@ fun! Spacework#ExtractConfig(shouldPrint=1)
             continue
 
         elseif firstChar == ''
-            let printLine = ''
+            call add(toPrint, '')
 
         elseif firstChar == s:CHAR_DISPLAY_TEXT
-            let printLine = line[2:]
+            call add(toPrint, line[2:])
 
         elseif firstChar == s:CHAR_FILELINK
-            " TODO: could turn below into a sep fctn?
             let [fileDisplayText, filePath] = SplitOnce(line[1:], ':')
 
             let jumpKey = s:getNextJumpKey()
             let l:mapKeyToFile[jumpKey] = filePath
 
-            let printLine = jumpKey . ': ' . StripWhitespace(fileDisplayText)
+            call add(toPrint, jumpKey . ': ' . StripWhitespace(fileDisplayText))
         else
-            let printLine = 'ERROR: Bad line - ' . line
-        endif
-
-        if a:shouldPrint
-            echo s:PADDING_LEFT . printLine . "\n"
+            call add(toPrint, 'ERROR: Bad line - ' . line)
         endif
     endfor
 
-    return l:mapKeyToFile
+    return [l:toPrint, l:mapKeyToFile]
 endfun
 
 fun! s:readConfig()
@@ -79,6 +75,12 @@ endfun
 fun! s:getNextJumpKey()
     let s:jumpKey += 1
     return s:jumpkeys[s:jumpKey]
+endfun
+
+fun! s:printDialog(toPrint)
+    for line in a:toPrint
+        echo s:PADDING_LEFT . l:line . "\n"
+    endfor
 endfun
 
 fun! s:getInput(jumpList)
