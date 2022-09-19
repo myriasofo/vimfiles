@@ -12,12 +12,11 @@
     let s:CHAR_FILELINK = '%'
     let s:CHAR_FILELINK_SPLIT = ':'
     let s:CHAR_FILELINK_VAR = '&'
-    let s:CHAR_COMMAND = '@'
     let s:PADDING_LEFT = '  '
 
     " Settings
     let g:Spacework#configLocation = g:dir_notes . '_configs/spacework.to'
-    let s:jumpkeys = 'abcdefghijmnopqrstuvwxyz'
+    let s:jumpKeys = 'abcdefghijmnopqrstuvwxyz'
 
 
 fun! Spacework()
@@ -74,7 +73,7 @@ endfun
 
 fun! s:getNextJumpKey()
     let s:jumpKey += 1
-    return s:jumpkeys[s:jumpKey]
+    return s:jumpKeys[s:jumpKey]
 endfun
 
 fun! s:printDialog(toPrint)
