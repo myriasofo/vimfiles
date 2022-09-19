@@ -18,7 +18,7 @@ fun! ScoutKey()
     elseif char == 'u'
         call ExecuteCurrentFile()
     elseif char == 'i'
-        call Spacework_Dialog()
+        call Spacework()
     elseif char == 'o'
         call NavKey_ListBookmarks()
     "elseif char == 'p'
