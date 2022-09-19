@@ -16,7 +16,7 @@
 
     " Settings
     let g:Spacework#configLocation = g:dir_notes . '_configs/spacework.to'
-    let s:jumpKeys = 'abcdefghijmnopqrstuvwxyz'
+    let s:jumpKeysAvailable = 'abcdefghijmnopqrstuvwxyz123'
 
 
 fun! Spacework()
@@ -26,10 +26,11 @@ fun! Spacework()
     redraw "To stop 'Press ENTER or...'
 endfun
 
+
 fun! Spacework#ExtractConfig()
     let l:toPrint = []
     let l:mapKeyToFile = {}
-    call s:resetJumpKeys() "TODO: easier method?
+    let jumpKeys = split(s:jumpKeysAvailable, '\zs')
 
     for l:line in s:readConfig()
         let line = StripWhitespace(l:line)
@@ -47,7 +48,13 @@ fun! Spacework#ExtractConfig()
         elseif firstChar == s:CHAR_FILELINK
             let [fileDisplayText, filePath] = SplitOnce(line[1:], ':')
 
-            let jumpKey = s:getNextJumpKey()
+            if fileDisplayText[0] == ' '
+                let jumpKey = s:getNextJumpKey(jumpKeys)
+            else
+                let jumpKey = fileDisplayText[0]
+                let fileDisplayText = fileDisplayText[1:]
+                call s:removeJumpKey(jumpKeys, jumpKey)
+            endif
             let l:mapKeyToFile[jumpKey] = filePath
 
             call add(toPrint, jumpKey . ': ' . StripWhitespace(fileDisplayText))
@@ -67,13 +74,18 @@ fun! s:readConfig()
     endtry
 endfun
 
-fun! s:resetJumpKeys()
-    let s:jumpKey = -1
+fun! s:removeJumpKey(jumpKeys, jumpKey)
+    let l:iKey = index(a:jumpKeys, a:jumpKey)
+
+    if l:iKey == -1
+        echo "ERROR: spacework has duplicate reserved key: |" . a:jumpKey ."|\n\n"
+    endif
+
+    call remove(a:jumpKeys, l:iKey)
 endfun
 
-fun! s:getNextJumpKey()
-    let s:jumpKey += 1
-    return s:jumpKeys[s:jumpKey]
+fun! s:getNextJumpKey(jumpKeys)
+    return remove(a:jumpKeys, 0)
 endfun
 
 fun! s:printDialog(toPrint)
