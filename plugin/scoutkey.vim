@@ -65,12 +65,16 @@ fun! ScoutKey()
     elseif char == 'm'
         call LoadFile(g:dir_palettes . '0.to')
     elseif char == ','
-        call LoadFile(g:dir_palettes . '1.to')
+        "call LoadFile(g:dir_palettes . '1.to')
+        echom "ERROR: Trying to not use 1.to"
     elseif char == '.'
         "call LoadFile(g:dir_palettes . '2.to')
-        echom "ERROR: Trying to not use 2.to"
+        "echom "ERROR: Trying to not use 2.to"
+        call SetupWorkspace(g:dir_palettes . 'A.to', g:dir_palettes . '0.to')
+
     elseif char == '/'
-        call LoadFile(g:dir_notes . '_specials/timeLog.to')
+        "call LoadFile(g:dir_notes . '_specials/timeLog.to')
+        call SetupWorkspace(g:dir_palettes . '0.to', g:dir_palettes . 'A.to')
 
 
     " Keys for left hand
