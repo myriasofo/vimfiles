@@ -65,7 +65,7 @@ fun! ScoutKey()
     elseif char == 'm'
         call LoadFile(g:dir_palettes . '0.to')
     elseif char == ','
-        call SetupWorkspace(g:dir_palettes . 'A.to', g:dir_palettes . '0.to')
+        echom "TODO"
     elseif char == '.'
         echom "TODO"
     elseif char == '/'

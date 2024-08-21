@@ -13,8 +13,8 @@ function! ExecuteCurrentFile()
         "call s:runInShell(cmd) #For async
 
         write
-        let cmd = 'source ' . g:dir_dotfiles . 'utils/.venv/bin/activate'
-        let cmd .= ' && python3 ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py -fromtimelog'
+        let cmd = 'source ' . g:dir_dotfiles . 'utils/.venv/bin/activate' .
+            \ ' && python3 ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py -fromtimelog'
         exe '!'.cmd
 
     elseif &filetype == 'vim'
