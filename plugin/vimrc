@@ -131,6 +131,7 @@
 
                 if has('gui_running') || g:os == 'linux'
                     colorscheme flattened_light
+                    "colorscheme flattened_dark
                     "colorscheme NeoSolarized
                     "colorscheme solarized
                     "colorscheme molokai
@@ -196,7 +197,7 @@
         " One-liners
             " Self-explanatory
             if g:os == 'mac'
-                set guifont=Consolas:h12
+                set guifont=Consolas:h16
                 set linespace=1
             elseif g:os == 'linux'
                 set guifont=Consolas\ 12
@@ -271,7 +272,7 @@
             endif
 
         " Highlighting for solarized
-            if g:colors_name == 'solarized' || g:colors_name == 'NeoSolarized' || g:colors_name == 'flattened_light'
+            if g:colors_name == 'solarized' || g:colors_name == 'NeoSolarized' || g:colors_name == 'flattened_light' || g:colors_name == 'flattened_dark'
                 "hi! link Folded Normal gui=bold
                 hi Folded gui=bold guifg=fg guibg=bg cterm=bold
                 "hi Folded gui=bold
