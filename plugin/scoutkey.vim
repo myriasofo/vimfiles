@@ -65,7 +65,7 @@ fun! ScoutKey()
     elseif char == 'm'
         call LoadFile(g:dir_palettes . '0.to')
     elseif char == ','
-        echom "TODO"
+        call LoadFile(g:dir_palettes . '1.to')
     elseif char == '.'
         echom "TODO"
     elseif char == '/'
