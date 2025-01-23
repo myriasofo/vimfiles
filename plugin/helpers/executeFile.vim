@@ -14,7 +14,8 @@ function! ExecuteCurrentFile()
 
         write
         let cmd = 'source ' . g:dir_dotfiles . 'utils/.venv/bin/activate' .
-            \ ' && python3 ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py -fromtimelog'
+            \ ' && python3 ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py -fromtimelog' .
+            \ " 2> >(grep -Ev 'IMKClient|IMKInputSession' >&2)"
         exe '!'.cmd
 
     elseif &filetype == 'vim'
@@ -298,7 +299,7 @@ function! s:getPythonCommand()
     endif
 
     " Add current file
-    let l:cmd_to_run_python = 'python3 -B '.l:current_filename
+    let l:cmd_to_run_python = 'python3 -B '.l:current_filename . " 2> >(grep -Ev 'IMKClient|IMKInputSession' >&2)"
     let l:cmd .= l:cmd_to_run_python
 
     return l:cmd
