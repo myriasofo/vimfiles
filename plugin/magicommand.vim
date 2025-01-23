@@ -7,8 +7,9 @@ let s:minimumWidth = 7
 let s:glasConfigLocation = g:dir_notes . '_configs/glas.to'
 let s:hotkeysToBufPaths = {}
 let s:decantFiles = [
+    \'A.to',
+    \'0.to',
     \'1.to',
-    \'2.to',
     \]
 
 let s:mapPaletteFiles = {
@@ -211,14 +212,12 @@ endfunction
 function! s:addSpecialBufs(magiList)
     for l:tail in s:decantFiles
         let l:path = g:dir_palettes . l:tail
+
         if IsBufVisible(l:path)
-            continue
+            continue "If special bufs are visible, dont show in bottom list
         endif
 
-        let firstThreeLines = s:getFileLines(l:path, 3) "If files are empty, they'll have exactly 2 lines
-        if len(firstThreeLines) > 2
-            call add(a:magiList, s:createStub(l:path, l:tail))
-        endif
+        call add(a:magiList, s:createStub(l:path, l:tail))
     endfor
 endfunction
 
@@ -392,9 +391,11 @@ function! s:getMagiMarker(path)
     elseif s:isSpecialBuf(a:path)
         let l:tail = fnamemodify(a:path, ':t')
         if s:hasElement(s:decantFiles, l:tail)
-            let firstThreeLines = s:getFileLines(a:path, 3) "If files are empty, they'll have exactly 2 lines
-            if len(firstThreeLines) > 2
-                return '~'
+            let firstLines = s:getFileLines(a:path, 10)
+
+            if (l:tail == '0.to' && len(firstLines) > 4) 
+            \|| (l:tail == '1.to' && len(firstLines) > 2)
+                return '~' "Show that a special file isnt empty
             endif
         endif
         return s:getLeftPadding()
