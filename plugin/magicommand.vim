@@ -9,7 +9,6 @@ let s:hotkeysToBufPaths = {}
 let s:decantFiles = [
     \'A.to',
     \'0.to',
-    \'1.to',
     \]
 
 let s:mapPaletteFiles = {
@@ -393,7 +392,7 @@ function! s:getMagiMarker(path)
         if s:hasElement(s:decantFiles, l:tail)
             let firstLines = s:getFileLines(a:path, 10)
 
-            if (l:tail == '0.to' && len(firstLines) > 4) 
+            if (l:tail == '0.to' && len(firstLines) > 4)
             \|| (l:tail == '1.to' && len(firstLines) > 2)
                 return '~' "Show that a special file isnt empty
             endif
