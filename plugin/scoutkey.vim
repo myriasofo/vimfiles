@@ -61,13 +61,13 @@ fun! ScoutKey()
 
 
     elseif char == 'n'
-        call LoadFile(g:dir_palettes . 'A.to')
+        echom "unused"
     elseif char == 'm'
-        call LoadFile(g:dir_palettes . '0.to')
+        call LoadFile(g:dir_palettes . 'A.to')
     elseif char == ','
-        call LoadFile(g:dir_palettes . '1.to')
+        call LoadFile(g:dir_palettes . '0.to')
     elseif char == '.'
-        echom "TODO"
+        echom "unused"
     elseif char == '/'
         call LoadFile(g:dir_notes . '_specials/timeLog.to')
         "call SetupWorkspace(g:dir_palettes . '0.to', g:dir_palettes . 'A.to')
