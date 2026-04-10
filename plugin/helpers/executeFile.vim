@@ -27,6 +27,9 @@ function! ExecuteCurrentFile()
     elseif &filetype == 'go'
         call s:executeGolang()
 
+    elseif &filetype == 'tex'
+        call ExecuteInShell('pdflatex %', 'right')
+
     else
         echom 'ScoutKey: Filetype not supported for RunCode()'
     endif
