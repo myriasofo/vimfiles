@@ -10,12 +10,9 @@ function! ExecuteCurrentFile()
         call s:executePython()
 
     elseif &filetype == 'todo' && expand('%:t') == 'timeLog.to'
-        "call s:runInShell(cmd) #For async
-
         write
         let cmd = 'source ' . g:dir_dotfiles . 'utils/.venv/bin/activate' .
-            \ ' && python3 ' . g:dir_dotfiles . 'utils/analyzeTimeLog.py -fromtimelog' .
-            \ " 2> >(grep -Ev 'IMKClient|IMKInputSession' >&2)"
+            \ ' && python3 ' . g:analyzeTimeLog_filename . ' -fromtimelog'
         exe '!'.cmd
 
     elseif &filetype == 'vim'
@@ -286,24 +283,18 @@ endfunction
 
 " For specificallly running python in shell
 function! s:getPythonCommand()
-    let l:cmd = ''
+    let l:filename = expand('%:p')
+    let l:folder = expand('%:p:h')
+    let l:cmd = 'python3 -B '.l:filename
 
-    " Switch dir if sketch.py
-    let l:venv_dir = getcwd()
-    let l:current_filename = expand('%:p')
-    if index([g:sketch_filename, g:analyzeTimeLog_filename], l:current_filename) != -1
-        let l:venv_dir = g:dir_dotfiles . 'utils'
+    " Activate venv, if possible
+    let l:venv_in_cwd = getcwd() . '/.venv/bin/activate'
+    let l:venv_in_filepath = l:folder . '/.venv/bin/activate'
+    if filereadable(l:venv_in_cwd)
+        let l:cmd = 'source '.l:venv_in_cwd.' && ' . l:cmd
+    elseif filereadable(l:venv_in_filepath)
+        let l:cmd = 'source '.l:venv_in_filepath.' && ' . l:cmd
     endif
-
-    " Source venv, if possible
-    let l:venv_file = l:venv_dir.'/.venv/bin/activate'
-    if filereadable(l:venv_file)
-        let l:cmd .= 'source '.l:venv_file.' && '
-    endif
-
-    " Add current file
-    let l:cmd_to_run_python = 'python3 -B '.l:current_filename . " 2> >(grep -Ev 'IMKClient|IMKInputSession' >&2)"
-    let l:cmd .= l:cmd_to_run_python
 
     return l:cmd
 endfunction
