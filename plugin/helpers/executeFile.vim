@@ -26,8 +26,10 @@ function! ExecuteCurrentFile()
 
     elseif &filetype == 'tex'
         let l:folder = expand('%:p:h')
+        let l:file = expand('%:p')
         let l:cmd = 'cd ' . l:folder . ' && '
-        let l:cmd .= 'pdflatex %'
+        let l:cmd .= 'texfot xelatex '
+        let l:cmd .= l:file
         call ExecuteInShell(l:cmd, 'right')
 
     else
