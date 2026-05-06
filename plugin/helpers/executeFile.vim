@@ -25,7 +25,10 @@ function! ExecuteCurrentFile()
         call s:executeGolang()
 
     elseif &filetype == 'tex'
-        call ExecuteInShell('pdflatex %', 'right')
+        let l:folder = expand('%:p:h')
+        let l:cmd = 'cd ' . l:folder . ' && '
+        let l:cmd .= 'pdflatex %'
+        call ExecuteInShell(l:cmd, 'right')
 
     else
         echom 'ScoutKey: Filetype not supported for RunCode()'
