@@ -25,7 +25,7 @@
         endif
 
         let g:dir_vim = expand('~/.vim/')
-        let g:dir_palettes = g:dir_notes . '_palettes/'
+        let g:dir_palettes = g:dir_notes . '_specials/'
         let g:dir_dev = expand('~/my/')
         let g:dir_myPlugins = g:dir_dev . 'vimfiles/'
         let g:dir_dotfiles = g:dir_dev . 'dotfiles/'
